@@ -79,6 +79,25 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
 .codebox .tx p{margin:2px 0 0;color:var(--muted);font-size:.92rem}
 .code{font-family:var(--mono);font-size:1.8rem;letter-spacing:.14em;background:var(--soft);border:2px dashed var(--line);border-radius:14px;padding:6px 16px}
 
+/* Turma (nuvem) */
+.turma{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 18px;border-radius:18px;background:color-mix(in srgb,var(--bip) 16%,var(--panel));border:2px solid color-mix(in srgb,var(--bip) 60%,var(--line));margin-bottom:18px}
+.turma .tx{flex:1;min-width:220px}
+.turma h3{font-size:1.35rem}
+.turma p{margin:2px 0 0;color:var(--muted)}
+.sep{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:4px 0 12px}
+.sep:before,.sep:after{content:"";flex:1;height:1px;background:var(--line)}
+.tag{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:99px;background:color-mix(in srgb,var(--go) 16%,var(--panel));color:var(--go);margin-top:2px}
+.form .hint{margin:0;color:var(--muted);font-size:.9rem}
+.form input.pin{font-family:var(--mono);letter-spacing:.5em;max-width:170px}
+.link{background:none;border:none;color:var(--turn);font-weight:700;padding:0;text-decoration:underline;text-underline-offset:3px}
+.cloudbox{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.cloudbox .tx{flex:1;min-width:220px}
+.cloudbox .tx p{margin:2px 0 0;color:var(--muted);font-size:.92rem}
+.sync{font-weight:700;font-size:.9rem;color:var(--go)}
+.sync.off{color:var(--bad)}
+.foot{display:flex;justify-content:center;gap:8px;color:var(--muted);font-size:.9rem;flex-wrap:wrap}
+.foot a{color:var(--turn);font-weight:700}
+
 /* Jogo aberto */
 #play{position:fixed;inset:0;z-index:50;background:var(--bg)}
 #play iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
@@ -97,11 +116,36 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
  <!-- Tela 1: quem vai jogar -->
  <section class="panel who" id="scrWho">
   <div id="whoList">
+   <div class="turma" id="ctaTurma" hidden>
+    <div class="tx"><h3>Entrar na minha turma</h3><p>Use o código que seu professor passou. Seu progresso fica salvo e você continua em qualquer computador.</p></div>
+    <button class="btn main" id="bTurma">Entrar na turma</button>
+   </div>
    <h2>Quem vai jogar?</h2>
    <div class="profiles" id="profiles"></div>
    <p class="empty" id="emptyMsg" hidden>Ainda não tem ninguém neste computador. Crie seu perfil para começar!</p>
    <div class="acts"><button class="btn main" id="bNew">+ Criar meu perfil</button><button class="btn" id="bCode">Tenho um código</button></div>
   </div>
+  <form class="form" id="fTurma" hidden>
+   <h2>Entrar na minha turma</h2>
+   <label for="tCod">Código da turma<input id="tCod" class="code" maxlength="7" autocomplete="off" placeholder="ABC-DEF"></label>
+   <label for="tApe">Seu apelido<input id="tApe" maxlength="20" autocomplete="off" placeholder="Ex.: Ana7"></label>
+   <label for="tPin">PIN (4 números)<input id="tPin" class="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></label>
+   <p class="err" id="errTurma"></p>
+   <div class="acts"><button class="btn main" type="submit" id="bTurmaOk">Entrar</button><button class="btn ghost" type="button" data-back>Voltar</button></div>
+   <p class="hint">Primeira vez nesta turma? <button type="button" class="link" id="bTurmaNova">Criar meu acesso</button></p>
+  </form>
+  <form class="form" id="fTurmaNova" hidden>
+   <h2>Criar meu acesso na turma</h2>
+   <label for="nCod">Código da turma<input id="nCod" class="code" maxlength="7" autocomplete="off" placeholder="ABC-DEF"></label>
+   <label for="nApe">Escolha um apelido<input id="nApe" maxlength="20" autocomplete="off" placeholder="Ex.: Ana7"></label>
+   <p class="hint">Use um apelido, não o seu nome completo.</p>
+   <label for="nPin">Crie um PIN de 4 números<input id="nPin" class="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></label>
+   <label for="nPin2">Repita o PIN<input id="nPin2" class="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></label>
+   <div><b>Cor do seu Bip</b><div class="colors" id="colors2"></div></div>
+   <p class="hint"><b>Anote no caderno:</b> o código da turma, seu apelido e seu PIN. Você vai precisar deles para entrar em outro computador.</p>
+   <p class="err" id="errNova"></p>
+   <div class="acts"><button class="btn main" type="submit" id="bNovaOk">Criar e entrar</button><button class="btn ghost" type="button" data-back>Voltar</button></div>
+  </form>
   <form class="form" id="fNew" hidden>
    <h2>Criar meu perfil</h2>
    <label for="inName">Seu nome<input id="inName" maxlength="24" autocomplete="off" placeholder="Ex.: Ana Clara"></label>
@@ -138,13 +182,19 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
       <button class="btn main go" data-open="academia" id="aGo">Começar</button></div>
     </article>
    </div>
-   <div class="panel codebox">
+   <div class="panel cloudbox" id="cloudBox" hidden>
+    <div class="tx"><span class="eyebrow" id="cloudTurma">Turma</span><p>Seu progresso fica salvo na nuvem. Em outro computador, entre na turma com seu apelido e PIN.</p></div>
+    <span class="sync" id="syncTxt" aria-live="polite">Salvo</span>
+    <button class="btn" id="bSair">Sair deste computador</button>
+   </div>
+   <div class="panel codebox" id="codeBox">
     <div class="tx"><span class="eyebrow">Seu código de progresso</span><p>Anote no caderno. Em outro computador, toque em <b>Tenho um código</b> e digite seu nome e este código.</p></div>
     <div class="code" id="myCode">———</div>
     <button class="btn" id="bCopy">Copiar</button>
    </div>
   </div>
  </section>
+ <p class="foot" id="foot" hidden>É professor? <a href="professor.html">Área do professor →</a></p>
 </div>
 
 <div id="play" hidden><iframe id="frame" title="Jogo" allow="fullscreen"></iframe></div>
@@ -189,20 +239,23 @@ function applyCode(id,{n,s,a}){
  ls.set("academia-bip-3d-v1:"+id,{done:ACAD.slice(0,a)})}
 
 /* ---- tela: quem vai jogar ---- */
-const show=(id)=>{["whoList","fNew","fCode"].forEach(k=>$(k).hidden=k!=id)};
+const show=(id)=>{["whoList","fNew","fCode","fTurma","fTurmaNova"].forEach(k=>$(k).hidden=k!=id)};
 let pending=null;
 function drawWho(){$("scrWho").hidden=false;$("scrMenu").hidden=true;show("whoList");
  $("emptyMsg").hidden=profiles.length>0;
- $("profiles").innerHTML=profiles.map(p=>{const st=stats(p.id);return `<div><button class="prof" data-p="${p.id}"><span class="av" style="background:${p.color}">${esc(p.name[0].toUpperCase())}</span><span class="tx"><span class="nm">${esc(p.name)}</span><small>${st.rDone} fases · ${st.aDone} aulas</small></span></button>`+
+ $("ctaTurma").hidden=!NUVEM.on;$("foot").hidden=!NUVEM.on;
+ $("profiles").innerHTML=profiles.map(p=>{const st=stats(p.id);return `<div><button class="prof" data-p="${p.id}"><span class="av" style="background:${p.color}">${esc(p.name[0].toUpperCase())}</span><span class="tx"><span class="nm">${esc(p.name)}</span><small>${st.rDone} fases · ${st.aDone} aulas</small>${p.cloud?`<span class="tag">☁ ${esc(p.cloud.turma.nome)}</span>`:""}</span></button>`+
   (pending==p.id?`<div class="confirm"><span>Apagar ${esc(p.name)} e o progresso?</span><button class="btn" data-del="${p.id}">Apagar</button><button class="btn ghost" data-keep>Cancelar</button></div>`:`<button class="rm" data-rm="${p.id}" aria-label="Remover ${esc(p.name)}">✕</button>`)+`</div>`}).join("")}
 $("profiles").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
  if(b.dataset.p)return enter(b.dataset.p);
  if(b.dataset.rm){pending=b.dataset.rm;return drawWho()}
  if(b.dataset.keep!=null){pending=null;return drawWho()}
- if(b.dataset.del){profiles=profiles.filter(p=>p.id!=b.dataset.del);saveProfiles();try{localStorage.removeItem("robo4:"+b.dataset.del);localStorage.removeItem("academia-bip-3d-v1:"+b.dataset.del)}catch(e){}pending=null;drawWho()}});
+ if(b.dataset.del){const p=profiles.find(q=>q.id==b.dataset.del);if(p&&p.cloud)NUVEM.rpc("aluno_sair",{p_token:p.cloud.token}).catch(()=>{});forget(b.dataset.del);pending=null;drawWho()}});
+function forget(id){profiles=profiles.filter(p=>p.id!=id);saveProfiles();try{localStorage.removeItem("robo4:"+id);localStorage.removeItem("academia-bip-3d-v1:"+id)}catch(e){}}
 let pick=COLORS[0][1];
 $("colors").innerHTML=COLORS.map(([n,c],i)=>`<button type="button" style="background:${c}" data-c="${c}" aria-label="${n}" aria-pressed="${i==0}"></button>`).join("");
-$("colors").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;pick=b.dataset.c;$("colors").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x==b))};
+$("colors2").innerHTML=$("colors").innerHTML;
+["colors","colors2"].forEach(id=>$(id).onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;pick=b.dataset.c;$(id).querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x==b))});
 $("bNew").onclick=()=>{show("fNew");$("errNew").textContent="";$("inName").value="";$("inName").focus()};
 $("bCode").onclick=()=>{show("fCode");$("errCode").textContent="";$("inName2").value="";$("inCode").value="";$("inName2").focus()};
 document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>show("whoList"));
@@ -212,15 +265,68 @@ $("fNew").onsubmit=e=>{e.preventDefault();const name=clean($("inName").value);
  if(name.length<2)return $("errNew").textContent="Escreva seu nome (pelo menos 2 letras).";
  if(profiles.some(p=>p.name.toLowerCase()==name.toLowerCase()))return $("errNew").textContent="Já existe um perfil com esse nome aqui. Escolha ele na lista ou use outro nome.";
  const p={id:newId(),name,color:pick};profiles.push(p);saveProfiles();enter(p.id)};
-$("inCode").oninput=e=>{let v=e.target.value.toUpperCase().replace(/[^0-9A-Z]/g,"").slice(0,6);e.target.value=v.length>3?v.slice(0,3)+"-"+v.slice(3):v};
+const fmtCode=e=>{let v=e.target.value.toUpperCase().replace(/[^0-9A-Z]/g,"").slice(0,6);e.target.value=v.length>3?v.slice(0,3)+"-"+v.slice(3):v};
+["inCode","tCod","nCod"].forEach(id=>$(id).oninput=fmtCode);
+["tPin","nPin","nPin2"].forEach(id=>$(id).oninput=e=>{e.target.value=e.target.value.replace(/\D/g,"").slice(0,4)});
 $("fCode").onsubmit=e=>{e.preventDefault();const name=clean($("inName2").value),c=readCode($("inCode").value);
  if(name.length<2)return $("errCode").textContent="Escreva seu nome.";
  if(!c)return $("errCode").textContent="Esse código não existe. Confira as letras e os números (são 6, como ABC-DEF).";
  let p=profiles.find(q=>q.name.toLowerCase()==name.toLowerCase());if(!p){p={id:newId(),name,color:COLORS[profiles.length%COLORS.length][1]};profiles.push(p);saveProfiles()}
  applyCode(p.id,c);enter(p.id)};
 
+/* ---- turma na nuvem: entrar, criar acesso e juntar o progresso ---- */
+const cid=uuid=>"c"+uuid.replace(/-/g,"");
+const KEYS={robo:id=>"robo4:"+id,academia:id=>"academia-bip-3d-v1:"+id};
+function mergeRobo(a,b){if(!a)return b;if(!b)return a;const r={...b,...a,v:1,all:0},st={...(b.stars||{})};
+ for(const k in a.stars||{})st[k]=Math.max(st[k]||0,a.stars[k]);r.stars=st;const sk={...(b.skip||{}),...(a.skip||{})};for(const k in st)delete sk[k];r.skip=sk;
+ r.seen={...(b.seen||{}),...(a.seen||{})};const n=x=>Object.keys(x.stars||{}).length+Object.keys(x.skip||{}).length;r.lvl=n(a)>=n(b)?a.lvl:b.lvl;return r}
+const mergeAcad=(a,b)=>(a||b)?{done:[...new Set([...((a&&a.done)||[]),...((b&&b.done)||[])])]}:null;
+function absorb(p,remote){/* junta o que está na nuvem com o que está neste computador */
+ const r=mergeRobo(roboSave(p.id),remote.robo||null),a=mergeAcad(acadSave(p.id),remote.academia||null);
+ if(r)ls.set(KEYS.robo(p.id),r);if(a)ls.set(KEYS.academia(p.id),a)}
+function cloudLogin(res){const id=cid(res.aluno_id);let p=profiles.find(q=>q.id==id);
+ const c={token:res.token,turma:res.turma,apelido:res.apelido};
+ if(p){p.name=res.apelido;p.color=res.cor;p.cloud=c}else{p={id,name:res.apelido,color:res.cor,cloud:c};profiles.push(p)}
+ saveProfiles();absorb(p,res.progresso||{});pushed={};enter(id,true);push(p)}
+async function busy(btn,fn){const t=btn.textContent;btn.disabled=true;btn.textContent="Aguarde…";try{await fn()}finally{btn.disabled=false;btn.textContent=t}}
+$("bTurma").onclick=()=>{show("fTurma");$("errTurma").textContent="";$("tCod").focus()};
+$("bTurmaNova").onclick=()=>{show("fTurmaNova");$("errNova").textContent="";$("nCod").value=$("tCod").value;$("nApe").value=$("tApe").value;($("nCod").value?$("nApe"):$("nCod")).focus()};
+const codeOf=id=>$(id).value.toUpperCase().replace(/[^0-9A-Z]/g,"");
+$("fTurma").onsubmit=e=>{e.preventDefault();const err=$("errTurma");err.textContent="";
+ if(codeOf("tCod").length!=6)return err.textContent="O código da turma tem 6 letras e números, como ABC-DEF.";
+ if(clean($("tApe").value).length<2)return err.textContent="Escreva seu apelido.";
+ if($("tPin").value.length!=4)return err.textContent="O PIN tem 4 números.";
+ busy($("bTurmaOk"),async()=>{try{cloudLogin(await NUVEM.rpc("aluno_entrar",{p_codigo:codeOf("tCod"),p_apelido:$("tApe").value,p_pin:$("tPin").value}))}
+  catch(x){err.textContent=erroBip(x)+(x.code=="pin_errado"&&x.restam!=null?` Você ainda tem ${x.restam} tentativa${x.restam==1?"":"s"}.`:"");$("tPin").value=""}})};
+$("fTurmaNova").onsubmit=e=>{e.preventDefault();const err=$("errNova");err.textContent="";
+ if(codeOf("nCod").length!=6)return err.textContent="O código da turma tem 6 letras e números, como ABC-DEF.";
+ const ape=clean($("nApe").value);if(ape.length<2)return err.textContent="Escolha um apelido com pelo menos 2 letras.";
+ if($("nPin").value.length!=4)return err.textContent="O PIN precisa ter 4 números.";
+ if($("nPin").value!=$("nPin2").value)return err.textContent="Os dois PINs estão diferentes. Digite de novo.";
+ busy($("bNovaOk"),async()=>{try{cloudLogin(await NUVEM.rpc("aluno_cadastrar",{p_codigo:codeOf("nCod"),p_apelido:ape,p_pin:$("nPin").value,p_cor:pick}))}
+  catch(x){err.textContent=erroBip(x)}})};
+
+/* envia o progresso para a nuvem (só o que mudou) */
+let pushed={},syncState="ok";
+function setSync(t,bad){syncState=bad?"erro":"ok";const el=$("syncTxt");if(el){el.textContent=t;el.classList.toggle("off",!!bad)}}
+async function push(p,keepalive){if(!p||!p.cloud||!NUVEM.on)return;
+ for(const jogo of ["robo","academia"]){const d=ls.get(KEYS[jogo](p.id),null);if(!d)continue;const s=JSON.stringify(d);if(pushed[p.id+jogo]===s)continue;
+  try{await NUVEM.rpc("aluno_salvar",{p_token:p.cloud.token,p_jogo:jogo,p_dados:d},null,keepalive);pushed[p.id+jogo]=s;
+   setSync("✓ Salvo às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}))}
+  catch(x){if(x.code=="sessao_expirada"){setSync("Entre de novo para salvar",true);p.cloud.expired=1;saveProfiles()}else setSync("Sem internet: salvo neste computador",true);return}}}
+async function pull(p){/* ao escolher o perfil: busca o que está na nuvem */
+ try{const res=await NUVEM.rpc("aluno_dados",{p_token:p.cloud.token});p.cloud.turma=res.turma;delete p.cloud.expired;saveProfiles();absorb(p,res.progresso||{});return true}
+ catch(x){if(x.code=="sessao_expirada"){show("fTurma");$("scrWho").hidden=false;$("scrMenu").hidden=true;$("tCod").value=p.cloud.turma.codigo.slice(0,3)+"-"+p.cloud.turma.codigo.slice(3);$("tApe").value=p.name;$("tPin").value="";$("errTurma").textContent=erroBip(x);$("tPin").focus();return false}
+  setSync("Sem internet: salvo neste computador",true);return true}}
+const curP=()=>profiles.find(q=>q.id==cur);
+setInterval(()=>{if(!$("play").hidden)push(curP())},20000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState=="hidden")push(curP(),true)});
+window.addEventListener("pagehide",()=>push(curP(),true));
+
 /* ---- tela: menu ---- */
-function enter(id){cur=id;ls.raw("bipsite-cur",id);drawMenu()}
+async function enter(id,fresh){const p=profiles.find(q=>q.id==id);if(!p)return;
+ if(p.cloud&&NUVEM.on&&!fresh){if(!(await pull(p)))return}
+ cur=id;ls.raw("bipsite-cur",id);drawMenu();if(p.cloud)push(p)}
 function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  $("scrWho").hidden=true;$("scrMenu").hidden=false;
  $("meAv").style.background=p.color;$("meAv").textContent=p.name[0].toUpperCase();$("meHi").textContent=`Olá, ${p.name.split(" ")[0]}!`;
@@ -229,7 +335,10 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  $("rGo").textContent=st.rDone?"Continuar":"Começar";
  $("aTxt").textContent=`${st.aDone} de ${ACAD.length} aulas`;$("aLv").textContent=`Nível ${Math.floor(st.xp/300)+1}`;$("aBar").style.width=st.aDone/ACAD.length*100+"%";
  $("aGo").textContent=st.aDone?"Continuar":"Começar";
- $("myCode").textContent=makeCode(st)}
+ $("myCode").textContent=makeCode(st);
+ $("codeBox").hidden=!!p.cloud;$("cloudBox").hidden=!p.cloud;$("foot").hidden=!NUVEM.on;
+ if(p.cloud){$("cloudTurma").textContent="☁ Turma "+p.cloud.turma.nome;if(p.cloud.expired)setSync("Entre de novo para salvar",true)}}
+$("bSair").onclick=async()=>{const p=curP();if(!p)return;await push(p);NUVEM.rpc("aluno_sair",{p_token:p.cloud.token}).catch(()=>{});forget(p.id);cur=null;try{localStorage.removeItem("bipsite-cur")}catch(e){}drawWho()};
 $("bSwitch").onclick=()=>{cur=null;try{localStorage.removeItem("bipsite-cur")}catch(e){}drawWho()};
 $("bCopy").onclick=()=>{const t=$("myCode").textContent;const done=()=>{$("bCopy").textContent="Copiado!";setTimeout(()=>$("bCopy").textContent="Copiar",1500)};
  try{navigator.clipboard.writeText(t).then(done,()=>sel())}catch(e){sel()}
@@ -237,7 +346,7 @@ $("bCopy").onclick=()=>{const t=$("myCode").textContent;const done=()=>{$("bCopy
 
 /* ---- abrir e fechar os jogos ---- */
 document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{if(!cur)return;$("frame").src=b.dataset.open+".html#p-"+cur;$("play").hidden=false;document.body.style.overflow="hidden"});
-function closeGame(){$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";drawMenu()}
+function closeGame(){$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";drawMenu();push(curP())}
 window.addEventListener("message",e=>{if(e.data&&e.data.bip=="menu")closeGame()});
 
 /* ---- ilustrações dos cartões ---- */
@@ -254,5 +363,7 @@ window.addEventListener("message",e=>{if(e.data&&e.data.bip=="menu")closeGame()}
  `<text x="390" y="150" text-anchor="end" font-family="Georgia,serif" font-size="18" fill="#f2c230" letter-spacing="3">AXIOMA I</text>`;
  document.getElementById("acadArt").innerHTML=a})();
 
-if(cur&&profiles.some(p=>p.id==cur))drawMenu();else drawWho();
+/* link de confirmação de e-mail do professor cai aqui: manda para a área do professor */
+if(/access_token=|error_description=/.test(location.hash))location.replace("professor.html"+location.hash);
+else if(cur&&profiles.some(p=>p.id==cur))enter(cur);else drawWho();
 </script>

@@ -64,19 +64,25 @@ ACAD=[]
 for m in re.finditer(r'^const W(\d+)=\[(.*?)^\];',s,re.M|re.S):
     w=int(m.group(1))-1;n=len(re.findall(r'^/\* ?\d+ ?\*/\{t:',m.group(2),re.M));ACAD+= [f"{w}-{i}" for i in range(n)]
 
-# ---------- Menu ----------
-m=rd(os.path.join(F,'menu','index.src.html'))
-m=m.replace('/*ROBO*/[]',json.dumps(ROBO,ensure_ascii=False)).replace('/*ACAD*/[]',json.dumps(ACAD))
+# ---------- Área do professor + conexão com o banco ----------
+CFG=json.load(open(os.path.join(F,'config.json'),encoding='utf8'))
+NUV='<script>window.BIP_CFG='+json.dumps({"url":CFG.get('supabase_url','').rstrip('/'),"key":CFG.get('supabase_key','')})+';</script>\n<script>'+rd(os.path.join(F,'menu','nuvem.js'))+'</script>\n'
+def page(src,out,extra_head=''):
+    m=rd(os.path.join(F,'menu',src))
+    m=m.replace('/*ROBO*/[]',json.dumps(ROBO,ensure_ascii=False)).replace('/*ACAD*/[]',json.dumps(ACAD)).replace('/*ROBO_N*/0',str(len(ROBO)))
+    m=patch(m,'<!--LOGO-->','<span class="sr-only">Mundo do Bip</span>'+logo if 'sr-only' in m else logo,src)
+    m=m.replace('<script>\n',NUV+'<script>\n',1)
+    cut=m.index('</style>\n')+len('</style>\n')
+    wr(OUT+'/'+out,HEAD+ICONS+extra_head+'<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n'+m[:cut]+'</head>\n<body>\n'+m[cut:]+'\n</body>\n</html>\n')
 logo=rd(os.path.join(MK,'logo-cor.svg')).replace('<svg xmlns="http://www.w3.org/2000/svg" ','<svg aria-hidden="true" focusable="false" ')
-m=patch(m,'<!--LOGO-->','<span class="sr-only">Mundo do Bip</span>'+logo,'menu')
-cut=m.index('</style>\n')+len('</style>\n')
-wr(OUT+'/index.html',HEAD+ICONS+SHARE+'<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n'+m[:cut]+'</head>\n<body>\n'+m[cut:]+'\n</body>\n</html>\n')
+page('index.src.html','index.html',SHARE)
+page('professor.src.html','professor.html','<meta name="robots" content="noindex">\n')
 
 # ---------- conferência ----------
-for f in ['index.html','robo.html','academia.html']:
+for f in ['index.html','professor.html','robo.html','academia.html']:
     h=rd(OUT+'/'+f)
     for js in re.findall(r'<script>(.*?)</script>',h,re.S):
         p=os.path.join(tempfile.gettempdir(),'chk.js');wr(p,js)
         r=subprocess.run(['node','--check',p],capture_output=True,text=True);assert r.returncode==0,(f,r.stderr[:400])
 print(f"dist/ pronto · {len(ROBO)} fases do robô · {len(ACAD)} aulas da academia")
-for f in ['index.html','robo.html','academia.html']:print(f"  {f}: {os.path.getsize(OUT+'/'+f)//1024} KB")
+for f in ['index.html','professor.html','robo.html','academia.html']:print(f"  {f}: {os.path.getsize(OUT+'/'+f)//1024} KB")

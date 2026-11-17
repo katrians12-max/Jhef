@@ -1,0 +1,261 @@
+<title>Área do professor · Mundo do Bip</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@600&display=swap">
+<style>
+/* Layout: coluna central. Entrar → lista de turmas → turma com a tabela de alunos. */
+:root{
+ --bg:#e8edf4;--panel:#ffffff;--ink:#172536;--muted:#586779;--line:#c3cedc;--soft:#f0f4f9;
+ --bip:#f2c230;--run:#ee5f2b;--rundk:#b9441c;--turn:#6b4fd8;--go:#0e8f86;--good:#1b9a52;--bad:#d23f45;--warn:#d58200;
+ --display:"Baloo 2",system-ui,sans-serif;--body:"Atkinson Hyperlegible",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1520;--panel:#172130;--ink:#e8eef6;--muted:#9aa9bb;--line:#2c3a4d;--soft:#111a27;--good:#38c172;--bad:#ff6b70;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1520;--panel:#172130;--ink:#e8eef6;--muted:#9aa9bb;--line:#2c3a4d;--soft:#111a27;--good:#38c172;--bad:#ff6b70;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+ padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--run);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top .logo{color:var(--ink);line-height:0}
+.top .logo svg{width:190px;height:auto}
+.top .who{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted)}
+.badge{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 16px;font-weight:700}
+.btn.main{background:var(--run);border-color:var(--run);color:#fff;box-shadow:0 3px 0 var(--rundk)}
+.btn.sm{padding:5px 10px;font-size:.88rem;border-radius:10px}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.link{background:none;border:none;color:var(--turn);font-weight:700;padding:0;text-decoration:underline;text-underline-offset:3px}
+.form{display:flex;flex-direction:column;gap:12px;max-width:420px}
+.form label{font-weight:700;display:flex;flex-direction:column;gap:6px}
+.form input,.inl input{border:2px solid var(--line);border-radius:12px;padding:9px 13px;background:var(--soft)}
+.hint{margin:0;color:var(--muted);font-size:.92rem}
+.err{color:var(--bad);font-weight:700;min-height:1.3em;margin:0}
+.ok{color:var(--good);font-weight:700;margin:0}
+.acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.auth{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.auth aside h2{font-size:1.7rem;margin-bottom:8px}
+.auth aside ol{margin:8px 0 0;padding-left:20px;color:var(--muted)}
+.auth aside li{margin:4px 0}
+.inl{display:flex;gap:8px;flex-wrap:wrap}
+.inl input{flex:1;min-width:180px}
+.turmas{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:14px}
+.tcard{display:flex;flex-direction:column;gap:6px;text-align:left;padding:14px 16px;border-radius:16px;border:2px solid var(--line);background:var(--soft)}
+.tcard:hover{border-color:var(--run)}
+.tcard h3{font-size:1.25rem}
+.tcard .cd{font-family:var(--mono);letter-spacing:.12em;color:var(--turn)}
+.tcard small{color:var(--muted)}
+.tcard.off{opacity:.65}
+.head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.head .tx{flex:1;min-width:240px}
+.head h2{font-size:1.8rem}
+.codebig{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 20px;border-radius:16px;border:2px dashed var(--line);background:var(--soft)}
+.codebig b{font-family:var(--mono);font-size:2rem;letter-spacing:.16em}
+.codebig small{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
+.stat{border:1px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--soft)}
+.stat b{display:block;font-family:var(--display);font-size:1.7rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:.85rem}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:680px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft)}
+tr:last-child td{border-bottom:none}
+.av{width:30px;height:30px;border-radius:9px;display:inline-grid;place-items:center;font-family:var(--display);font-weight:800;color:#172536;border:2px solid rgba(0,0,0,.15);margin-right:8px;vertical-align:middle}
+.mini{display:flex;align-items:center;gap:8px}
+.mini .bar{width:90px;height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+.mini .bar i{display:block;height:100%}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--line)}
+.dot.on{background:var(--good)}
+.rowact{display:flex;gap:6px;flex-wrap:wrap}
+.pinbox{display:flex;gap:6px;align-items:center}
+.pinbox input{width:90px;font-family:var(--mono);letter-spacing:.3em;border:2px solid var(--line);border-radius:10px;padding:4px 8px;background:var(--soft)}
+.empty{color:var(--muted);text-align:center;padding:26px 10px}
+.danger-zone{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--bad) 10%,var(--panel));border:1px solid var(--bad)}
+.confirm input{width:130px;font-family:var(--mono);letter-spacing:.12em;border:2px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--soft)}
+.notice{padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--soft)}
+@media (max-width:760px){.auth{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.top .who{margin-left:0}}
+</style>
+
+<div class="wrap">
+ <header class="top"><a class="logo" href="./" aria-label="Mundo do Bip: voltar ao início"><!--LOGO--></a><span class="badge">Área do professor</span>
+  <div class="who" id="whoBox" hidden><span id="whoName"></span><button class="btn sm" id="bOut">Sair</button></div></header>
+
+ <div class="panel notice" id="offMsg" hidden>A área do professor ainda não foi ligada ao banco de dados. Volte depois que a configuração estiver pronta.</div>
+
+ <!-- Entrar / criar conta -->
+ <section class="panel auth" id="scrAuth" hidden>
+  <aside>
+   <h2>Acompanhe suas turmas</h2>
+   <p class="hint">Crie uma turma e passe o código para os alunos. Eles entram só com um apelido e um PIN, sem e-mail. Aqui você vê o progresso de cada um.</p>
+   <ol><li>Crie sua conta de professor.</li><li>Crie uma turma e anote o código.</li><li>Os alunos abrem o site, tocam em <b>Entrar na turma</b> e usam o código.</li></ol>
+  </aside>
+  <div>
+   <form class="form" id="fIn">
+    <h2>Entrar</h2>
+    <label for="inEmail">E-mail<input id="inEmail" type="email" autocomplete="email" required></label>
+    <label for="inPass">Senha<input id="inPass" type="password" autocomplete="current-password" required></label>
+    <p class="err" id="errIn"></p>
+    <div class="acts"><button class="btn main" type="submit" id="bIn">Entrar</button><button class="link" type="button" id="toForgot">Esqueci a senha</button></div>
+    <p class="hint">Ainda não tem conta? <button class="link" type="button" id="toUp">Criar conta de professor</button></p>
+   </form>
+   <form class="form" id="fUp" hidden>
+    <h2>Criar conta de professor</h2>
+    <label for="upName">Seu nome<input id="upName" maxlength="60" autocomplete="name" required placeholder="Ex.: Prof. Jhef"></label>
+    <label for="upEmail">E-mail<input id="upEmail" type="email" autocomplete="email" required></label>
+    <label for="upPass">Senha (mínimo 8 caracteres)<input id="upPass" type="password" minlength="8" autocomplete="new-password" required></label>
+    <p class="err" id="errUp"></p><p class="ok" id="okUp"></p>
+    <div class="acts"><button class="btn main" type="submit" id="bUp">Criar conta</button><button class="btn ghost" type="button" data-to="fIn">Voltar</button></div>
+   </form>
+   <form class="form" id="fForgot" hidden>
+    <h2>Recuperar senha</h2>
+    <label for="fgEmail">E-mail da sua conta<input id="fgEmail" type="email" autocomplete="email" required></label>
+    <p class="err" id="errFg"></p><p class="ok" id="okFg"></p>
+    <div class="acts"><button class="btn main" type="submit" id="bFg">Enviar link</button><button class="btn ghost" type="button" data-to="fIn">Voltar</button></div>
+   </form>
+   <form class="form" id="fNewPass" hidden>
+    <h2>Criar nova senha</h2>
+    <label for="npPass">Nova senha (mínimo 8 caracteres)<input id="npPass" type="password" minlength="8" autocomplete="new-password" required></label>
+    <p class="err" id="errNp"></p>
+    <div class="acts"><button class="btn main" type="submit" id="bNp">Salvar senha</button></div>
+   </form>
+  </div>
+ </section>
+
+ <!-- Turmas -->
+ <section class="panel" id="scrTurmas" hidden>
+  <div class="head"><div class="tx"><h2>Minhas turmas</h2><p class="hint">Toque numa turma para ver os alunos e o progresso.</p></div></div>
+  <form class="inl" id="fTurma" style="margin-top:12px"><input id="tNome" maxlength="40" placeholder="Nome da nova turma (ex.: 7º ano A)" aria-label="Nome da nova turma"><button class="btn main" type="submit" id="bTurma">+ Criar turma</button></form>
+  <p class="err" id="errTurma"></p>
+  <div class="turmas" id="turmas"></div>
+ </section>
+
+ <!-- Uma turma -->
+ <section class="panel" id="scrTurma" hidden>
+  <button class="btn sm ghost" id="bBack">← Minhas turmas</button>
+  <div class="head" style="margin-top:10px">
+   <div class="tx"><h2 id="tTitle">Turma</h2><p class="hint">Os alunos abrem <b id="siteUrl"></b>, tocam em <b>Entrar na turma</b> e usam este código. Na primeira vez, cada um cria um apelido e um PIN.</p></div>
+   <div class="codebig"><small>Código da turma</small><b id="tCode">———</b><button class="btn sm" id="bCopy">Copiar</button></div>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="acts" style="justify-content:space-between;margin-bottom:10px"><b id="nAlunos">Alunos</b><button class="btn sm" id="bReload">↻ Atualizar</button></div>
+  <div class="tbl"><table><thead><tr><th>Aluno</th><th>Robô Programador</th><th>Academia do Bip</th><th>Último acesso</th><th>Ações</th></tr></thead><tbody id="rows"></tbody></table></div>
+  <p class="err" id="errRows"></p>
+  <div class="danger-zone" id="dz"></div>
+ </section>
+</div>
+
+<script>
+/* ============ Área do professor ============ */
+const $=id=>document.getElementById(id);
+const ROBO_N=/*ROBO_N*/0,ACAD=/*ACAD*/[];
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const SITE=location.href.replace(/[^/]*([?#].*)?$/,"");
+$("siteUrl").textContent=SITE.replace(/^https?:\/\//,"").replace(/\/$/,"");
+const fmtCode=c=>c.slice(0,3)+"-"+c.slice(3);
+const ago=d=>{if(!d)return "nunca";const s=(Date.now()-new Date(d))/1000;if(s<90)return "agora";if(s<3600)return Math.round(s/60)+" min atrás";if(s<86400)return Math.round(s/3600)+" h atrás";const n=Math.round(s/86400);return n==1?"ontem":n+" dias atrás"};
+async function busy(btn,fn){const t=btn.textContent;btn.disabled=true;btn.textContent="Aguarde…";try{return await fn()}finally{btn.disabled=false;btn.textContent=t}}
+
+/* ---- sessão do professor ---- */
+let ses=ls.get("bipsite-prof");
+function keep(j){ses={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Date.now()+(j.expires_in||3600)*1000,email:(j.user&&j.user.email)||ses&&ses.email,nome:(j.user&&j.user.user_metadata&&j.user.user_metadata.nome)||ses&&ses.nome||""};ls.set("bipsite-prof",ses)}
+async function token(){if(!ses)throw {code:"precisa_entrar"};
+ if(Date.now()>ses.expires_at-60000){try{keep(await NUVEM.auth("token?grant_type=refresh_token",{refresh_token:ses.refresh_token}))}catch(e){sair();throw {code:"precisa_entrar"}}}
+ return ses.access_token}
+async function rpc(fn,args){try{return await NUVEM.rpc(fn,args,await token())}catch(e){if(e.code=="precisa_entrar"||e.code=="sem_permissao"){sair();}throw e}}
+function sair(){if(ses)NUVEM.auth("logout",{},ses.access_token).catch(()=>{});ses=null;ls.del("bipsite-prof");go("auth")}
+
+/* ---- telas ---- */
+function go(t){["scrAuth","scrTurmas","scrTurma"].forEach(k=>$(k).hidden=true);$("whoBox").hidden=!ses;
+ if(t=="auth"){$("scrAuth").hidden=false;form("fIn")}
+ if(t=="turmas"){$("scrTurmas").hidden=false;loadTurmas()}
+ if(t=="turma"){$("scrTurma").hidden=false}
+ if(ses)$("whoName").textContent=ses.nome?`Olá, ${ses.nome}`:ses.email}
+function form(id){["fIn","fUp","fForgot","fNewPass"].forEach(k=>$(k).hidden=k!=id);document.querySelectorAll(".err,.ok").forEach(e=>e.textContent="")}
+document.querySelectorAll("[data-to]").forEach(b=>b.onclick=()=>form(b.dataset.to));
+$("toUp").onclick=()=>form("fUp");$("toForgot").onclick=()=>{form("fForgot");$("fgEmail").value=$("inEmail").value};
+$("bOut").onclick=sair;
+
+$("fIn").onsubmit=e=>{e.preventDefault();busy($("bIn"),async()=>{try{
+ keep(await NUVEM.auth("token?grant_type=password",{email:$("inEmail").value.trim(),password:$("inPass").value}));
+ const p=await rpc("professor_perfil",{p_nome:ses.nome||null});ses.nome=p.nome||ses.nome;ls.set("bipsite-prof",ses);go("turmas")}
+ catch(x){$("errIn").textContent=erroBip(x)}})};
+$("fUp").onsubmit=e=>{e.preventDefault();const nome=$("upName").value.trim();busy($("bUp"),async()=>{try{
+ const j=await NUVEM.auth("signup?redirect_to="+encodeURIComponent(SITE+"professor.html"),{email:$("upEmail").value.trim(),password:$("upPass").value,data:{nome}});
+ if(j.access_token){keep(j);ses.nome=nome;await rpc("professor_perfil",{p_nome:nome});ls.set("bipsite-prof",ses);go("turmas")}
+ else{$("okUp").textContent="Conta criada! Enviamos um e-mail de confirmação. Abra a mensagem, clique no link e depois volte aqui para entrar.";$("fUp").reset()}}
+ catch(x){$("errUp").textContent=erroBip(x)}})};
+$("fForgot").onsubmit=e=>{e.preventDefault();busy($("bFg"),async()=>{try{
+ await NUVEM.auth("recover?redirect_to="+encodeURIComponent(SITE+"professor.html"),{email:$("fgEmail").value.trim()});
+ $("okFg").textContent="Se esse e-mail tiver conta, chega uma mensagem com o link para criar uma nova senha."}
+ catch(x){$("errFg").textContent=erroBip(x)}})};
+$("fNewPass").onsubmit=e=>{e.preventDefault();busy($("bNp"),async()=>{try{
+ const r=await fetch(window.BIP_CFG.url+"/auth/v1/user",{method:"PUT",headers:{"Content-Type":"application/json",apikey:window.BIP_CFG.key,Authorization:"Bearer "+await token()},body:JSON.stringify({password:$("npPass").value})});
+ if(!r.ok){const j=await r.json().catch(()=>({}));throw {code:j.error_code||j.code,msg:j.msg||j.message}}
+ go("turmas")}catch(x){$("errNp").textContent=erroBip(x)}})};
+
+/* ---- turmas ---- */
+let turmas=[],turma=null,alunos=[];
+async function loadTurmas(){$("turmas").innerHTML='<p class="hint">Carregando…</p>';
+ try{turmas=await rpc("professor_turmas",{});drawTurmas()}catch(x){$("turmas").innerHTML=`<p class="err">${esc(erroBip(x))}</p>`}}
+function drawTurmas(){$("turmas").innerHTML=turmas.length?turmas.map(t=>`<button class="tcard${t.ativa?"":" off"}" data-t="${t.id}"><h3>${esc(t.nome)}</h3><span class="cd">${fmtCode(t.codigo)}</span><small>${t.alunos} aluno${t.alunos==1?"":"s"}${t.ativa?"":" · pausada"}</small></button>`).join("")
+ :'<p class="empty">Você ainda não tem turmas. Crie a primeira acima.</p>'}
+$("turmas").onclick=e=>{const b=e.target.closest("[data-t]");if(b)openTurma(turmas.find(t=>t.id==b.dataset.t))};
+$("fTurma").onsubmit=e=>{e.preventDefault();const n=$("tNome").value.trim();$("errTurma").textContent="";if(!n)return $("errTurma").textContent="Escreva o nome da turma.";
+ busy($("bTurma"),async()=>{try{const t=await rpc("professor_criar_turma",{p_nome:n});$("tNome").value="";turmas.unshift(t);drawTurmas();openTurma(t)}catch(x){$("errTurma").textContent=erroBip(x)}})};
+
+/* ---- uma turma ---- */
+let pinOpen=null,delOpen=null,dzOpen=null;
+function openTurma(t){turma=t;pinOpen=delOpen=dzOpen=null;$("tTitle").textContent=t.nome;$("tCode").textContent=fmtCode(t.codigo);go("turma");loadAlunos()}
+$("bBack").onclick=()=>go("turmas");
+$("bReload").onclick=()=>busy($("bReload"),loadAlunos);
+$("bCopy").onclick=()=>{const t=$("tCode").textContent;try{navigator.clipboard.writeText(t).then(()=>{$("bCopy").textContent="Copiado!";setTimeout(()=>$("bCopy").textContent="Copiar",1500)})}catch(e){}};
+async function loadAlunos(){$("errRows").textContent="";try{alunos=await rpc("professor_alunos",{p_turma:turma.id});drawAlunos()}catch(x){$("errRows").textContent=erroBip(x)}}
+function stat(a){const r=(a.progresso&&a.progresso.robo)||{},ac=(a.progresso&&a.progresso.academia)||{};
+ const fases=Object.keys(r.stars||{}).length+Object.keys(r.skip||{}).length,est=Object.values(r.stars||{}).reduce((s,v)=>s+(+v||0),0);
+ const aulas=(ac.done||[]).filter(x=>ACAD.includes(x)).length;return {fases,est,aulas}}
+function drawAlunos(){const n=alunos.length,S=alunos.map(stat),sem=7*864e5;
+ $("nAlunos").textContent=`${n} aluno${n==1?"":"s"}`;
+ const ativos=alunos.filter(a=>a.ultimo_acesso&&Date.now()-new Date(a.ultimo_acesso)<sem).length,avg=k=>n?Math.round(S.reduce((s,x)=>s+x[k],0)/n):0;
+ $("stats").innerHTML=[[n,"alunos na turma"],[ativos,"jogaram nos últimos 7 dias"],[avg("fases"),`fases em média (de ${ROBO_N})`],[avg("aulas"),`aulas em média (de ${ACAD.length})`]].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+ $("rows").innerHTML=n?alunos.map((a,i)=>{const s=S[i],on=a.ultimo_acesso&&Date.now()-new Date(a.ultimo_acesso)<sem;
+  const acts=pinOpen==a.id?`<form class="pinbox" data-pinf="${a.id}"><input inputmode="numeric" maxlength="4" placeholder="0000" aria-label="Novo PIN de ${esc(a.apelido)}" required><button class="btn sm main">Salvar</button><button class="btn sm ghost" type="button" data-cancel>✕</button></form>`
+   :delOpen==a.id?`<span class="confirm" style="padding:4px 8px">Remover e apagar o progresso? <button class="btn sm danger" data-delok="${a.id}">Remover</button><button class="btn sm ghost" data-cancel>Cancelar</button></span>`
+   :`<span class="rowact"><button class="btn sm" data-pin="${a.id}">Novo PIN</button><button class="btn sm danger" data-del="${a.id}">Remover</button></span>`;
+  return `<tr><td><span class="av" style="background:${esc(a.cor)}">${esc(a.apelido[0].toUpperCase())}</span><b>${esc(a.apelido)}</b></td>
+   <td><div class="mini"><span class="bar"><i style="width:${s.fases/ROBO_N*100}%;background:var(--run)"></i></span>${s.fases} fases · ${s.est} ★</div></td>
+   <td><div class="mini"><span class="bar"><i style="width:${ACAD.length?s.aulas/ACAD.length*100:0}%;background:var(--turn)"></i></span>${s.aulas} aulas</div></td>
+   <td><span class="dot${on?" on":""}"></span>${ago(a.ultimo_acesso)}</td><td>${acts}</td></tr>`}).join("")
+  :`<tr><td colspan="5" class="empty">Nenhum aluno ainda. Passe o código <b>${fmtCode(turma.codigo)}</b> para a turma.</td></tr>`;
+ drawDZ()}
+function drawDZ(){const t=turma;$("dz").innerHTML=dzOpen?`<span class="confirm">Para apagar a turma e o progresso de todos os alunos, digite o código <b>${fmtCode(t.codigo)}</b>: <input id="dzIn" aria-label="Código da turma"><button class="btn sm danger" id="dzOk">Apagar turma</button><button class="btn sm ghost" id="dzNo">Cancelar</button></span>`
+ :`<button class="btn sm" id="dzPause">${t.ativa?"Pausar turma (ninguém entra)":"Reabrir turma"}</button><button class="btn sm danger" id="dzDel">Apagar turma…</button><span class="hint">${t.ativa?"":"Turma pausada: os alunos não conseguem entrar."}</span>`;
+ if(dzOpen){$("dzNo").onclick=()=>{dzOpen=null;drawDZ()};$("dzOk").onclick=()=>{if($("dzIn").value.toUpperCase().replace(/[^0-9A-Z]/g,"")!=t.codigo)return $("errRows").textContent="O código digitado não confere.";
+   busy($("dzOk"),async()=>{try{await rpc("professor_apagar_turma",{p_turma:t.id});turmas=turmas.filter(x=>x.id!=t.id);go("turmas")}catch(x){$("errRows").textContent=erroBip(x)}})}}
+ else{$("dzDel").onclick=()=>{dzOpen=1;drawDZ();$("dzIn").focus()};$("dzPause").onclick=()=>busy($("dzPause"),async()=>{try{await rpc("professor_editar_turma",{p_turma:t.id,p_ativa:!t.ativa});t.ativa=!t.ativa;drawDZ()}catch(x){$("errRows").textContent=erroBip(x)}})}}
+$("rows").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.pin){pinOpen=b.dataset.pin;delOpen=null;drawAlunos();const i=document.querySelector(`[data-pinf="${b.dataset.pin}"] input`);i&&i.focus()}
+ else if(b.dataset.del){delOpen=b.dataset.del;pinOpen=null;drawAlunos()}
+ else if(b.dataset.cancel!=null){pinOpen=delOpen=null;drawAlunos()}
+ else if(b.dataset.delok){busy(b,async()=>{try{await rpc("professor_remover_aluno",{p_aluno:b.dataset.delok});alunos=alunos.filter(a=>a.id!=b.dataset.delok);delOpen=null;drawAlunos()}catch(x){$("errRows").textContent=erroBip(x)}})}});
+$("rows").addEventListener("submit",e=>{e.preventDefault();const f=e.target,id=f.dataset.pinf,pin=f.querySelector("input").value;
+ if(!/^\d{4}$/.test(pin))return $("errRows").textContent="O PIN precisa ter 4 números.";
+ busy(f.querySelector("button"),async()=>{try{await rpc("professor_novo_pin",{p_aluno:id,p_pin:pin});const a=alunos.find(x=>x.id==id);pinOpen=null;drawAlunos();
+  $("errRows").innerHTML=`<span class="ok">Novo PIN de ${esc(a.apelido)}: <b>${pin}</b>. Avise o aluno.</span>`}catch(x){$("errRows").textContent=erroBip(x)}})});
+
+/* ---- início: volta do link do e-mail (confirmação ou nova senha) ---- */
+(function(){if(!NUVEM.on){$("offMsg").hidden=false;return}
+ const h=new URLSearchParams(location.hash.slice(1));
+ if(h.get("error_description")){go("auth");$("errIn").textContent=h.get("error_code")=="otp_expired"?"Esse link expirou. Peça um novo em “Esqueci a senha” ou entre normalmente.":h.get("error_description");history.replaceState(null,"",location.pathname);return}
+ if(h.get("access_token")){keep({access_token:h.get("access_token"),refresh_token:h.get("refresh_token"),expires_in:+h.get("expires_in")||3600});history.replaceState(null,"",location.pathname);
+  if(h.get("type")=="recovery"){go("auth");form("fNewPass");return}
+  rpc("professor_perfil",{p_nome:null}).then(p=>{ses.nome=p.nome;ls.set("bipsite-prof",ses);go("turmas")}).catch(()=>go("auth"));return}
+ if(ses)go("turmas");else go("auth")})();
+</script>

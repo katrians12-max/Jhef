@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f2c230">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="robots" content="noindex">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Área do professor · Mundo do Bip</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@600&display=swap">
+<style>
+/* Layout: coluna central. Entrar → lista de turmas → turma com a tabela de alunos. */
+:root{
+ --bg:#e8edf4;--panel:#ffffff;--ink:#172536;--muted:#586779;--line:#c3cedc;--soft:#f0f4f9;
+ --bip:#f2c230;--run:#ee5f2b;--rundk:#b9441c;--turn:#6b4fd8;--go:#0e8f86;--good:#1b9a52;--bad:#d23f45;--warn:#d58200;
+ --display:"Baloo 2",system-ui,sans-serif;--body:"Atkinson Hyperlegible",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1520;--panel:#172130;--ink:#e8eef6;--muted:#9aa9bb;--line:#2c3a4d;--soft:#111a27;--good:#38c172;--bad:#ff6b70;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1520;--panel:#172130;--ink:#e8eef6;--muted:#9aa9bb;--line:#2c3a4d;--soft:#111a27;--good:#38c172;--bad:#ff6b70;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+ padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--run);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top .logo{color:var(--ink);line-height:0}
+.top .logo svg{width:190px;height:auto}
+.top .who{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted)}
+.badge{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 16px;font-weight:700}
+.btn.main{background:var(--run);border-color:var(--run);color:#fff;box-shadow:0 3px 0 var(--rundk)}
+.btn.sm{padding:5px 10px;font-size:.88rem;border-radius:10px}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.link{background:none;border:none;color:var(--turn);font-weight:700;padding:0;text-decoration:underline;text-underline-offset:3px}
+.form{display:flex;flex-direction:column;gap:12px;max-width:420px}
+.form label{font-weight:700;display:flex;flex-direction:column;gap:6px}
+.form input,.inl input{border:2px solid var(--line);border-radius:12px;padding:9px 13px;background:var(--soft)}
+.hint{margin:0;color:var(--muted);font-size:.92rem}
+.err{color:var(--bad);font-weight:700;min-height:1.3em;margin:0}
+.ok{color:var(--good);font-weight:700;margin:0}
+.acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.auth{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.auth aside h2{font-size:1.7rem;margin-bottom:8px}
+.auth aside ol{margin:8px 0 0;padding-left:20px;color:var(--muted)}
+.auth aside li{margin:4px 0}
+.inl{display:flex;gap:8px;flex-wrap:wrap}
+.inl input{flex:1;min-width:180px}
+.turmas{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:14px}
+.tcard{display:flex;flex-direction:column;gap:6px;text-align:left;padding:14px 16px;border-radius:16px;border:2px solid var(--line);background:var(--soft)}
+.tcard:hover{border-color:var(--run)}
+.tcard h3{font-size:1.25rem}
+.tcard .cd{font-family:var(--mono);letter-spacing:.12em;color:var(--turn)}
+.tcard small{color:var(--muted)}
+.tcard.off{opacity:.65}
+.head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.head .tx{flex:1;min-width:240px}
+.head h2{font-size:1.8rem}
+.codebig{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 20px;border-radius:16px;border:2px dashed var(--line);background:var(--soft)}
+.codebig b{font-family:var(--mono);font-size:2rem;letter-spacing:.16em}
+.codebig small{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
+.stat{border:1px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--soft)}
+.stat b{display:block;font-family:var(--display);font-size:1.7rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:.85rem}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:680px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft)}
+tr:last-child td{border-bottom:none}
+.av{width:30px;height:30px;border-radius:9px;display:inline-grid;place-items:center;font-family:var(--display);font-weight:800;color:#172536;border:2px solid rgba(0,0,0,.15);margin-right:8px;vertical-align:middle}
+.mini{display:flex;align-items:center;gap:8px}
+.mini .bar{width:90px;height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+.mini .bar i{display:block;height:100%}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--line)}
+.dot.on{background:var(--good)}
+.rowact{display:flex;gap:6px;flex-wrap:wrap}
+.pinbox{display:flex;gap:6px;align-items:center}
+.pinbox input{width:90px;font-family:var(--mono);letter-spacing:.3em;border:2px solid var(--line);border-radius:10px;padding:4px 8px;background:var(--soft)}
+.empty{color:var(--muted);text-align:center;padding:26px 10px}
+.danger-zone{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--bad) 10%,var(--panel));border:1px solid var(--bad)}
+.confirm input{width:130px;font-family:var(--mono);letter-spacing:.12em;border:2px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--soft)}
+.notice{padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--soft)}
+@media (max-width:760px){.auth{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.top .who{margin-left:0}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+ <header class="top"><a class="logo" href="./" aria-label="Mundo do Bip: voltar ao início"><svg aria-hidden="true" focusable="false" viewBox="0 0 250 96" role="img" aria-label="Mundo do Bip"><g transform="translate(4 6)"><line x1="42" y1="16" x2="42" y2="4" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><circle cx="42" cy="5" r="6.5" fill="#ee5f2b"/>
+<rect x="4" y="15" width="76" height="66" rx="20" fill="#f2c230" stroke="#b98d10" stroke-width="3.5"/><rect x="14" y="26" width="56" height="42" rx="12" fill="#172536"/>
+<path d="M24 49q7-10 14 0M46 49q7-10 14 0" stroke="#5ef0e0" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M33 57q9 7 18 0" stroke="#5ef0e0" stroke-width="4" fill="none" stroke-linecap="round"/></g><path d="M101.171875 44.0H107.1484375V35.5625C107.1484375 34.15625 107.03125 31.3583984375 106.9580078125 28.6630859375C107.6611328125 31.3291015625 108.3935546875 34.0830078125 108.84765625 35.5625L111.42578125 44.0H116.34765625L118.8818359375 35.5625C119.3359375 34.0244140625 120.09765625 31.138671875 120.7861328125 28.3994140625C120.7275390625 31.16796875 120.595703125 34.09765625 120.595703125 35.5625V44.0H126.572265625V22.173828125H117.4462890625L115.5126953125 29.0C115.087890625 30.4794921875 114.443359375 33.013671875 113.88671875 35.2548828125C113.330078125 33.013671875 112.6708984375 30.4794921875 112.24609375 29.0L110.283203125 22.173828125H101.171875ZM134.21875 44.3515625C136.650390625 44.3515625 138.2177734375 43.1943359375 139.2431640625 41.421875V44.0H145.029296875V28.53125H139.169921875V36.734375C139.169921875 38.521484375 138.3935546875 39.400390625 137.0166015625 39.400390625C135.6396484375 39.400390625 134.86328125 38.521484375 134.86328125 36.96875V28.53125H129.00390625V38.287109375C129.00390625 42.0078125 130.7763671875 44.3515625 134.21875 44.3515625ZM153.408203125 35.796875C153.408203125 34.009765625 154.1845703125 33.130859375 155.5615234375 33.130859375C156.9384765625 33.130859375 157.71484375 34.009765625 157.71484375 35.5625V44.0H163.57421875V34.244140625C163.57421875 30.5234375 161.8017578125 28.1796875 158.359375 28.1796875C155.927734375 28.1796875 154.3603515625 29.3369140625 153.3349609375 31.109375V28.53125H147.548828125V44.0H153.408203125ZM172.1875 44.3515625C174.23828125 44.3515625 175.8056640625 43.4140625 176.5087890625 41.59765625H176.5234375V44.0H182.32421875V22.173828125H176.46484375V30.552734375H176.4501953125C175.46875 28.9267578125 174.1357421875 28.1796875 172.12890625 28.1796875C168.2470703125 28.1796875 165.5078125 31.5048828125 165.5078125 36.236328125C165.5078125 41.158203125 168.1298828125 44.3515625 172.1875 44.3515625ZM173.9306640625 39.751953125C172.333984375 39.751953125 171.42578125 38.375 171.42578125 36.236328125C171.42578125 34.1123046875 172.333984375 32.75 173.9306640625 32.75C175.52734375 32.75 176.669921875 34.1123046875 176.669921875 36.236328125C176.669921875 38.375 175.52734375 39.751953125 173.9306640625 39.751953125ZM192.6953125 44.3515625C197.734375 44.3515625 201.1328125 41.216796875 201.1328125 36.265625C201.1328125 31.3291015625 197.734375 28.1796875 192.6953125 28.1796875C187.6708984375 28.1796875 184.2578125 31.3291015625 184.2578125 36.265625C184.2578125 41.2314453125 187.6708984375 44.3515625 192.6953125 44.3515625ZM192.6953125 39.78125C191.3037109375 39.78125 190.17578125 38.5947265625 190.17578125 36.265625C190.17578125 33.9365234375 191.3037109375 32.75 192.6953125 32.75C194.0869140625 32.75 195.21484375 33.9365234375 195.21484375 36.265625C195.21484375 38.5947265625 194.0869140625 39.78125 192.6953125 39.78125ZM214.66796875 44.3515625C216.71875 44.3515625 218.2861328125 43.4140625 218.9892578125 41.59765625H219.00390625V44.0H224.8046875V22.173828125H218.9453125V30.552734375H218.9306640625C217.94921875 28.9267578125 216.6162109375 28.1796875 214.609375 28.1796875C210.7275390625 28.1796875 207.98828125 31.5048828125 207.98828125 36.236328125C207.98828125 41.158203125 210.6103515625 44.3515625 214.66796875 44.3515625ZM216.4111328125 39.751953125C214.814453125 39.751953125 213.90625 38.375 213.90625 36.236328125C213.90625 34.1123046875 214.814453125 32.75 216.4111328125 32.75C218.0078125 32.75 219.150390625 34.1123046875 219.150390625 36.236328125C219.150390625 38.375 218.0078125 39.751953125 216.4111328125 39.751953125ZM235.17578125 44.3515625C240.21484375 44.3515625 243.61328125 41.216796875 243.61328125 36.265625C243.61328125 31.3291015625 240.21484375 28.1796875 235.17578125 28.1796875C230.1513671875 28.1796875 226.73828125 31.3291015625 226.73828125 36.265625C226.73828125 41.2314453125 230.1513671875 44.3515625 235.17578125 44.3515625ZM235.17578125 39.78125C233.7841796875 39.78125 232.65625 38.5947265625 232.65625 36.265625C232.65625 33.9365234375 233.7841796875 32.75 235.17578125 32.75C236.5673828125 32.75 237.6953125 33.9365234375 237.6953125 36.265625C237.6953125 38.5947265625 236.5673828125 39.78125 235.17578125 39.78125Z" fill="currentColor"/><path d="M100.640625 84.0H115.037109375C121.6611328125 84.0 125.578125 80.349609375 125.578125 75.345703125C125.578125 71.0390625 122.583984375 68.0859375 118.646484375 67.9423828125V67.9013671875C122.1943359375 67.224609375 124.552734375 64.6201171875 124.552734375 61.072265625C124.552734375 56.6220703125 120.861328125 53.443359375 113.888671875 53.443359375H100.640625ZM108.92578125 77.6015625V71.572265625H113.4375C115.5087890625 71.572265625 116.841796875 72.76171875 116.841796875 74.5869140625C116.841796875 76.412109375 115.5087890625 77.6015625 113.4375 77.6015625ZM108.92578125 65.54296875V59.841796875H112.9248046875C114.8115234375 59.841796875 116.021484375 60.9697265625 116.021484375 62.6923828125C116.021484375 64.4150390625 114.8115234375 65.54296875 112.9248046875 65.54296875ZM127.0595703125 84.0H135.2626953125V62.34375H127.0595703125ZM131.140625 60.908203125C133.7041015625 60.908203125 135.5087890625 59.267578125 135.5087890625 56.9501953125C135.5087890625 54.6533203125 133.7041015625 53.033203125 131.140625 53.033203125C128.5771484375 53.033203125 126.7724609375 54.6533203125 126.7724609375 56.9501953125C126.7724609375 59.267578125 128.5771484375 60.908203125 131.140625 60.908203125ZM137.7900390625 92.572265625H145.9931640625V80.80078125H146.0751953125C147.0595703125 83.1796875 149.1103515625 84.4921875 151.9814453125 84.4921875C157.662109375 84.4921875 161.3330078125 80.021484375 161.3330078125 73.130859375C161.3330078125 66.5068359375 157.498046875 61.8515625 152.0634765625 61.8515625C149.25390625 61.8515625 147.28515625 62.9384765625 146.013671875 65.05078125H145.9111328125V62.34375H137.7900390625ZM149.541015625 78.052734375C147.3056640625 78.052734375 145.7060546875 76.125 145.7060546875 73.130859375C145.7060546875 70.1572265625 147.3056640625 68.25 149.541015625 68.25C151.7763671875 68.25 153.0478515625 70.1572265625 153.0478515625 73.130859375C153.0478515625 76.125 151.7763671875 78.052734375 149.541015625 78.052734375Z" fill="#ee5f2b"/></svg></a><span class="badge">Área do professor</span>
+  <div class="who" id="whoBox" hidden><span id="whoName"></span><button class="btn sm" id="bOut">Sair</button></div></header>
+
+ <div class="panel notice" id="offMsg" hidden>A área do professor ainda não foi ligada ao banco de dados. Volte depois que a configuração estiver pronta.</div>
+
+ <!-- Entrar / criar conta -->
+ <section class="panel auth" id="scrAuth" hidden>
+  <aside>
+   <h2>Acompanhe suas turmas</h2>
+   <p class="hint">Crie uma turma e passe o código para os alunos. Eles entram só com um apelido e um PIN, sem e-mail. Aqui você vê o progresso de cada um.</p>
+   <ol><li>Crie sua conta de professor.</li><li>Crie uma turma e anote o código.</li><li>Os alunos abrem o site, tocam em <b>Entrar na turma</b> e usam o código.</li></ol>
+  </aside>
+  <div>
+   <form class="form" id="fIn">
+    <h2>Entrar</h2>
+    <label for="inEmail">E-mail<input id="inEmail" type="email" autocomplete="email" required></label>
+    <label for="inPass">Senha<input id="inPass" type="password" autocomplete="current-password" required></label>
+    <p class="err" id="errIn"></p>
+    <div class="acts"><button class="btn main" type="submit" id="bIn">Entrar</button><button class="link" type="button" id="toForgot">Esqueci a senha</button></div>
+    <p class="hint">Ainda não tem conta? <button class="link" type="button" id="toUp">Criar conta de professor</button></p>
+   </form>
+   <form class="form" id="fUp" hidden>
+    <h2>Criar conta de professor</h2>
+    <label for="upName">Seu nome<input id="upName" maxlength="60" autocomplete="name" required placeholder="Ex.: Prof. Jhef"></label>
+    <label for="upEmail">E-mail<input id="upEmail" type="email" autocomplete="email" required></label>
+    <label for="upPass">Senha (mínimo 8 caracteres)<input id="upPass" type="password" minlength="8" autocomplete="new-password" required></label>
+    <p class="err" id="errUp"></p><p class="ok" id="okUp"></p>
+    <div class="acts"><button class="btn main" type="submit" id="bUp">Criar conta</button><button class="btn ghost" type="button" data-to="fIn">Voltar</button></div>
+   </form>
+   <form class="form" id="fForgot" hidden>
+    <h2>Recuperar senha</h2>
+    <label for="fgEmail">E-mail da sua conta<input id="fgEmail" type="email" autocomplete="email" required></label>
+    <p class="err" id="errFg"></p><p class="ok" id="okFg"></p>
+    <div class="acts"><button class="btn main" type="submit" id="bFg">Enviar link</button><button class="btn ghost" type="button" data-to="fIn">Voltar</button></div>
+   </form>
+   <form class="form" id="fNewPass" hidden>
+    <h2>Criar nova senha</h2>
+    <label for="npPass">Nova senha (mínimo 8 caracteres)<input id="npPass" type="password" minlength="8" autocomplete="new-password" required></label>
+    <p class="err" id="errNp"></p>
+    <div class="acts"><button class="btn main" type="submit" id="bNp">Salvar senha</button></div>
+   </form>
+  </div>
+ </section>
+
+ <!-- Turmas -->
+ <section class="panel" id="scrTurmas" hidden>
+  <div class="head"><div class="tx"><h2>Minhas turmas</h2><p class="hint">Toque numa turma para ver os alunos e o progresso.</p></div></div>
+  <form class="inl" id="fTurma" style="margin-top:12px"><input id="tNome" maxlength="40" placeholder="Nome da nova turma (ex.: 7º ano A)" aria-label="Nome da nova turma"><button class="btn main" type="submit" id="bTurma">+ Criar turma</button></form>
+  <p class="err" id="errTurma"></p>
+  <div class="turmas" id="turmas"></div>
+ </section>
+
+ <!-- Uma turma -->
+ <section class="panel" id="scrTurma" hidden>
+  <button class="btn sm ghost" id="bBack">← Minhas turmas</button>
+  <div class="head" style="margin-top:10px">
+   <div class="tx"><h2 id="tTitle">Turma</h2><p class="hint">Os alunos abrem <b id="siteUrl"></b>, tocam em <b>Entrar na turma</b> e usam este código. Na primeira vez, cada um cria um apelido e um PIN.</p></div>
+   <div class="codebig"><small>Código da turma</small><b id="tCode">———</b><button class="btn sm" id="bCopy">Copiar</button></div>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="acts" style="justify-content:space-between;margin-bottom:10px"><b id="nAlunos">Alunos</b><button class="btn sm" id="bReload">↻ Atualizar</button></div>
+  <div class="tbl"><table><thead><tr><th>Aluno</th><th>Robô Programador</th><th>Academia do Bip</th><th>Último acesso</th><th>Ações</th></tr></thead><tbody id="rows"></tbody></table></div>
+  <p class="err" id="errRows"></p>
+  <div class="danger-zone" id="dz"></div>
+ </section>
+</div>
+
+<script>window.BIP_CFG={"url": "", "key": ""};</script>
+<script>/* ===== Mundo do Bip · conexão com o banco (Supabase), sem biblioteca: só fetch =====
+   window.BIP_CFG = {url, key} é colocado pelo build.py a partir de fonte/config.json.
+   Sem configuração, NUVEM.on = false e o site funciona só no aparelho, como antes. */
+const NUVEM=(()=>{
+ const C=window.BIP_CFG||{},on=!!(C.url&&C.key);
+ const H=tok=>{const h={"Content-Type":"application/json","apikey":C.key};if(tok)h.Authorization="Bearer "+tok;return h};
+ async function call(url,opt){let r,j=null;
+  try{r=await fetch(url,opt)}catch(e){throw {code:"sem_internet"}}
+  try{j=await r.json()}catch(e){}
+  return {r,j}}
+ /* funções do banco (aluno_*, professor_*) */
+ async function rpc(fn,args,tok,keepalive){
+  const {r,j}=await call(C.url+"/rest/v1/rpc/"+fn,{method:"POST",headers:H(tok),body:JSON.stringify(args||{}),keepalive:!!keepalive});
+  if(!r.ok){const m=(j&&(j.message||j.msg))||"";throw {code:/^[a-z_]+$/.test(m)?m:(r.status==401||r.status==403?"sem_permissao":"erro_"+r.status),status:r.status}}
+  if(j&&j.erro)throw {code:j.erro,restam:j.restam};
+  return j}
+ /* login do professor (Supabase Auth) */
+ async function auth(path,body,tok){
+  const {r,j}=await call(C.url+"/auth/v1/"+path,{method:"POST",headers:H(tok),body:JSON.stringify(body||{})});
+  if(!r.ok)throw {code:(j&&(j.error_code||j.code||j.error))||"erro_"+r.status,msg:(j&&(j.msg||j.error_description||j.message))||"",status:r.status};
+  return j}
+ return {on,rpc,auth}})();
+
+const ERROS_BIP={
+ turma_nao_encontrada:"Não achei essa turma. Confira o código com seu professor.",
+ aluno_nao_encontrado:"Não achei esse apelido nesta turma. Se é sua primeira vez, toque em “Primeira vez nesta turma?”.",
+ pin_errado:"PIN errado.",
+ bloqueado:"Muitas tentativas erradas. Espere 10 minutos ou peça para o professor trocar seu PIN.",
+ apelido_em_uso:"Esse apelido já existe nesta turma. Escolha outro (pode juntar com um número, como Ana7).",
+ apelido_invalido:"O apelido precisa ter de 2 a 20 letras.",
+ pin_invalido:"O PIN precisa ter 4 números.",
+ turma_cheia:"Essa turma já está cheia. Fale com seu professor.",
+ sessao_expirada:"Sua entrada expirou. Digite seu PIN de novo.",
+ sem_internet:"Sem internet agora. Confira a conexão e tente de novo.",
+ nome_invalido:"Escreva um nome para a turma.",
+ limite_turmas:"Você chegou ao limite de 30 turmas.",
+ precisa_entrar:"Sua sessão de professor terminou. Entre de novo.",
+ sem_permissao:"Sua sessão de professor terminou. Entre de novo.",
+ invalid_credentials:"E-mail ou senha errados.",
+ email_not_confirmed:"Falta confirmar o e-mail. Abra a mensagem que o Supabase enviou e clique no link.",
+ user_already_exists:"Já existe uma conta com esse e-mail. Use “Entrar”.",
+ weak_password:"Senha fraca. Use pelo menos 8 caracteres, misturando letras e números.",
+ over_email_send_rate_limit:"Muitos e-mails enviados agora. Espere alguns minutos e tente de novo.",
+ validation_failed:"Confira o e-mail digitado."};
+const erroBip=e=>(e&&ERROS_BIP[e.code])||(e&&e.msg)||"Algo deu errado. Tente de novo.";
+</script>
+<script>
+/* ============ Área do professor ============ */
+const $=id=>document.getElementById(id);
+const ROBO_N=91,ACAD=["0-0", "0-1", "0-2", "0-3", "0-4", "0-5", "0-6", "0-7", "0-8", "0-9", "0-10", "0-11"];
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const SITE=location.href.replace(/[^/]*([?#].*)?$/,"");
+$("siteUrl").textContent=SITE.replace(/^https?:\/\//,"").replace(/\/$/,"");
+const fmtCode=c=>c.slice(0,3)+"-"+c.slice(3);
+const ago=d=>{if(!d)return "nunca";const s=(Date.now()-new Date(d))/1000;if(s<90)return "agora";if(s<3600)return Math.round(s/60)+" min atrás";if(s<86400)return Math.round(s/3600)+" h atrás";const n=Math.round(s/86400);return n==1?"ontem":n+" dias atrás"};
+async function busy(btn,fn){const t=btn.textContent;btn.disabled=true;btn.textContent="Aguarde…";try{return await fn()}finally{btn.disabled=false;btn.textContent=t}}
+
+/* ---- sessão do professor ---- */
+let ses=ls.get("bipsite-prof");
+function keep(j){ses={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Date.now()+(j.expires_in||3600)*1000,email:(j.user&&j.user.email)||ses&&ses.email,nome:(j.user&&j.user.user_metadata&&j.user.user_metadata.nome)||ses&&ses.nome||""};ls.set("bipsite-prof",ses)}
+async function token(){if(!ses)throw {code:"precisa_entrar"};
+ if(Date.now()>ses.expires_at-60000){try{keep(await NUVEM.auth("token?grant_type=refresh_token",{refresh_token:ses.refresh_token}))}catch(e){sair();throw {code:"precisa_entrar"}}}
+ return ses.access_token}
+async function rpc(fn,args){try{return await NUVEM.rpc(fn,args,await token())}catch(e){if(e.code=="precisa_entrar"||e.code=="sem_permissao"){sair();}throw e}}
+function sair(){if(ses)NUVEM.auth("logout",{},ses.access_token).catch(()=>{});ses=null;ls.del("bipsite-prof");go("auth")}
+
+/* ---- telas ---- */
+function go(t){["scrAuth","scrTurmas","scrTurma"].forEach(k=>$(k).hidden=true);$("whoBox").hidden=!ses;
+ if(t=="auth"){$("scrAuth").hidden=false;form("fIn")}
+ if(t=="turmas"){$("scrTurmas").hidden=false;loadTurmas()}
+ if(t=="turma"){$("scrTurma").hidden=false}
+ if(ses)$("whoName").textContent=ses.nome?`Olá, ${ses.nome}`:ses.email}
+function form(id){["fIn","fUp","fForgot","fNewPass"].forEach(k=>$(k).hidden=k!=id);document.querySelectorAll(".err,.ok").forEach(e=>e.textContent="")}
+document.querySelectorAll("[data-to]").forEach(b=>b.onclick=()=>form(b.dataset.to));
+$("toUp").onclick=()=>form("fUp");$("toForgot").onclick=()=>{form("fForgot");$("fgEmail").value=$("inEmail").value};
+$("bOut").onclick=sair;
+
+$("fIn").onsubmit=e=>{e.preventDefault();busy($("bIn"),async()=>{try{
+ keep(await NUVEM.auth("token?grant_type=password",{email:$("inEmail").value.trim(),password:$("inPass").value}));
+ const p=await rpc("professor_perfil",{p_nome:ses.nome||null});ses.nome=p.nome||ses.nome;ls.set("bipsite-prof",ses);go("turmas")}
+ catch(x){$("errIn").textContent=erroBip(x)}})};
+$("fUp").onsubmit=e=>{e.preventDefault();const nome=$("upName").value.trim();busy($("bUp"),async()=>{try{
+ const j=await NUVEM.auth("signup?redirect_to="+encodeURIComponent(SITE+"professor.html"),{email:$("upEmail").value.trim(),password:$("upPass").value,data:{nome}});
+ if(j.access_token){keep(j);ses.nome=nome;await rpc("professor_perfil",{p_nome:nome});ls.set("bipsite-prof",ses);go("turmas")}
+ else{$("okUp").textContent="Conta criada! Enviamos um e-mail de confirmação. Abra a mensagem, clique no link e depois volte aqui para entrar.";$("fUp").reset()}}
+ catch(x){$("errUp").textContent=erroBip(x)}})};
+$("fForgot").onsubmit=e=>{e.preventDefault();busy($("bFg"),async()=>{try{
+ await NUVEM.auth("recover?redirect_to="+encodeURIComponent(SITE+"professor.html"),{email:$("fgEmail").value.trim()});
+ $("okFg").textContent="Se esse e-mail tiver conta, chega uma mensagem com o link para criar uma nova senha."}
+ catch(x){$("errFg").textContent=erroBip(x)}})};
+$("fNewPass").onsubmit=e=>{e.preventDefault();busy($("bNp"),async()=>{try{
+ const r=await fetch(window.BIP_CFG.url+"/auth/v1/user",{method:"PUT",headers:{"Content-Type":"application/json",apikey:window.BIP_CFG.key,Authorization:"Bearer "+await token()},body:JSON.stringify({password:$("npPass").value})});
+ if(!r.ok){const j=await r.json().catch(()=>({}));throw {code:j.error_code||j.code,msg:j.msg||j.message}}
+ go("turmas")}catch(x){$("errNp").textContent=erroBip(x)}})};
+
+/* ---- turmas ---- */
+let turmas=[],turma=null,alunos=[];
+async function loadTurmas(){$("turmas").innerHTML='<p class="hint">Carregando…</p>';
+ try{turmas=await rpc("professor_turmas",{});drawTurmas()}catch(x){$("turmas").innerHTML=`<p class="err">${esc(erroBip(x))}</p>`}}
+function drawTurmas(){$("turmas").innerHTML=turmas.length?turmas.map(t=>`<button class="tcard${t.ativa?"":" off"}" data-t="${t.id}"><h3>${esc(t.nome)}</h3><span class="cd">${fmtCode(t.codigo)}</span><small>${t.alunos} aluno${t.alunos==1?"":"s"}${t.ativa?"":" · pausada"}</small></button>`).join("")
+ :'<p class="empty">Você ainda não tem turmas. Crie a primeira acima.</p>'}
+$("turmas").onclick=e=>{const b=e.target.closest("[data-t]");if(b)openTurma(turmas.find(t=>t.id==b.dataset.t))};
+$("fTurma").onsubmit=e=>{e.preventDefault();const n=$("tNome").value.trim();$("errTurma").textContent="";if(!n)return $("errTurma").textContent="Escreva o nome da turma.";
+ busy($("bTurma"),async()=>{try{const t=await rpc("professor_criar_turma",{p_nome:n});$("tNome").value="";turmas.unshift(t);drawTurmas();openTurma(t)}catch(x){$("errTurma").textContent=erroBip(x)}})};
+
+/* ---- uma turma ---- */
+let pinOpen=null,delOpen=null,dzOpen=null;
+function openTurma(t){turma=t;pinOpen=delOpen=dzOpen=null;$("tTitle").textContent=t.nome;$("tCode").textContent=fmtCode(t.codigo);go("turma");loadAlunos()}
+$("bBack").onclick=()=>go("turmas");
+$("bReload").onclick=()=>busy($("bReload"),loadAlunos);
+$("bCopy").onclick=()=>{const t=$("tCode").textContent;try{navigator.clipboard.writeText(t).then(()=>{$("bCopy").textContent="Copiado!";setTimeout(()=>$("bCopy").textContent="Copiar",1500)})}catch(e){}};
+async function loadAlunos(){$("errRows").textContent="";try{alunos=await rpc("professor_alunos",{p_turma:turma.id});drawAlunos()}catch(x){$("errRows").textContent=erroBip(x)}}
+function stat(a){const r=(a.progresso&&a.progresso.robo)||{},ac=(a.progresso&&a.progresso.academia)||{};
+ const fases=Object.keys(r.stars||{}).length+Object.keys(r.skip||{}).length,est=Object.values(r.stars||{}).reduce((s,v)=>s+(+v||0),0);
+ const aulas=(ac.done||[]).filter(x=>ACAD.includes(x)).length;return {fases,est,aulas}}
+function drawAlunos(){const n=alunos.length,S=alunos.map(stat),sem=7*864e5;
+ $("nAlunos").textContent=`${n} aluno${n==1?"":"s"}`;
+ const ativos=alunos.filter(a=>a.ultimo_acesso&&Date.now()-new Date(a.ultimo_acesso)<sem).length,avg=k=>n?Math.round(S.reduce((s,x)=>s+x[k],0)/n):0;
+ $("stats").innerHTML=[[n,"alunos na turma"],[ativos,"jogaram nos últimos 7 dias"],[avg("fases"),`fases em média (de ${ROBO_N})`],[avg("aulas"),`aulas em média (de ${ACAD.length})`]].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+ $("rows").innerHTML=n?alunos.map((a,i)=>{const s=S[i],on=a.ultimo_acesso&&Date.now()-new Date(a.ultimo_acesso)<sem;
+  const acts=pinOpen==a.id?`<form class="pinbox" data-pinf="${a.id}"><input inputmode="numeric" maxlength="4" placeholder="0000" aria-label="Novo PIN de ${esc(a.apelido)}" required><button class="btn sm main">Salvar</button><button class="btn sm ghost" type="button" data-cancel>✕</button></form>`
+   :delOpen==a.id?`<span class="confirm" style="padding:4px 8px">Remover e apagar o progresso? <button class="btn sm danger" data-delok="${a.id}">Remover</button><button class="btn sm ghost" data-cancel>Cancelar</button></span>`
+   :`<span class="rowact"><button class="btn sm" data-pin="${a.id}">Novo PIN</button><button class="btn sm danger" data-del="${a.id}">Remover</button></span>`;
+  return `<tr><td><span class="av" style="background:${esc(a.cor)}">${esc(a.apelido[0].toUpperCase())}</span><b>${esc(a.apelido)}</b></td>
+   <td><div class="mini"><span class="bar"><i style="width:${s.fases/ROBO_N*100}%;background:var(--run)"></i></span>${s.fases} fases · ${s.est} ★</div></td>
+   <td><div class="mini"><span class="bar"><i style="width:${ACAD.length?s.aulas/ACAD.length*100:0}%;background:var(--turn)"></i></span>${s.aulas} aulas</div></td>
+   <td><span class="dot${on?" on":""}"></span>${ago(a.ultimo_acesso)}</td><td>${acts}</td></tr>`}).join("")
+  :`<tr><td colspan="5" class="empty">Nenhum aluno ainda. Passe o código <b>${fmtCode(turma.codigo)}</b> para a turma.</td></tr>`;
+ drawDZ()}
+function drawDZ(){const t=turma;$("dz").innerHTML=dzOpen?`<span class="confirm">Para apagar a turma e o progresso de todos os alunos, digite o código <b>${fmtCode(t.codigo)}</b>: <input id="dzIn" aria-label="Código da turma"><button class="btn sm danger" id="dzOk">Apagar turma</button><button class="btn sm ghost" id="dzNo">Cancelar</button></span>`
+ :`<button class="btn sm" id="dzPause">${t.ativa?"Pausar turma (ninguém entra)":"Reabrir turma"}</button><button class="btn sm danger" id="dzDel">Apagar turma…</button><span class="hint">${t.ativa?"":"Turma pausada: os alunos não conseguem entrar."}</span>`;
+ if(dzOpen){$("dzNo").onclick=()=>{dzOpen=null;drawDZ()};$("dzOk").onclick=()=>{if($("dzIn").value.toUpperCase().replace(/[^0-9A-Z]/g,"")!=t.codigo)return $("errRows").textContent="O código digitado não confere.";
+   busy($("dzOk"),async()=>{try{await rpc("professor_apagar_turma",{p_turma:t.id});turmas=turmas.filter(x=>x.id!=t.id);go("turmas")}catch(x){$("errRows").textContent=erroBip(x)}})}}
+ else{$("dzDel").onclick=()=>{dzOpen=1;drawDZ();$("dzIn").focus()};$("dzPause").onclick=()=>busy($("dzPause"),async()=>{try{await rpc("professor_editar_turma",{p_turma:t.id,p_ativa:!t.ativa});t.ativa=!t.ativa;drawDZ()}catch(x){$("errRows").textContent=erroBip(x)}})}}
+$("rows").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.pin){pinOpen=b.dataset.pin;delOpen=null;drawAlunos();const i=document.querySelector(`[data-pinf="${b.dataset.pin}"] input`);i&&i.focus()}
+ else if(b.dataset.del){delOpen=b.dataset.del;pinOpen=null;drawAlunos()}
+ else if(b.dataset.cancel!=null){pinOpen=delOpen=null;drawAlunos()}
+ else if(b.dataset.delok){busy(b,async()=>{try{await rpc("professor_remover_aluno",{p_aluno:b.dataset.delok});alunos=alunos.filter(a=>a.id!=b.dataset.delok);delOpen=null;drawAlunos()}catch(x){$("errRows").textContent=erroBip(x)}})}});
+$("rows").addEventListener("submit",e=>{e.preventDefault();const f=e.target,id=f.dataset.pinf,pin=f.querySelector("input").value;
+ if(!/^\d{4}$/.test(pin))return $("errRows").textContent="O PIN precisa ter 4 números.";
+ busy(f.querySelector("button"),async()=>{try{await rpc("professor_novo_pin",{p_aluno:id,p_pin:pin});const a=alunos.find(x=>x.id==id);pinOpen=null;drawAlunos();
+  $("errRows").innerHTML=`<span class="ok">Novo PIN de ${esc(a.apelido)}: <b>${pin}</b>. Avise o aluno.</span>`}catch(x){$("errRows").textContent=erroBip(x)}})});
+
+/* ---- início: volta do link do e-mail (confirmação ou nova senha) ---- */
+(function(){if(!NUVEM.on){$("offMsg").hidden=false;return}
+ const h=new URLSearchParams(location.hash.slice(1));
+ if(h.get("error_description")){go("auth");$("errIn").textContent=h.get("error_code")=="otp_expired"?"Esse link expirou. Peça um novo em “Esqueci a senha” ou entre normalmente.":h.get("error_description");history.replaceState(null,"",location.pathname);return}
+ if(h.get("access_token")){keep({access_token:h.get("access_token"),refresh_token:h.get("refresh_token"),expires_in:+h.get("expires_in")||3600});history.replaceState(null,"",location.pathname);
+  if(h.get("type")=="recovery"){go("auth");form("fNewPass");return}
+  rpc("professor_perfil",{p_nome:null}).then(p=>{ses.nome=p.nome;ls.set("bipsite-prof",ses);go("turmas")}).catch(()=>go("auth"));return}
+ if(ses)go("turmas");else go("auth")})();
+</script>
+
+</body>
+</html>
