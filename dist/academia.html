@@ -115,6 +115,11 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1}
 .prog span{border-radius:8px;padding:2px 9px;font-weight:700;color:#fff;font-size:.88rem}
 .prog .ph{color:var(--muted);font-size:.88rem;font-weight:400}
 .readout{font-family:var(--display);font-weight:800;font-size:1.5rem}
+.stp{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.stp b{font-size:.85rem}.stp .sn{font-size:1.2rem;min-width:1.4em;text-align:center}
+.unlock{display:flex;align-items:center;gap:14px;padding:14px 18px;margin-bottom:12px;border-radius:18px;border:2px solid var(--star);background:color-mix(in srgb,var(--star) 14%,var(--panel));animation:pop .5s ease}
+.unlock b{font-family:var(--display);font-size:1.2rem}
+@keyframes pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
 input[type=range]{width:min(420px,70vw);accent-color:var(--run)}
 .axcard{border:2px solid var(--star);background:color-mix(in srgb,var(--star) 14%,var(--panel));border-radius:18px;padding:12px 22px;text-align:center;box-shadow:0 10px 30px rgba(120,80,0,.18)}
 .axcard .k{font-size:.72rem;font-weight:700;letter-spacing:.14em;color:var(--loop)}
@@ -203,7 +208,7 @@ FACES.festa=FACES.feliz;FACES.aponta=FACES.normal;
 /* =====================================================================
    MOTOR 3D
    ===================================================================== */
-let R,scene,cam,root,floorMat,bigGrid,smallGrid,bip,ok3d=false;
+let R,scene,cam,root,fx,floorMat,bigGrid,smallGrid,bip,ok3d=false;
 const camS={th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0},camGoal={...camS};
 const P3=(x,y,h=0)=>new THREE.Vector3(x,h,-y);
 const mat=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.55,metalness:.05,...o});
@@ -217,12 +222,13 @@ function init3d(){if(ok3d)return true;if(!window.THREE){$("load").textContent="N
  $("cv").appendChild(R.domElement);
  scene=new THREE.Scene();cam=new THREE.PerspectiveCamera(42,1,.1,300);
  scene.add(new THREE.HemisphereLight(0xffffff,0x8b9bb0,.85));
- const sun=new THREE.DirectionalLight(0xffffff,.75);sun.position.set(6,14,8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-10,right:10,top:10,bottom:-10});scene.add(sun);
+ const rim=new THREE.DirectionalLight(0xa8c8ff,.45);rim.position.set(-8,9,-12);scene.add(rim);
+ const sun=new THREE.DirectionalLight(0xfff4e0,.8);sun.position.set(6,14,8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-10,right:10,top:10,bottom:-10});scene.add(sun);
  floorMat=mat(0xf6f8fb,{roughness:.9});const fl=new THREE.Mesh(new THREE.PlaneGeometry(400,400),floorMat);fl.rotation.x=-Math.PI/2;fl.receiveShadow=true;scene.add(fl);
  bigGrid=new THREE.GridHelper(120,120,0xd5dde8,0xe2e8f0);bigGrid.position.y=.002;scene.add(bigGrid);
  smallGrid=new THREE.GridHelper(12,12,0x9fb0c6,0xb9c6d6);smallGrid.position.y=.004;scene.add(smallGrid);
  const edge=new THREE.Mesh(new THREE.RingGeometry(0,0,4),mat(0));edge.visible=false;
- root=new THREE.Group();scene.add(root);
+ root=new THREE.Group();scene.add(root);fx=new THREE.Group();scene.add(fx);
  bip=makeBip();scene.add(bip.g);
  theme3d();matchMedia("(prefers-color-scheme: dark)").addEventListener("change",theme3d);
  new ResizeObserver(size).observe($("stage"));size();
@@ -230,14 +236,16 @@ function init3d(){if(ok3d)return true;if(!window.THREE){$("load").textContent="N
  let last=performance.now();const loop=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;
   for(const k in camGoal)camS[k]+=(camGoal[k]-camS[k])*Math.min(1,dt*4);
   const {th,ph,r,tx,tz}=camS;cam.position.set(tx+r*Math.sin(ph)*Math.cos(th),r*Math.cos(ph),tz+r*Math.sin(ph)*Math.sin(th));cam.lookAt(tx,0,tz);
-  bip.tick(dt,now/1000);root.children.forEach(o=>o.userData.tick&&o.userData.tick(now/1000));R.render(scene,cam);requestAnimationFrame(loop)};
+  bip.tick(dt,now/1000);root.children.forEach(o=>o.userData.tick&&o.userData.tick(now/1000));
+  for(let i=fx.children.length-1;i>=0;i--){const o=fx.children[i];if(o.userData.step&&o.userData.step(dt)===false){fx.remove(o);o.geometry&&o.geometry.dispose();o.material&&o.material.dispose()}}
+  R.render(scene,cam);requestAnimationFrame(loop)};
  requestAnimationFrame(loop);ok3d=true;$("load").remove();return true}
 function theme3d(){const d=dark(),bg=d?0x0e1520:0xe8edf4;scene.background=new THREE.Color(bg);scene.fog=new THREE.Fog(bg,18,40);
  floorMat.color.setHex(d?0x162131:0xf6f8fb);
  [bigGrid,smallGrid].forEach((g,i)=>{const c=d?(i?0x3a4b63:0x223047):(i?0x9fb0c6:0xdbe2ec);[].concat(g.material).forEach(m=>{m.vertexColors=false;m.color.setHex(c);m.needsUpdate=true})})}
-function size(){const s=$("stage"),w=s.clientWidth,h=s.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();
- if(w<600)camGoal.r=Math.max(camGoal.r,18)}
-function camTo(o){Object.assign(camGoal,o);const w=$("stage").clientWidth;if(w<600&&o.r)camGoal.r=o.r*1.25}
+function size(){const s=$("stage"),w=s.clientWidth,h=s.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<1?Math.min(68,42/Math.pow(w/h,.8)):42;cam.updateProjectionMatrix();  /* celular em pé: ângulo de visão mais aberto */
+}
+function camTo(o){Object.assign(camGoal,o);const w=$("stage").clientWidth;if(w<600&&o.r)camGoal.r=o.r*1.12}
 
 /* Câmera: arrastar gira; toque sem arrastar = escolher ponto no chão */
 let onPick=null;
@@ -251,15 +259,27 @@ function floorAt(e){const r=R.domElement.getBoundingClientRect(),v=new THREE.Vec
  const rc=new THREE.Raycaster();rc.setFromCamera(v,cam);const hit=new THREE.Vector3();if(!rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),hit))return null;
  const x=Math.round(hit.x),y=Math.round(-hit.z);if(Math.abs(x)>6||Math.abs(y)>6)return null;return [x,y]}
 
+/* ---------- Brilhos e confete ---------- */
+let GLOW=null;
+function glowTex(){if(GLOW)return GLOW;const c=document.createElement("canvas");c.width=c.height=128;const g=c.getContext("2d"),r=g.createRadialGradient(64,64,0,64,64,64);
+ r.addColorStop(0,"rgba(255,255,255,1)");r.addColorStop(.25,"rgba(255,255,255,.55)");r.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=r;g.fillRect(0,0,128,128);return GLOW=new THREE.CanvasTexture(c)}
+function confetti(x,y,n=46){if(!fx)return;const cols=[0xf2c230,0xee5f2b,0x0e8f86,0x6b4fd8,0xd93a7f,0x2f6fd6,0x5fd08a];
+ for(let i=0;i<n;i++){const m=new THREE.Mesh(new THREE.PlaneGeometry(.14,.22),new THREE.MeshBasicMaterial({color:cols[i%cols.length],side:2,transparent:true}));
+  m.position.copy(P3(x,y,2.2));const a=Math.random()*Math.PI*2,sp=1.6+Math.random()*2.6,v=new THREE.Vector3(Math.cos(a)*sp,3+Math.random()*3.5,Math.sin(a)*sp),rv=new THREE.Vector3(Math.random()*9,Math.random()*9,Math.random()*9);let life=0;
+  m.userData.step=dt=>{life+=dt;v.y-=9.8*dt*.55;v.multiplyScalar(1-dt*.9);m.position.addScaledVector(v,dt);m.rotation.x+=rv.x*dt;m.rotation.y+=rv.y*dt;m.rotation.z+=rv.z*dt;
+   if(m.position.y<.02){m.position.y=.02;v.set(0,0,0);rv.set(0,0,0)}m.material.opacity=Math.max(0,1-(life-1.6)/0.8);return life<2.4};fx.add(m)}}
+
 /* ---------- O Bip em 3D ---------- */
-function faceTex(m){const c=document.createElement("canvas");c.width=256;c.height=160;const g=c.getContext("2d");g.fillStyle="#172536";g.fillRect(0,0,256,160);
+const FTX={};
+function faceTex(m){if(FTX[m])return FTX[m];const c=document.createElement("canvas");c.width=256;c.height=160;const g=c.getContext("2d");g.fillStyle="#172536";g.fillRect(0,0,256,160);
  g.strokeStyle=g.fillStyle=m=="ops"?"#ff8a8a":"#5ef0e0";g.lineCap="round";g.lineWidth=14;
  const eyes=(y,h)=>{g.beginPath();g.roundRect(70,y,30,h,15);g.roundRect(156,y,30,h,15);g.fill()};
  if(m=="feliz"||m=="festa"){g.beginPath();g.moveTo(66,82);g.quadraticCurveTo(85,50,104,82);g.moveTo(152,82);g.quadraticCurveTo(171,50,190,82);g.stroke();g.beginPath();g.moveTo(96,110);g.quadraticCurveTo(128,140,160,110);g.stroke()}
  else if(m=="ops"){g.beginPath();[[70,52],[156,52]].forEach(([x,y])=>{g.moveTo(x,y);g.lineTo(x+30,y+34);g.moveTo(x+30,y);g.lineTo(x,y+34)});g.stroke();g.lineWidth=9;g.beginPath();g.arc(128,120,12,0,7);g.stroke()}
+ else if(m=="pisca"){g.lineWidth=12;g.beginPath();g.moveTo(70,70);g.lineTo(100,70);g.moveTo(156,70);g.lineTo(186,70);g.stroke();g.lineWidth=10;g.beginPath();g.moveTo(106,118);g.quadraticCurveTo(128,132,150,118);g.stroke()}
  else if(m=="pensa"){eyes(34,36);g.beginPath();g.moveTo(108,122);g.lineTo(150,122);g.stroke()}
  else{eyes(44,46);g.lineWidth=10;g.beginPath();g.moveTo(106,118);g.quadraticCurveTo(128,132,150,118);g.stroke()}
- const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t}
+ const t=new THREE.CanvasTexture(c);t.anisotropy=4;return FTX[m]=t}
 function makeBip(){const g=new THREE.Group(),inner=new THREE.Group(),Y=mat(0xf2c230,{roughness:.4}),Dk=mat(0x3b4250,{roughness:.6}),Or=mat(0xee5f2b,{emissive:0xee5f2b,emissiveIntensity:.35});
  g.add(inner);const s=.68;inner.scale.set(s,s,s);
  const box=(w,h,d,m,x,y,z,p=inner)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(x,y,z);b.castShadow=true;p.add(b);return b};
@@ -270,25 +290,47 @@ function makeBip(){const g=new THREE.Group(),inner=new THREE.Group(),Y=mat(0xf2c
  const scr=new THREE.Mesh(new THREE.PlaneGeometry(1.04,.65),new THREE.MeshBasicMaterial({map:faceTex("feliz")}));scr.position.set(0,1.98,.452);body.add(scr);
  const ant=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.35),Dk);ant.position.set(0,2.6,0);body.add(ant);
  const bulb=new THREE.Mesh(new THREE.SphereGeometry(.12,16,12),Or);bulb.position.set(0,2.8,0);body.add(bulb);
+ const glow=new THREE.PointLight(0xff8a4c,.6,3.2);glow.position.set(0,2.8,.2);body.add(glow);
+ const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xff9a5c,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));halo.scale.set(.9,.9,1);halo.position.set(0,2.8,0);body.add(halo);
  const arms=[-1,1].map(sd=>{const p=new THREE.Group();p.position.set(sd*.62,1.38,0);body.add(p);box(.2,.6,.2,Dk,0,-.3,0,p);const h=new THREE.Mesh(new THREE.SphereGeometry(.16,16,12),Y);h.position.set(0,-.65,0);h.castShadow=true;p.add(h);return p});
  const sh=new THREE.Mesh(new THREE.CircleGeometry(.5,24),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.12}));sh.rotation.x=-Math.PI/2;sh.position.y=.01;g.add(sh);
- const B={g,x:0,y:0,a:90,walking:0,mood:"feliz",fix:0,last:0,
+ const B={g,x:0,y:0,h:0,a:90,walking:0,wv:0,ph:0,mood:"feliz",fix:0,last:0,blinkAt:2,squash:0,
   place(x,y,a){B.x=x;B.y=y;if(a!=null)B.a=a;B.last=performance.now();B.sync()},
-  sync(){g.position.copy(P3(B.x,B.y));g.rotation.y=(B.a+90)*D2R},
-  face(m){if(m==B.mood)return;B.mood=m;scr.material.map.dispose();scr.material.map=faceTex(m);scr.material.needsUpdate=true},
+  sync(){g.position.copy(P3(B.x,B.y,B.h));g.rotation.y=(B.a+90)*D2R},
+  face(m){if(m==B.mood)return;B.mood=m;scr.material.map=faceTex(m);scr.material.needsUpdate=true;if(m=="festa")B.squash=1},
   tick(dt,t){if(!B.walking&&!B.fix&&performance.now()-B.last>900){const ca=Math.atan2(-cam.position.z-B.y,cam.position.x-B.x)/D2R,d=((ca-B.a)%360+540)%360-180;if(Math.abs(d)>1){B.a+=d*Math.min(1,dt*3);B.sync()}}
-   const w=B.walking,sw=Math.sin(t*11)*.6*w;legs[0].rotation.x=sw;legs[1].rotation.x=-sw;
-   let la=-sw*.8,ra=sw*.8,lz=0,rz=0,jump=0;
-   if(!w){if(B.mood=="aponta"){rz=2.5}else if(B.mood=="festa"){lz=-2.6;rz=2.6;jump=Math.abs(Math.sin(t*6))*.35}else if(B.mood=="pensa"){ra=-1.9;rz=.5}else if(B.mood=="ops"){lz=-.5;rz=.5}}
-   arms[0].rotation.set(la,0,lz);arms[1].rotation.set(ra,0,rz);
-   body.position.y=Math.sin(t*2.4)*.03+(w?Math.abs(Math.sin(t*11))*.06:0);inner.position.y=jump;bulb.material.emissiveIntensity=.3+.3*(Math.sin(t*5)>0)},
+   /* andar: a força do passo (wv) sobe e desce aos poucos, sem trancos */
+   B.wv+=(B.walking-B.wv)*Math.min(1,dt*7);const w=B.wv;B.ph+=dt*10.5*Math.max(w,.0001);
+   const sw=Math.sin(B.ph)*.7*w;legs[0].rotation.x=sw;legs[1].rotation.x=-sw;
+   let la=-sw*.9,ra=sw*.9,lz=.12,rz=-.12,jump=0,tilt=Math.sin(t*1.3)*.035,nod=0;
+   const ease=(cur,goal)=>cur+(goal-cur)*Math.min(1,dt*9);
+   if(w<.3){if(B.mood=="aponta"){rz=2.4;ra=-.3+Math.sin(t*3)*.08;tilt=-.08}
+    else if(B.mood=="festa"){const j=Math.abs(Math.sin(t*6));lz=-2.6+Math.sin(t*12)*.25;rz=2.6-Math.sin(t*12)*.25;jump=j*.38;nod=-.08}
+    else if(B.mood=="pensa"){ra=-1.9;rz=.55;tilt=.14+Math.sin(t*1.6)*.03}
+    else if(B.mood=="ops"){lz=-.6;rz=.6;tilt=Math.sin(t*9)*.06}
+    else {la=Math.sin(t*1.8)*.06;ra=-Math.sin(t*1.8)*.06}}
+   B.arm=B.arm||[0,0,0,0];B.arm=[ease(B.arm[0],la),ease(B.arm[1],lz),ease(B.arm[2],ra),ease(B.arm[3],rz)];
+   arms[0].rotation.set(B.arm[0],0,B.arm[1]);arms[1].rotation.set(B.arm[2],0,B.arm[3]);
+   B.tl=ease(B.tl||0,tilt);B.nd=ease(B.nd||0,nod+w*.13);body.rotation.z=B.tl;inner.rotation.x=B.nd;
+   B.squash=Math.max(0,B.squash-dt*3.5);const sq=Math.sin(B.squash*Math.PI)*.12;
+   inner.scale.set(s*(1+sq*.6),s*(1-sq),s*(1+sq*.6));
+   body.position.y=Math.sin(t*2.4)*.035+Math.abs(Math.sin(B.ph))*.07*w;inner.position.y=jump;
+   const pulse=.5+.5*Math.sin(t*4);bulb.material.emissiveIntensity=.35+.45*pulse;glow.intensity=.35+.5*pulse;halo.material.opacity=.45+.4*pulse;
+   /* piscar */
+   if(t>B.blinkAt){B.blinkAt=t+2.5+Math.random()*3;if(/normal|aponta|pensa/.test(B.mood)){scr.material.map=faceTex("pisca");setTimeout(()=>{scr.material.map=faceTex(B.mood)},130)}}},
   async turnTo(a){let d=((a-B.a)%360+540)%360-180;if(Math.abs(d)<.5){B.a=a;return true}const a0=B.a;return await tween(Math.abs(d)*4+120,k=>{B.a=a0+d*k;B.last=performance.now();B.sync()})},
   async turn(d){const a0=B.a;return await tween(Math.abs(d)*5+150,k=>{B.a=a0+d*k;B.last=performance.now();B.sync()})},
   async walk(pts,o={}){for(const [x,y] of pts){const dx=x-B.x,dy=y-B.y,L=Math.hypot(dx,dy);if(L<1e-6)continue;
     if(!o.noTurn&&!(await B.turnTo(Math.atan2(dy,dx)/D2R)))return false;
     const x0=B.x,y0=B.y;let tr=null;if(o.trail)tr=seg([x0,y0],[x0,y0],{color:o.trail,w:o.w||.07});
-    B.walking=1;const okk=await tween(L*(o.ms||420),(k,lin)=>{B.x=x0+dx*lin;B.y=y0+dy*lin;B.sync();if(tr)tr.set([x0,y0],[B.x,B.y]);o.each&&o.each(B.x,B.y)});B.walking=0;B.last=performance.now();if(!okk)return false}
-   return true}};
+    B.walking=1;const okk=await tween(L*(o.ms||420),(k,lin)=>{const q=lin-Math.sin(2*Math.PI*lin)/(2*Math.PI)*.4;  /* começa e termina mais devagar */
+      B.x=x0+dx*q;B.y=y0+dy*q;B.sync();if(tr)tr.set([x0,y0],[B.x,B.y]);o.each&&o.each(B.x,B.y)});B.walking=0;B.last=performance.now();if(!okk)return false}
+   B.squash=.5;return true},
+  /* pulo (usado na reta numérica): sobe e desce, com uma agachadinha ao aterrissar */
+  async hop(x,y,o={}){const dx=x-B.x,dy=y-B.y,L=Math.hypot(dx,dy);if(L<1e-6)return true;
+   if(!o.noTurn&&!(await B.turnTo(Math.atan2(dy,dx)/D2R)))return false;
+   const x0=B.x,y0=B.y,H=o.h??Math.min(2.2,.6+L*.28);B.squash=.6;if(!(await wait(90)))return false;
+   const ok=await tween(o.ms||Math.max(380,L*170),(k,lin)=>{B.x=x0+dx*lin;B.y=y0+dy*lin;B.h=4*H*lin*(1-lin);B.sync()});B.h=0;B.sync();B.squash=1;B.last=performance.now();return ok}};
  B.sync();return B}
 
 /* ---------- Peças do cenário (todas entram em "root" e saem na troca de passo) ---------- */
@@ -302,7 +344,8 @@ function label(txt,x,y,h=.9,o={}){const c=document.createElement("canvas"),g=c.g
 function pt(name,x,y,o={}){const g=new THREE.Group(),c=o.color||COL.pt;
  const s=new THREE.Mesh(new THREE.SphereGeometry(.16,20,14),mat(c,{emissive:c,emissiveIntensity:.25}));s.position.y=.16;s.castShadow=true;g.add(s);
  const ring=new THREE.Mesh(new THREE.RingGeometry(.2,.3,28),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.5}));ring.rotation.x=-Math.PI/2;ring.position.y=.012;g.add(ring);
- g.position.copy(P3(x,y));if(o.pulse)g.userData.tick=t=>{const k=1+.25*Math.sin(t*4);ring.scale.set(k,k,k)};add(g);
+ const hl=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:c,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.55}));hl.scale.set(.85,.85,1);hl.position.y=.16;g.add(hl);
+ g.position.copy(P3(x,y));if(o.pulse)g.userData.tick=t=>{const k=1+.25*Math.sin(t*4);ring.scale.set(k,k,k);hl.material.opacity=.4+.3*Math.sin(t*4)};add(g);
  if(name)label(name,x,y,.75,{size:.5});return g}
 function seg(a,b,o={}){const m=new THREE.Mesh(new THREE.CylinderGeometry(1,1,1,10),mat(o.color||COL.seg,{emissive:o.color||COL.seg,emissiveIntensity:.15,transparent:o.op!=null,opacity:o.op??1}));
  m.castShadow=true;add(m);const w=o.w||.06;
@@ -483,9 +526,218 @@ function triFig(){poly(TRI,{color:COL.loop});const A=triAng(),d=(p,q)=>Math.atan
  arc(TRI[0],0,A[0][0],.8,{color:A[0][1]});arc(TRI[1],180-A[2][0],180,.8,{color:A[2][1]});const a0=d(TRI[2],TRI[0]);arc(TRI[2],a0,a0+A[1][0],.8,{color:A[1][1]})}
 function angleFig(a){pt("",0,0);semi([0,0],[1,0]);semi([0,0],[Math.cos(a*D2R),Math.sin(a*D2R)]);arc([0,0],0,a,1.5,{txt:a+"°"})}
 
+/* =====================================================================
+   MUNDO 2 · NÚMEROS NATURAIS
+   Peças novas: cubos, blocos de base 10, plaquinhas com número,
+   reta numérica com pulos e o crivo de Eratóstenes.
+   ===================================================================== */
+const NCOL={u:0xf2c230,d:0x0e8f86,c:0x6b4fd8,red:0xd23f45,good:0x1b9a52,grey:0x9aa9bb};
+function cube(x,y,c=NCOL.u,o={}){const s=o.s||.42,m=new THREE.Mesh(new THREE.BoxGeometry(s,s,s),mat(c,{roughness:.35,emissive:c,emissiveIntensity:.1}));
+ m.position.copy(P3(x,y,(o.h||0)+s/2));m.castShadow=true;return add(m)}
+/* move uma peça até (x, y) no chão, com um arco */
+function slide(m,x,y,ms=320,h=.6){const a=m.position.clone(),b=P3(x,y,a.y);return tween(ms,(k,l)=>{m.position.lerpVectors(a,b,k);m.position.y=a.y+4*h*l*(1-l)})}
+function gridTex(nx,ny,c){const W=nx*24,H=ny*24,cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");
+ g.fillStyle=c;g.fillRect(0,0,W,H);g.strokeStyle="rgba(0,0,0,.28)";g.lineWidth=2;for(let i=0;i<=nx;i++){g.beginPath();g.moveTo(i*24,0);g.lineTo(i*24,H);g.stroke()}
+ for(let j=0;j<=ny;j++){g.beginPath();g.moveTo(0,j*24);g.lineTo(W,j*24);g.stroke()}return new THREE.CanvasTexture(cv)}
+const hex=c=>"#"+c.toString(16).padStart(6,"0");
+/* blocos de base 10: placa = 100, barra = 10, cubinho = 1 (lado .3) */
+function flat(x,y,h=0){const m=new THREE.Mesh(new THREE.BoxGeometry(3,.28,3),new THREE.MeshStandardMaterial({map:gridTex(10,10,hex(NCOL.c)),roughness:.5}));m.position.copy(P3(x,y,h+.14));m.castShadow=true;return add(m)}
+function rod(x,y){const m=new THREE.Mesh(new THREE.BoxGeometry(.3,.3,3),new THREE.MeshStandardMaterial({map:gridTex(1,10,hex(NCOL.d)),roughness:.5}));m.position.copy(P3(x,y,.15));m.castShadow=true;return add(m)}
+function base10(c,d,u){
+ for(let i=0;i<c;i++)flat(-3.6,.3,i*.32);
+ for(let i=0;i<d;i++)rod(-1.2+i*.42,.3);
+ for(let i=0;i<u;i++)cube(3.4+(i%3)*.42,1.3-Math.floor(i/3)*.42,NCOL.u,{s:.3});
+ if(c)label(c+" × 100",-3.6,-2,.3,{size:.42});if(d)label(d+" × 10",-1.2+(d-1)*.21,-2,.3,{size:.42});if(u)label(u+" × 1",3.8,-2,.3,{size:.42})}
+/* plaquinha no chão com um número (ou sinal) */
+function tileTex(txt,bg,fg){const cv=document.createElement("canvas");cv.width=cv.height=128;const g=cv.getContext("2d");g.fillStyle=bg;g.beginPath();g.roundRect(6,6,116,116,24);g.fill();
+ g.fillStyle=fg;g.font=`800 ${String(txt).length>2?50:66}px "Baloo 2",system-ui,sans-serif`;g.textAlign="center";g.textBaseline="middle";g.fillText(txt,64,70);return new THREE.CanvasTexture(cv)}
+function tile(txt,x,y,o={}){const g=new THREE.Group(),bg=o.bg||"#ffffff",fg=o.fg||"#172536";
+ const base=new THREE.Mesh(new THREE.BoxGeometry(.9,.12,.9),mat(o.edge||0xc3cedc));base.position.y=.06;base.castShadow=true;g.add(base);
+ const top=new THREE.Mesh(new THREE.PlaneGeometry(.86,.86),new THREE.MeshBasicMaterial({map:tileTex(txt,bg,fg),transparent:true}));top.rotation.x=-Math.PI/2;top.position.y=.125;g.add(top);
+ g.position.copy(P3(x,y));g.userData.paint=(b,f,e)=>{top.material.map.dispose();top.material.map=tileTex(txt,b,f||"#ffffff");top.material.needsUpdate=true;if(e!=null)base.material.color.setHex(e)};
+ g.userData.txt=txt;return add(g)}
+/* reta numérica: n vira x = x0 + (n - min) * k */
+function nline(min,max,o={}){const k=o.k||1,x0=o.x0??-6,X=n=>x0+(n-min)*k,every=o.every||1;
+ seg([X(min)-.6,0],[X(max)+.6,0],{color:0x586779,w:.05});
+ for(let n=min;n<=max;n++){const t=new THREE.Mesh(new THREE.BoxGeometry(.05,.05,.32),mat(0x586779));t.position.copy(P3(X(n),0,.05));add(t);
+  if(n%every==0)label(String(n),X(n),-.75,.15,{size:.42})}
+ return X}
+async function hopTo(X,n,o={}){return bip.hop(X(n),0,o)}
+function arcLine(x1,x2,color,lift=1){const pts=[],N=16;for(let i=0;i<=N;i++){const t=i/N;pts.push(P3(x1+(x2-x1)*t,0,.15+lift*4*t*(1-t)))}
+ const g=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),24,.035,6,false);return add(new THREE.Mesh(g,mat(color,{emissive:color,emissiveIntensity:.3})))}
+/* quadro de 1 a 30 para o crivo: x = coluna - 5, y = 2 - linha */
+const CRIVO=n=>[((n-1)%10)-5,2-Math.floor((n-1)/10)];
+const isPrime=n=>{if(n<2)return false;for(let d=2;d*d<=n;d++)if(n%d==0)return false;return true};
+function crivo(state){const T={};for(let n=1;n<=30;n++){const [x,y]=CRIVO(n),st=state?state(n):"";T[n]=tile(String(n),x,y,st=="p"?{bg:"#1b9a52",fg:"#fff",edge:0x146b3a}:st=="x"?{bg:"#c3cedc",fg:"#7d8a9a"}:{})}return T}
+/* conta (2 + 3 × 4) em plaquinhas que se juntam */
+function exprRow(tokens,y=1.5){const n=tokens.length,x0=-(n-1)/2;return tokens.map((t,i)=>tile(t,x0+i,y,/[+−×÷()]/.test(t)?{bg:"#6b4fd8",fg:"#fff",edge:0x4b36a0}:{}))}
+async function merge(row,i,j,res,y=1.5){const ts=row.slice(i,j+1),cx=(ts[0].position.x+ts[ts.length-1].position.x)/2;
+ if(!(await tween(420,k=>ts.forEach(t=>{t.position.x+=(cx-t.position.x)*k*.35;t.scale.setScalar(1-.5*k)}))))return null;
+ ts.forEach(t=>root.remove(t));const nt=tile(res,cx,y,{bg:"#f2c230",edge:0xb98d10});nt.position.x=cx;row.splice(i,j-i+1,nt);
+ const n=row.length,x0=-(n-1)/2;await tween(300,k=>row.forEach((t,q)=>{t.position.x+=(x0+q-t.position.x)*k}));return row}
+
+const W2=[
+/* 1 */{t:"Contar e agrupar",d:"Um, dois, três... e a grande ideia de agrupar de 10 em 10.",i:"123",steps:[
+ {m:"feliz",t:"Bem-vindo ao <b>Mundo 2</b>! Muito antes de existir número escrito, pastores contavam ovelhas com pedrinhas: <b>uma pedrinha para cada ovelha</b>.",set(){B().place(-5,-1,0);camTo({th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0});
+   [[-3,1],[-1,2],[1,1],[3,2],[2,-1]].forEach(([x,y])=>cube(x,y,0xffffff,{s:.5}))},
+  async play(){const P=[[-3,1],[-1,2],[1,1],[3,2],[2,-1]];for(let i=0;i<P.length;i++){if(!(await B().walk([[P[i][0],P[i][1]-.8]],{ms:300})))return;cube(P[i][0]-.6,P[i][1]-.2,0x8a6a4a,{s:.22});label(String(i+1),P[i][0],P[i][1],1.1,{size:.5})}}},
+ {m:"aponta",t:"Contar é ligar cada objeto a um número: 1, 2, 3... O <b>último número</b> que eu falo diz quantos são. Aqui são <b>7</b>.",set(){B().place(-5,-2,0)},
+  async play(){for(let i=0;i<7;i++){const c=cube(-3+i,0,NCOL.u);c.position.y+=1.5;await tween(220,k=>{c.position.y=.21+1.5*(1-k)});label(String(i+1),-3+i,0,1,{size:.45})}label("7 cubos",0,-1.5,.3,{size:.55})}},
+ {m:"normal",t:"Sua vez de contar. Gire a câmera se precisar!",set(){B().place(-5,-3,30);[[-3,2],[-1,1],[0,3],[2,2],[4,1],[1,-1],[-2,-1],[3,-2],[5,3]].forEach(([x,y])=>cube(x,y,NCOL.u))},
+  a:{k:"opt",q:"Quantos cubos há no chão?",o:["8","9","10"],ans:1,ok:"Isso! São <b>9</b> cubos.",no:"Conte devagar, um de cada vez, apontando com o dedo."}},
+ {m:"pensa",t:"Contar 23 coisas uma por uma cansa e dá erro. A ideia genial foi <b>agrupar de 10 em 10</b>. Veja os cubos se organizando...",set(){B().place(-5,-3,30)},
+  async play(){const P=[];for(let i=0;i<23;i++){const a=i*2.39996,r=1.2+Math.sqrt(i)*.75;P.push(cube(Math.cos(a)*r*.9,Math.sin(a)*r*.6+.5,NCOL.u))}
+   if(!(await wait(700)))return;for(let i=0;i<23;i++){const g=Math.floor(i/10),q=i%10,x=g<2?-3+q*.48:2+q*.48,y=g<2?2-g*1.2:2;if(!(await slide(P[i],x,y,140,.3)))return}
+   label("10",-.8,2.9,.3,{size:.5});label("10",-.8,1.7,.3,{size:.5});label("3 soltos",2.5,2.9,.3,{size:.45})}},
+ {m:"aponta",t:"Ficaram <b>2 grupos de 10</b> e <b>3 soltos</b>: 20 + 3 = <b>23</b>. Um grupo de 10 se chama <b>dezena</b>; cada solto é uma <b>unidade</b>.",
+  set(){B().place(-5,-3,30);for(let i=0;i<23;i++){const g=Math.floor(i/10),q=i%10;cube(g<2?-3+q*.48:2+q*.48,g<2?2-g*1.2:2,NCOL.u)}ov(CARDS([["2 dezenas","2 grupos de 10"],["3 unidades","3 soltos"],["23","vinte e três"]]))}},
+ {m:"normal",t:"Agrupado fica fácil de contar.",set(){B().place(-5,-3,30);for(let g=0;g<3;g++)for(let q=0;q<10;q++)cube(-3+q*.48,2.4-g*1.1,NCOL.u);for(let i=0;i<4;i++)cube(2.6+i*.48,1.3,NCOL.u)},
+  a:{k:"opt",q:"Quantos cubos há aqui?",o:["34","43","7"],ans:0,ok:"Certo: 3 dezenas e 4 unidades = <b>34</b>.",no:"Cada fileira comprida tem 10. Conte as fileiras e depois os soltos."}},
+ {m:"festa",end:1,t:"Você aprendeu a ideia que está por trás de todos os números: <b>agrupar de 10 em 10</b>!",set(){B().place(0,0,-90)},badge:["10","Contador","Unidades e dezenas."]}]},
+
+/* 2 */{t:"Sistema decimal",d:"Unidade, dezena e centena: o lugar do algarismo muda o valor.",i:"10²",steps:[
+ {m:"aponta",t:"Este é o <b>cubinho</b>: vale 1 (uma unidade). Junte 10 cubinhos e eles viram uma <b>barra</b>: 1 dezena.",set(){B().place(-5,-3,30)},
+  async play(){const C=[];for(let i=0;i<10;i++)C.push(cube(-2.5+i*.6,0,NCOL.u,{s:.3}));if(!(await wait(500)))return;
+   if(!(await tween(700,k=>C.forEach((c,i)=>{c.position.x=(-2.5+i*.6)+((-1.35+i*.3)-(-2.5+i*.6))*k}))))return;C.forEach(c=>root.remove(c));
+   const r=new THREE.Mesh(new THREE.BoxGeometry(3,.3,.3),new THREE.MeshStandardMaterial({map:gridTex(10,1,hex(NCOL.d))}));r.position.copy(P3(0,0,.15));r.castShadow=true;add(r);label("1 dezena = 10",0,-1,.3,{size:.5})}},
+ {m:"aponta",t:"E 10 barras juntas formam uma <b>placa</b>: 1 centena = 100. Nosso sistema é <b>decimal</b> porque tudo se agrupa de 10 em 10.",set(){B().place(-5,-3,30);flat(1,.5);label("1 centena = 100",1,-1.6,.3,{size:.5});ov(CARDS([["1","unidade"],["10","dezena"],["100","centena"]]))}},
+ {m:"aponta",t:"Com os blocos, o número <b>245</b> fica assim: 2 placas, 4 barras e 5 cubinhos. Cada algarismo diz quantos blocos daquele tipo há.",set(){B().place(-5.5,-3.5,30);base10(2,4,5);ov(CARDS([["2","centenas = 200"],["4","dezenas = 40"],["5","unidades = 5"]]))}},
+ {m:"normal",t:"Agora monte você: forme o número <b>132</b> com os blocos.",set(){B().place(-5.5,-3.5,30)},
+  a:{k:"step",c:[["Centenas",0,9],["Dezenas",0,9],["Unidades",0,9]],goal:[1,3,2],draw:v=>base10(v[0],v[1],v[2]),txt:v=>`${v[0]*100+v[1]*10+v[2]}`,test:v=>v[0]==1&&v[1]==3&&v[2]==2,ok:()=>"Perfeito! 1 centena + 3 dezenas + 2 unidades = <b>132</b>."}},
+ {m:"pensa",t:"O mesmo algarismo vale coisas diferentes conforme o <b>lugar</b> onde está. No 333, o primeiro 3 vale 300, o do meio vale 30 e o último vale 3.",
+  set(){B().place(-5.5,-3.5,30);base10(3,3,3);ov(CARDS([["3","vale 300"],["3","vale 30"],["3","vale 3"]]))}},
+ {m:"normal",t:"Valor de cada lugar.",set(){B().place(0,-3,90)},a:{k:"opt",q:"No número 4 507, quanto vale o algarismo 5?",o:["5","50","500"],ans:2,ok:"Isso! O 5 está no lugar das centenas: vale <b>500</b>.",no:"Conte da direita para a esquerda: unidades, dezenas, centenas..."}},
+ {m:"normal",t:"E o zero?",set(){B().place(-5.5,-3.5,30);base10(5,0,7)},a:{k:"opt",q:"No número 507, o que o zero quer dizer?",o:["Nenhuma dezena","Nada, pode apagar","Cinco dezenas"],ans:0,ok:"Exato! O zero guarda o lugar: <b>nenhuma dezena</b>. Sem ele, 507 viraria 57.",no:"Olhe os blocos: quantas barras de 10 aparecem?"}},
+ {m:"festa",end:1,t:"Agora você entende o <b>valor posicional</b>, a ideia mais poderosa do nosso sistema de números!",set(){B().place(0,0,-90)},badge:["10²","Sistema decimal","O lugar muda o valor."]}]},
+
+/* 3 */{t:"Adição e subtração",d:"Somar e subtrair pulando na reta numérica.",i:"+−",steps:[
+ {m:"aponta",t:"Na <b>reta numérica</b>, cada número tem seu lugar, em ordem. Somar é pular para a <b>direita</b>. Veja: 3 + 4.",set(){camTo({th:Math.PI/2-.2,ph:.9,r:13,tx:0,tz:0})},
+  async play(){const X=nline(0,12);B().place(X(0),0,0);if(!(await wait(400)))return;arcLine(X(0),X(3),0xee5f2b,1.2);if(!(await hopTo(X,3)))return;label("+3",X(1.5),0,2,{size:.5,color:"#ee5f2b"});
+   arcLine(X(3),X(7),0x0e8f86,1.5);if(!(await hopTo(X,7)))return;label("+4",X(5),0,2.2,{size:.5,color:"#0e8f86"});label("3 + 4 = 7",X(7),2,.3,{size:.6})}},
+ {m:"normal",t:"Estou no <b>5</b>. Toque na reta onde eu paro em <b>5 + 6</b>.",set(){const X=nline(0,12);B().place(X(5),0,0)},
+  a:{k:"pick",n:1,mark:0,check:async p=>{const [x,y]=p[0],n=x+6;if(y==0&&n==11){await bip.hop(x,0);return {ok:1,msg:"Isso! 6 pulinhos para a direita: <b>5 + 6 = 11</b>."}}return {ok:0,msg:"Ali não. Comece no 5 e conte 6 casas para a <b>direita</b>."}}}},
+ {m:"aponta",t:"Subtrair é pular para a <b>esquerda</b>. 9 − 4: saio do 9 e volto 4 casas.",set(){},
+  async play(){const X=nline(0,12);B().place(X(9),0,180);if(!(await wait(400)))return;arcLine(X(9),X(5),0x6b4fd8,1.4);if(!(await hopTo(X,5)))return;label("−4",X(7),0,2,{size:.5,color:"#6b4fd8"});label("9 − 4 = 5",X(5),2,.3,{size:.6})}},
+ {m:"normal",t:"Estou no <b>12</b>. Toque onde eu paro em <b>12 − 7</b>.",set(){const X=nline(0,12);B().place(X(12),0,180)},
+  a:{k:"pick",n:1,mark:0,check:async p=>{const [x,y]=p[0],n=x+6;if(y==0&&n==5){await bip.hop(x,0);return {ok:1,msg:"Certo: <b>12 − 7 = 5</b>."}}return {ok:0,msg:"Comece no 12 e volte 7 casas para a <b>esquerda</b>."}}}},
+ {m:"pensa",t:"Somar e subtrair são <b>operações inversas</b>: uma desfaz a outra. Vou ao 11 com +6 e volto ao 5 com −6.",set(){},
+  async play(){const X=nline(0,12);B().place(X(5),0,0);if(!(await wait(300)))return;arcLine(X(5),X(11),0xee5f2b,1.6);if(!(await hopTo(X,11)))return;if(!(await wait(300)))return;
+   arcLine(X(11),X(5),0x6b4fd8,.8);if(!(await hopTo(X,5)))return;label("5 + 6 = 11  ⇄  11 − 6 = 5",0,2.2,.3,{size:.55})}},
+ {m:"normal",t:"Use a ideia de inversa.",set(){B().place(0,-3,90)},a:{k:"opt",q:"Se 38 + 25 = 63, quanto é 63 − 25?",o:["38","25","88"],ans:0,ok:"Isso! A subtração desfaz a soma: <b>38</b>.",no:"Se somar 25 levou de 38 a 63, tirar 25 volta para onde?"}},
+ {m:"normal",t:"Agora uma conta maior. Some as unidades, depois as dezenas, depois as centenas.",set(){B().place(0,-3,90);ov(CARDS([["7 + 5","= 12 unidades"],["4 + 3 + 1","= 8 dezenas"],["2 + 1","= 3 centenas"]]))},
+  a:{k:"opt",q:"Quanto é 247 + 135?",o:["372","382","482"],ans:1,ok:"Certo! 12 unidades viram 1 dezena e 2 unidades (o famoso <b>vai um</b>): <b>382</b>.",no:"7 + 5 = 12: escreva 2 e leve 1 dezena para a próxima coluna."}},
+ {m:"festa",end:1,t:"Somar e subtrair agora são pulos na reta para você!",set(){B().place(0,0,-90)},badge:["+","Saltador","Adição e subtração."]}]},
+
+/* 4 */{t:"Multiplicação",d:"Somas repetidas e retângulos de cubos.",i:"×",steps:[
+ {m:"aponta",t:"Multiplicar é <b>somar parcelas iguais</b>. 3 × 4 é somar o 4 três vezes: 4 + 4 + 4.",set(){camTo({th:Math.PI/2-.2,ph:.9,r:13,tx:0,tz:0})},
+  async play(){const X=nline(0,12);B().place(X(0),0,0);for(let i=0;i<3;i++){if(!(await wait(250)))return;arcLine(X(4*i),X(4*i+4),[0xee5f2b,0x0e8f86,0x6b4fd8][i],1.5);if(!(await hopTo(X,4*i+4)))return;label("+4",X(4*i+2),0,2.2,{size:.45})}
+   label("3 × 4 = 12",X(12)-1,2,.3,{size:.6})}},
+ {m:"aponta",t:"Também dá para ver como um <b>retângulo</b>: 3 fileiras com 4 cubos cada. Total: 12 cubos.",set(){B().place(-5,-3,30)},
+  async play(){for(let r=0;r<3;r++){for(let c=0;c<4;c++){const m=cube(-1.5+c*.9,1.4-r*.9,NCOL.u,{s:.6});m.position.y+=1.2;if(!(await tween(120,k=>{m.position.y=.3+1.2*(1-k)})))return}label(`${(r+1)*4}`,2.4,1.4-r*.9,.4,{size:.45})}}},
+ {m:"pensa",t:"Agora giro o retângulo: viram 4 fileiras de 3. Continua 12! Na multiplicação, <b>a ordem não muda o resultado</b>: 3 × 4 = 4 × 3.",set(){B().place(-5,-3,30)},
+  async play(){const G=new THREE.Group();add(G);for(let r=0;r<3;r++)for(let c=0;c<4;c++){const m=new THREE.Mesh(new THREE.BoxGeometry(.6,.6,.6),mat(NCOL.u,{roughness:.35,emissive:NCOL.u,emissiveIntensity:.1}));m.position.set(-1.35+c*.9,.3,-.9+r*.9);m.castShadow=true;G.add(m)}
+   if(!(await wait(500)))return;if(!(await tween(1100,k=>{G.rotation.y=k*Math.PI/2})))return;label("4 × 3 = 12",0,-2.6,.3,{size:.6})}},
+ {m:"normal",t:"Monte um retângulo com exatamente <b>24 cubos</b>. Escolha quantas fileiras e quantos cubos em cada uma.",set(){B().place(-5.5,-3.5,30)},
+  a:{k:"step",c:[["Fileiras",1,8],["Cubos por fileira",1,8]],init:[2,2],goal:[3,8],draw:v=>{const s=.45;for(let r=0;r<v[0];r++)for(let c=0;c<v[1];c++)cube(-(v[1]-1)*s/2*1.15+c*s*1.15,1.6-r*s*1.15,NCOL.u,{s})},
+   txt:v=>`${v[0]} × ${v[1]} = ${v[0]*v[1]}`,test:v=>v[0]*v[1]==24,ok:v=>`Isso! <b>${v[0]} × ${v[1]} = 24</b>. Existem outros jeitos também: 3 × 8, 4 × 6, 6 × 4, 8 × 3...`}},
+ {m:"normal",t:"Tabuada!",set(){B().place(0,-3,90)},a:{k:"opt",q:"Quanto é 7 × 8?",o:["54","56","64"],ans:1,ok:"Certo: <b>56</b>. Dica: 7 × 8 = 7 × 4 × 2 = 28 × 2.",no:"Tente 7 × 4 = 28 e depois dobre."}},
+ {m:"normal",t:"Na escola.",set(){B().place(-5,-3,30);for(let r=0;r<6;r++)for(let c=0;c<5;c++){const m=new THREE.Mesh(new THREE.BoxGeometry(.6,.4,.45),mat(0x8a6a4a));m.position.copy(P3(-2+c,2.5-r*.9,.2));m.castShadow=true;add(m)}},
+  a:{k:"opt",q:"Uma sala tem 6 fileiras com 5 carteiras em cada. Quantas carteiras há?",o:["11","30","35"],ans:1,ok:"Isso: 6 × 5 = <b>30</b> carteiras.",no:"São 6 fileiras iguais de 5: multiplique."}},
+ {m:"festa",end:1,t:"Você enxerga a multiplicação como soma repetida e como retângulo!",set(){B().place(0,0,-90)},badge:["×","Multiplicador","Somas iguais e retângulos."]}]},
+
+/* 5 */{t:"Divisão",d:"Repartir em partes iguais, e o que sobra.",i:"÷",steps:[
+ {m:"pensa",t:"Dividir é <b>repartir em partes iguais</b>. Tenho 12 cubos para dividir entre 3 amigos. Vou dar um para cada, na vez de cada um...",set(){B().place(-5,-3,30);[-3,0,3].forEach((x,i)=>{circ([x,2],.9,{fill:1,color:[0xee5f2b,0x0e8f86,0x6b4fd8][i]})})},
+  async play(){const C=[];for(let i=0;i<12;i++)C.push(cube(-1.1+(i%4)*.5,-1.6-Math.floor(i/4)*.5,NCOL.u));if(!(await wait(500)))return;
+   for(let i=0;i<12;i++){const a=i%3,q=Math.floor(i/3);if(!(await slide(C[i],[-3,0,3][a]-.3+(q%2)*.6,2.3-Math.floor(q/2)*.6,260,.9)))return}label("12 ÷ 3 = 4",0,-1.4,.3,{size:.6})}},
+ {m:"aponta",t:"Dividir também responde: <b>quantos grupos de 3 cabem em 12?</b> Na reta, volto de 3 em 3 do 12 até o 0: são <b>4 pulos</b>.",set(){camTo({th:Math.PI/2-.2,ph:.9,r:13,tx:0,tz:0})},
+  async play(){const X=nline(0,12);B().place(X(12),0,180);for(let i=0;i<4;i++){if(!(await wait(200)))return;arcLine(X(12-3*i),X(9-3*i),0x6b4fd8,1.2);if(!(await hopTo(X,9-3*i)))return;label(String(i+1)+"º",X(10.5-3*i),0,1.9,{size:.42})}}},
+ {m:"aponta",t:"Às vezes <b>sobra</b>. 14 cubos para 3 amigos: cada um ganha 4 e sobram 2. A sobra se chama <b>resto</b>.",set(){B().place(-5,-3,30);[-3,0,3].forEach((x,i)=>circ([x,2],.9,{fill:1,color:[0xee5f2b,0x0e8f86,0x6b4fd8][i]}))},
+  async play(){const C=[];for(let i=0;i<14;i++)C.push(cube(-1.4+(i%5)*.5,-1.4-Math.floor(i/5)*.5,i>=12?NCOL.red:NCOL.u));if(!(await wait(400)))return;
+   for(let i=0;i<12;i++){const a=i%3,q=Math.floor(i/3);if(!(await slide(C[i],[-3,0,3][a]-.3+(q%2)*.6,2.3-Math.floor(q/2)*.6,200,.9)))return}
+   label("← sobram 2",1.6,-2.4,.4,{size:.5,color:"#d23f45"});label("14 ÷ 3 = 4, resto 2",0,-3.6,.3,{size:.55})}},
+ {m:"normal",t:"Tente.",set(){B().place(0,-3,90)},a:{k:"opt",q:"Quanto é 35 ÷ 5?",o:["6","7","8"],ans:1,ok:"Certo: <b>7</b>, porque 7 × 5 = 35.",no:"Pense: qual número vezes 5 dá 35?"}},
+ {m:"normal",t:"Agora com resto.",set(){B().place(0,-3,90)},a:{k:"opt",q:"17 balas divididas entre 4 crianças. Quantas balas sobram?",o:["0","1","3"],ans:1,ok:"Isso! Cada uma ganha 4 (4 × 4 = 16) e <b>sobra 1</b>.",no:"Quanto é 4 × 4? E quanto falta para 17?"}},
+ {m:"pensa",t:"A divisão é a <b>inversa da multiplicação</b>.",set(){B().place(0,-3,90);ov(CARDS([["4 × 3 = 12","multiplicação"],["12 ÷ 3 = 4","divisão"],["12 ÷ 4 = 3","divisão"]]))},
+  a:{k:"opt",q:"Se 9 × 6 = 54, quanto é 54 ÷ 9?",o:["5","6","9"],ans:1,ok:"Certo: <b>6</b>. A divisão desfaz a multiplicação.",no:"9 vezes quanto dá 54?"}},
+ {m:"festa",end:1,t:"Você sabe repartir, contar grupos e achar o resto!",set(){B().place(0,0,-90)},badge:["÷","Repartidor","Divisão exata e com resto."]}]},
+
+/* 6 */{t:"Expressões numéricas",d:"Qual conta vem primeiro? A ordem das operações.",i:"( )",steps:[
+ {m:"pensa",t:"Quanto é <b>2 + 3 × 4</b>? Se eu fizer na ordem em que leio, dá 20. Mas a resposta certa é <b>14</b>! Por quê?",set(){B().place(-5,-1.5,0);exprRow(["2","+","3","×","4"])}},
+ {m:"aponta",t:"Existe uma <b>ordem combinada</b> no mundo inteiro: 1º parênteses, 2º multiplicação e divisão, 3º adição e subtração. Veja a multiplicação ser feita primeiro.",set(){B().place(-5,-1.5,0);ov(CARDS([["1º","( ) parênteses"],["2º","× e ÷"],["3º","+ e −"]]))},
+  async play(){let r=exprRow(["2","+","3","×","4"]);if(!(await wait(800)))return;if(!(r=await merge(r,2,4,"12")))return;if(!(await wait(500)))return;if(!(r=await merge(r,0,2,"14")))return;confetti(0,1.5,24)}},
+ {m:"aponta",t:"Os <b>parênteses</b> mandam fazer primeiro: (2 + 3) × 4 = 5 × 4 = <b>20</b>.",set(){B().place(-5,-1.5,0)},
+  async play(){let r=exprRow(["(","2","+","3",")","×","4"]);if(!(await wait(800)))return;if(!(r=await merge(r,0,4,"5")))return;if(!(await wait(500)))return;if(!(r=await merge(r,0,2,"20")))return}},
+ {m:"normal",t:"Primeiro a multiplicação!",set(){B().place(-5,-1.5,0);exprRow(["10","−","2","×","3"])},a:{k:"opt",q:"Quanto é 10 − 2 × 3?",o:["24","4","7"],ans:1,ok:"Isso! 2 × 3 = 6, depois 10 − 6 = <b>4</b>.",no:"Faça primeiro 2 × 3."}},
+ {m:"normal",t:"Agora com parênteses.",set(){B().place(-5,-1.5,0);exprRow(["(","8","+","4",")","÷","2"])},a:{k:"opt",q:"Quanto é (8 + 4) ÷ 2?",o:["10","6","12"],ans:1,ok:"Certo: 12 ÷ 2 = <b>6</b>.",no:"Primeiro o que está dentro dos parênteses."}},
+ {m:"normal",t:"Desafio da ordem.",set(){B().place(-5,-1.5,0);exprRow(["5","+","20","÷","5","−","1"])},a:{k:"opt",q:"Quanto é 5 + 20 ÷ 5 − 1?",o:["4","8","3"],ans:1,ok:"Perfeito: 20 ÷ 5 = 4, depois 5 + 4 − 1 = <b>8</b>.",no:"Faça a divisão primeiro. Depois some e subtraia da esquerda para a direita."}},
+ {m:"festa",end:1,t:"Agora nenhuma expressão engana você!",set(){B().place(0,0,-90)},badge:["( )","Organizador","A ordem das operações."]}]},
+
+/* 7 */{t:"Múltiplos e divisores",d:"Pular de tantos em tantos e dividir sem sobrar.",i:"3·4",steps:[
+ {m:"aponta",t:"Os <b>múltiplos de 3</b> são os números onde eu paro pulando de 3 em 3 a partir do zero: 0, 3, 6, 9, 12...",set(){camTo({th:Math.PI/2-.2,ph:.9,r:13,tx:0,tz:0})},
+  async play(){const X=nline(0,12);B().place(X(0),0,0);for(let n=3;n<=12;n+=3){arcLine(X(n-3),X(n),0xee5f2b,1.1);if(!(await hopTo(X,n)))return;pt("",X(n),0,{color:0xee5f2b})}}},
+ {m:"normal",t:"Sua vez: toque nos <b>3 múltiplos de 4</b> que aparecem na reta (sem contar o zero).",set(){nline(0,12);B().place(-6,-2.5,0)},
+  a:{k:"pick",n:3,check:async p=>{const ns=p.map(([x,y])=>y==0?x+6:-1).sort((a,b)=>a-b);if(ns.join()=="4,8,12"){for(const n of ns)await bip.hop(n-6,0);return {ok:1,msg:"Isso! <b>4, 8 e 12</b>: pulando de 4 em 4."}}
+   return {ok:0,msg:"Algum não está certo. Comece no zero e pule de 4 em 4."}}}},
+ {m:"pensa",t:"<b>Divisor</b> é o outro lado da moeda: 3 é divisor de 12 porque 12 ÷ 3 dá exato, <b>sem sobrar nada</b>.",set(){B().place(-5,-3,30);for(let r=0;r<3;r++)for(let c=0;c<4;c++)cube(-1.5+c*.9,1.4-r*.9,NCOL.u,{s:.6});label("12 = 3 × 4",0,-1.6,.3,{size:.55})}},
+ {m:"aponta",t:"Os divisores de 12 aparecem nos retângulos que dá para montar com 12 cubos: 1 × 12, 2 × 6 e 3 × 4. Então os divisores de 12 são <b>1, 2, 3, 4, 6 e 12</b>.",set(){B().place(-6,-3.5,30)},
+  async play(){const C=[];for(let i=0;i<12;i++)C.push(cube(-5.5+i*.9,2.5,NCOL.u,{s:.5}));label("1 × 12",0,3.5,.3,{size:.45});if(!(await wait(900)))return;
+   for(const [r,c,yy] of [[2,6,.5],[3,4,-2]]){const cs=C.map(m=>{const n=cube(0,0,NCOL.d,{s:.5});n.position.copy(m.position);return n});
+    if(!(await Promise.all(cs.map((m,i)=>slide(m,-(c-1)*.35+(i%c)*.7,yy+((r-1)/2-Math.floor(i/c))*.7,500,.5)))))return;label(`${r} × ${c}`,(c)*.35+.8,yy,.3,{size:.45});if(!(await wait(500)))return}}},
+ {m:"normal",t:"Teste rápido.",set(){B().place(0,-3,90)},a:{k:"opt",q:"Qual destes NÃO é divisor de 18?",o:["2","3","4","6"],ans:2,ok:"Certo! 18 ÷ 4 = 4 e <b>sobra 2</b>. Então 4 não é divisor de 18.",no:"Faça a divisão: ela tem que dar exata."}},
+ {m:"normal",t:"Mais um.",set(){B().place(0,-3,90)},a:{k:"opt",q:"Qual número é múltiplo de 2 e também de 5?",o:["15","20","25"],ans:1,ok:"Isso: <b>20</b> = 2 × 10 = 5 × 4. Todo número terminado em 0 é múltiplo de 2 e de 5.",no:"Precisa ser par e terminar em 0 ou 5."}},
+ {m:"festa",end:1,t:"Múltiplos e divisores dominados!",set(){B().place(0,0,-90)},badge:["3·4","Caçador de múltiplos","Múltiplos e divisores."]}]},
+
+/* 8 */{t:"Números primos",d:"Os números que só formam um retângulo, e o crivo de Eratóstenes.",i:"7",steps:[
+ {m:"pensa",t:"Com 7 cubos só dá para montar uma fila: 1 × 7. Se tento 2 fileiras, sobra um. Números assim são os <b>primos</b>: só têm dois divisores, o 1 e eles mesmos.",set(){B().place(-5,-3,30)},
+  async play(){const C=[];for(let i=0;i<7;i++)C.push(cube(-3+i,2,NCOL.u,{s:.6}));label("1 × 7",0,3,.3,{size:.45});if(!(await wait(900)))return;
+   for(let i=0;i<7;i++){const m=cube(-3+i,2,i==6?NCOL.red:NCOL.d,{s:.6});if(!(await slide(m,i<6?-1+(i%3)*.9:2.2,i<6?-.2-Math.floor(i/3)*.9:-.6,220,.4)))return}label("sobra 1!",2.2,-1.5,.4,{size:.45,color:"#d23f45"})}},
+ {m:"aponta",t:"O grego <b>Eratóstenes</b> inventou uma peneira para achar primos: risco o 1, depois os múltiplos de 2, de 3 e de 5. O que não for riscado é <b>primo</b>.",set(){B().place(-6,-2.5,30);camTo({th:Math.PI/2-.25,ph:.9,r:13,tx:0,tz:-.8})},
+  async play(){const T=crivo();if(!(await wait(500)))return;T[1].userData.paint("#c3cedc","#7d8a9a");
+   for(const p of [2,3,5]){if(!(await wait(500)))return;T[p].userData.paint("#1b9a52","#fff",0x146b3a);for(let n=2*p;n<=30;n+=p){if(!(await wait(70)))return;T[n].userData.paint("#c3cedc","#7d8a9a")}}
+   for(let n=2;n<=30;n++)if(isPrime(n))T[n].userData.paint("#1b9a52","#fff",0x146b3a)}},
+ {m:"aponta",t:"Sobraram os primos até 30: <b>2, 3, 5, 7, 11, 13, 17, 19, 23 e 29</b>.",set(){B().place(-6,-2.5,30);camTo({tz:-.8});crivo(n=>isPrime(n)?"p":"x")}},
+ {m:"normal",t:"Toque em <b>2 números primos</b> no quadro.",set(){B().place(-6,-2.5,30);camTo({tz:-.8});crivo()},
+  a:{k:"pick",n:2,mark:0,check:async p=>{const ns=p.map(([x,y])=>(y>=0&&y<=2&&x>=-5&&x<=4)?(2-y)*10+x+6:0);if(ns.every(isPrime))return {ok:1,msg:`Isso! <b>${ns.join(" e ")}</b> são primos.`};
+   const bad=ns.find(n=>!isPrime(n));return {ok:0,msg:bad>1?`O ${bad} não é primo: ele tem outros divisores. Tente de novo.`:"Toque nos números do quadro. Lembre: o 1 não é primo."}}}},
+ {m:"normal",t:"Pergunta clássica.",set(){B().place(0,-3,90)},a:{k:"opt",q:"O número 1 é primo?",o:["Sim","Não"],ans:1,ok:"Certo! O 1 tem <b>só um</b> divisor. Primos têm exatamente dois.",no:"Quantos divisores o 1 tem?"}},
+ {m:"normal",t:"Mais uma.",set(){B().place(0,-3,90)},a:{k:"opt",q:"Qual é o único número primo que é par?",o:["2","4","0"],ans:0,ok:"Isso: o <b>2</b>. Todos os outros pares são divisíveis por 2.",no:"Os pares são múltiplos de 2..."}},
+ {m:"festa",end:1,t:"Você peneirou os primos como Eratóstenes!",set(){B().place(0,0,-90)},badge:["7","Peneira de primos","Números primos."]}]},
+
+/* 9 */{t:"MMC e MDC",d:"Onde os pulos se encontram e o maior pedaço que serve nos dois.",i:"∩",steps:[
+ {m:"pensa",t:"Imagine dois sapos saindo do zero: um pula de 4 em 4 (caminho <b>laranja</b>) e o outro de 6 em 6 (caminho <b>verde</b>). Onde eles se encontram primeiro?",set(){camTo({th:Math.PI/2-.2,ph:.9,r:13,tx:0,tz:0});B().place(-6,-3,30)},
+  async play(){const X=nline(0,24,{k:.5,every:2});for(let n=4;n<=24;n+=4){arcLine(X(n-4),X(n),0xee5f2b,1);if(!(await wait(220)))return}
+   for(let n=6;n<=24;n+=6){const a=arcLine(X(n-6),X(n),0x1b9a52,1.8);if(!(await wait(220)))return}[12,24].forEach(n=>pt("",X(n),0,{color:0xd58200,pulse:1}))}},
+ {m:"aponta",t:"Eles se encontram no 12 e no 24 (os <b>múltiplos comuns</b>). O <b>menor</b> deles é o <b>MMC</b>: mmc(4, 6) = 12.",set(){const X=nline(0,24,{k:.5,every:2});B().place(-6,-3,30);[12,24].forEach(n=>pt("",X(n),0,{color:0xd58200,pulse:1}));
+  ov(CARDS([["4","4, 8, 12, 16, 20, 24"],["6","6, 12, 18, 24"],["mmc = 12","o menor em comum"]]))}},
+ {m:"normal",t:"Ache o MMC.",set(){B().place(0,-3,90)},a:{k:"opt",q:"mmc(3, 5) = ?",o:["8","15","30"],ans:1,ok:"Certo: 3, 6, 9, 12, <b>15</b>... e 5, 10, <b>15</b>. O primeiro encontro é 15.",no:"Liste os múltiplos de 3 e de 5 e procure o primeiro que aparece nas duas listas."}},
+ {m:"pensa",t:"Agora o <b>MDC</b>. Tenho duas fitas: uma de 12 e outra de 18. Quero cortar as duas em pedaços <b>iguais</b>, do <b>maior tamanho</b> possível.",set(){B().place(-6,-3,30);seg([-3,1.5],[3,1.5],{color:0xee5f2b,w:.12});seg([-4.5,-.5],[4.5,-.5],{color:0x0e8f86,w:.12});label("12",-3.8,1.5,.4,{size:.45});label("18",-5.3,-.5,.4,{size:.45})}},
+ {m:"aponta",t:"Pedaços de <b>6</b> servem nas duas fitas: 12 = 6 + 6 e 18 = 6 + 6 + 6. Nenhum pedaço maior serve. Então <b>mdc(12, 18) = 6</b>, o maior divisor comum.",set(){B().place(-6,-3,30)},
+  async play(){const A=[],Bb=[];for(let i=0;i<2;i++)A.push(seg([-3+i*3,1.5],[-3+i*3+2.9,1.5],{color:0xee5f2b,w:.12}));for(let i=0;i<3;i++)Bb.push(seg([-4.5+i*3,-.5],[-4.5+i*3+2.9,-.5],{color:0x0e8f86,w:.12}));
+   for(const m of [...A,...Bb]){if(!(await wait(250)))return;const y0=m.position.y;await tween(300,(k,l)=>{m.position.y=y0+4*.4*l*(1-l)})}
+   [-1.5,1.5].forEach(x=>label("6",x,2.3,.3,{size:.42}));[-3,0,3].forEach(x=>label("6",x,.3,.3,{size:.42}))}},
+ {m:"normal",t:"Ache o MDC.",set(){B().place(0,-3,90)},a:{k:"opt",q:"mdc(8, 12) = ?",o:["2","4","24"],ans:1,ok:"Isso: os divisores de 8 são 1, 2, 4, 8 e os de 12 são 1, 2, 3, 4, 6, 12. O maior em comum é <b>4</b>.",no:"Liste os divisores dos dois números e pegue o maior que aparece nas duas listas."}},
+ {m:"festa",end:1,t:"Agora você sabe achar encontros (MMC) e pedaços iguais (MDC)!",set(){B().place(0,0,-90)},badge:["∩","Encontrador","MMC e MDC."]}]},
+
+/* 10 */{t:"Potência e raiz",d:"Quadrados, cubos e o caminho de volta.",i:"x²",steps:[
+ {m:"aponta",t:"Multiplicar um número por ele mesmo vira <b>potência</b>: 3 × 3 = 3² (três ao quadrado) = 9. Por que “quadrado”? Porque forma um quadrado!",set(){B().place(-5,-3,30)},
+  async play(){for(let r=0;r<3;r++)for(let c=0;c<3;c++){const m=cube(-.9+c*.9,1.6-r*.9,NCOL.u,{s:.7});m.position.y+=1;if(!(await tween(110,k=>{m.position.y=.35+1*(1-k)})))return}label("3² = 9",0,-1.5,.3,{size:.6})}},
+ {m:"aponta",t:"E 2 × 2 × 2 = 2³ (dois ao cubo) = 8: os cubinhos formam um <b>cubo</b>!",set(){B().place(-5,-3,30)},
+  async play(){let i=0;for(let z=0;z<2;z++)for(let r=0;r<2;r++)for(let c=0;c<2;c++){const m=cube(-.4+c*.8,1-r*.8,[NCOL.u,NCOL.d][z],{s:.78,h:z*.8});const y=m.position.y;m.position.y+=1.4;if(!(await tween(160,k=>{m.position.y=y+1.4*(1-k)})))return;i++}label("2³ = 8",0,-1,.3,{size:.6})}},
+ {m:"normal",t:"Monte o <b>quadrado de lado 5</b>. Quantos cubos ele tem?",set(){B().place(-6,-3.5,30)},
+  a:{k:"step",c:[["Lado do quadrado",1,7]],init:[2],goal:[5],draw:v=>{const s=.55;for(let r=0;r<v[0];r++)for(let c=0;c<v[0];c++)cube(-(v[0]-1)*s*.6+c*s*1.2,2-r*s*1.2,NCOL.u,{s})},
+   txt:v=>`${v[0]}² = ${v[0]*v[0]} cubos`,test:v=>v[0]==5,ok:()=>"Isso! <b>5² = 5 × 5 = 25</b> cubos."}},
+ {m:"pensa",t:"A <b>raiz quadrada</b> faz o caminho de volta: “qual quadrado tem 16 cubos?” O de lado 4. Então <b>√16 = 4</b>.",set(){B().place(-5,-3,30);for(let r=0;r<4;r++)for(let c=0;c<4;c++)cube(-1.35+c*.9,1.9-r*.9,NCOL.d,{s:.65});label("16 cubos",0,-2,.3,{size:.5});label("lado 4",2.6,.6,.3,{size:.45})}},
+ {m:"normal",t:"Agora descubra a raiz: monte um quadrado com <b>36 cubos</b>.",set(){B().place(-6,-3.5,30)},
+  a:{k:"step",c:[["Lado do quadrado",1,7]],init:[2],goal:[6],draw:v=>{const s=.55;for(let r=0;r<v[0];r++)for(let c=0;c<v[0];c++)cube(-(v[0]-1)*s*.6+c*s*1.2,2-r*s*1.2,NCOL.d,{s})},
+   txt:v=>`lado ${v[0]} → ${v[0]*v[0]} cubos`,test:v=>v[0]==6,ok:()=>"Achou! O lado é 6, então <b>√36 = 6</b>."}},
+ {m:"normal",t:"Potência.",set(){B().place(0,-3,90)},a:{k:"opt",q:"Quanto é 10²?",o:["20","100","1000"],ans:1,ok:"Certo: 10 × 10 = <b>100</b>. (Cuidado: 10² não é 10 × 2.)",no:"10² é 10 × 10, não 10 × 2."}},
+ {m:"normal",t:"Raiz.",set(){B().place(0,-3,90)},a:{k:"opt",q:"Quanto é √49?",o:["7","24,5","49"],ans:0,ok:"Isso: 7 × 7 = 49, então <b>√49 = 7</b>.",no:"Qual número vezes ele mesmo dá 49?"}},
+ {m:"festa",end:1,t:"Você completou o <b>Mundo 2</b>: os números naturais! Próxima parada: as frações.",set(){B().place(0,0,-90)},badge:["x²","Mestre dos naturais","Mundo 2 completo!"]}]}
+];
+
 const WORLDS=[
  {t:"Fundamentos da Geometria",d:"Do ponto ao círculo: os 5 axiomas de Euclides.",c:"#6b4fd8",L:W1},
- {t:"Números naturais",d:"Contar, o sistema decimal e as quatro operações.",c:"#0e8f86",soon:["Contar e agrupar","Sistema decimal","Adição e subtração","Multiplicação","Divisão","Expressões numéricas","Múltiplos e divisores","Números primos","MMC e MDC","Potência e raiz"]},
+ {t:"Números naturais",d:"Contar, o sistema decimal, as quatro operações, primos, MMC, MDC e potências.",c:"#0e8f86",L:W2},
  {t:"Frações e decimais",d:"Partes do inteiro, números decimais e porcentagem.",c:"#d93a7f",soon:["O que é fração","Frações equivalentes","Comparar frações","Somar e subtrair frações","Multiplicar e dividir frações","Números decimais","Operações com decimais","Porcentagem","Razão"]},
  {t:"Números inteiros",d:"Números negativos, operações e plano cartesiano.",c:"#2f6fd6",soon:["Abaixo de zero","Reta numérica","Somar e subtrair inteiros","Regra de sinais","Plano cartesiano","Números racionais"]},
  {t:"Álgebra",d:"Letras no lugar de números: equações e proporções.",c:"#d58200",soon:["Expressões algébricas","Princípio da igualdade","Equações do 1º grau","Inequações","Proporção e regra de três","Sistemas de equações"]},
@@ -504,6 +756,9 @@ const store=()=>{try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}};
 const lid=(w,l)=>w+"-"+l;
 const XP_LESSON=100,XP_LEVEL=300;
 
+/* um mundo abre quando todas as aulas do mundo anterior foram concluídas */
+function worldOpen(wi,done){if(wi==0)return true;const P=WORLDS[wi-1];return !!P.L&&P.L.every((_,li)=>done.has(lid(wi-1,li)))}
+let unlockMsg="";
 function drawHome(){$("heroBip").innerHTML=FACE2D("feliz");
  const done=new Set(save.done),xp=done.size*XP_LESSON,lv=Math.floor(xp/XP_LEVEL)+1;
  $("lvN").textContent="Nível "+lv;$("lvB").style.width=(xp%XP_LEVEL)/XP_LEVEL*100+"%";$("lvT").textContent=`${xp} XP · faltam ${XP_LEVEL-xp%XP_LEVEL} para o nível ${lv+1}`;
@@ -511,11 +766,11 @@ function drawHome(){$("heroBip").innerHTML=FACE2D("feliz");
  document.querySelectorAll(".axs span").forEach(s=>s.classList.toggle("on",axs.has(s.dataset.ax)));
  let h="";WORLDS.forEach((W,wi)=>{
   if(!W.L){h+=`<section class="world lock"><div class="wh"><span class="wn" style="background:${W.c}">${wi+1}</span><div><h2>${W.t}</h2><p>${W.d}</p><span class="tagsoon">EM CONSTRUÇÃO</span></div></div><div class="soon">${W.soon.map(s=>`<span>${s}</span>`).join("")}</div></section>`;return}
-  const n=W.L.filter((_,li)=>done.has(lid(wi,li))).length,next=W.L.findIndex((_,li)=>!done.has(lid(wi,li)));
-  h+=`<section class="world"><div class="wh"><span class="wn" style="background:${W.c}">${wi+1}</span><div><h2>${W.t}</h2><p>${W.d}</p></div><span class="wc">${n} de ${W.L.length}</span></div><div class="trail">`+
+  const n=W.L.filter((_,li)=>done.has(lid(wi,li))).length,open=worldOpen(wi,done),next=open?W.L.findIndex((_,li)=>!done.has(lid(wi,li))):-1;
+  h+=`<section class="world${open?"":" lock"}"><div class="wh"><span class="wn" style="background:${W.c}">${wi+1}</span><div><h2>${W.t}</h2><p>${W.d}</p>${open?"":`<span class="tagsoon">🔒 TERMINE O MUNDO ${wi} PARA ABRIR</span>`}</div><span class="wc">${n} de ${W.L.length}</span></div><div class="trail">`+
   W.L.map((L,li)=>{const d=done.has(lid(wi,li)),st=d?"done":li==next?"next":"lock";
    return `<button class="les ${st}" data-w="${wi}" data-l="${li}"><span class="num">${d?"✓":li+1}</span><span class="ico">${L.i}</span><span class="tx"><span class="tag">Aula ${String(li+1).padStart(2,"0")}${L.ax?" · Axioma "+L.ax:""}${d?" · concluída":""}</span><h3>${L.t}</h3><p>${L.d}</p></span><span class="go">${d?"Rever →":st=="lock"?"🔒":"Começar →"}<small>+${XP_LESSON} XP</small></span></button>`}).join("")+`</div></section>`});
- $("worlds").innerHTML=h}
+ $("worlds").innerHTML=(unlockMsg?`<div class="unlock" role="status"><span style="font-size:2rem">🎉</span><div><b>${unlockMsg}</b>${/liberado/.test(unlockMsg)?"<div>Role a página para começar.</div>":""}</div></div>`:"")+h;unlockMsg=""}
 $("worlds").addEventListener("click",e=>{const b=e.target.closest(".les");if(!b||b.classList.contains("lock"))return;openLesson(+b.dataset.w,+b.dataset.l)});
 
 /* =====================================================================
@@ -538,7 +793,7 @@ async function show(){const L=LES(),S=L.steps[step],n=L.steps.length,id=++runId;
  if(S.a)setup(S.a,S);
  $("next").disabled=!solved||!!S.play;
  if(S.play){await S.play();if(id==runId&&!S.a)$("next").disabled=false}}
-function win(msg){solved=true;$("next").disabled=false;say(msg,"ok","festa");const id=runId;setTimeout(()=>{if(id==runId&&solved)setMood("feliz")},1800)}
+function win(msg){solved=true;$("next").disabled=false;say(msg,"ok","festa");if(bip)confetti(bip.x,bip.y);const id=runId;setTimeout(()=>{if(id==runId&&solved)setMood("feliz")},1800)}
 function miss(msg){say(msg,"no","ops")}
 
 function setup(a,S){
@@ -560,6 +815,10 @@ function setup(a,S){
   const typ=a=>a==0?"nulo":a<90?"agudo":a==90?"reto":a<180?"obtuso":"raso";
   const upd=()=>{const v=+$("sl").value;clearStage();S.set();pt("",0,0);semi([0,0],[1,0]);semi([0,0],[Math.cos(v*D2R),Math.sin(v*D2R)]);if(v==90)rightMark([0,0],0,.6);else if(v)arc([0,0],0,v,1.5,{txt:v+"°"});
    $("sv").textContent=v+"°";$("st").textContent=typ(v);if(!solved&&a.test(v))win(a.ok)};$("sl").oninput=upd;upd()}
+ if(a.k=="step"){const v=(a.init||a.c.map(c=>c[1])).slice();
+  actP(`<div class="panel"><div class="readout" id="stv"></div><div class="tools">${a.c.map((c,i)=>`<span class="stp"><b>${c[0]}</b><button class="btn sm" data-d="${i}" data-s="-1" aria-label="Menos: ${c[0]}">−</button><span class="readout sn" id="sv${i}">${v[i]}</span><button class="btn sm" data-d="${i}" data-s="1" aria-label="Mais: ${c[0]}">+</button></span>`).join("")}</div></div>`);
+  const upd=()=>{clearStage();S.set&&S.set();a.draw(v);a.c.forEach((c,i)=>$("sv"+i).textContent=v[i]);$("stv").textContent=a.txt(v);if(!solved&&a.test(v))win(a.ok(v))};
+  $("act").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{if(solved)return;const i=+b.dataset.d,c=a.c[i];v[i]=Math.max(c[1],Math.min(c[2],v[i]+ +b.dataset.s));upd()});upd()}
  if(a.k=="prog"){let list=[],rep=1;const BL=a.blocks,cls={f:"f",t:"t"};
   actP(`<div class="panel"><div class="prog" id="pl"></div><div class="tools">${BL.map((b,i)=>`<button class="blk ${b[1]}" data-b="${i}">${b[0]}</button>`).join("")}<button class="blk rep" id="prep">Repetir tudo: 1×</button><button class="btn sm" id="pclr">Limpar</button><button class="btn main" id="prun" style="font-size:1rem;padding:6px 16px">▶ Executar</button></div></div>`);
   const draw=()=>{$("pl").innerHTML=list.length?(rep>1?`<span style="background:var(--loop)">Repetir ${rep}× [</span>`:"")+list.map(i=>`<span style="background:var(--${BL[i][1]=="f"?"go":"turn"})">${BL[i][0]}</span>`).join("")+(rep>1?`<span style="background:var(--loop)">]</span>`:""):'<span class="ph">Toque nos blocos para montar o programa</span>';$("prep").textContent=`Repetir tudo: ${rep}×`};draw();
@@ -579,7 +838,9 @@ function setup(a,S){
    if(closed&&res.n==uniq.length&&a.check(res,tr)){poly(uniq,{edges:false});win(a.ok)}else miss(a.no)}}}
 
 $("next").onclick=()=>{const L=LES();if(!solved||$("next").disabled)return;
- if(L.steps[step].end){const k=lid(cw,cl);if(!save.done.includes(k))save.done.push(k);store();return closeLesson()}
+ if(L.steps[step].end){const k=lid(cw,cl),before=new Set(save.done);if(!save.done.includes(k))save.done.push(k);store();
+  const now=new Set(save.done),nx=cw+1;if(WORLDS[nx]&&!worldOpen(nx,before)&&worldOpen(nx,now))unlockMsg=WORLDS[nx].L?`Mundo ${nx+1} liberado: ${WORLDS[nx].t}!`:`Você terminou o Mundo ${cw+1}! O Mundo ${nx+1} (${WORLDS[nx].t}) está chegando.`;
+  return closeLesson()}
  step++;show()};
 $("back").onclick=()=>{if(busy||!step)return;step--;show()};
 $("exit").onclick=closeLesson;

@@ -55,7 +55,7 @@ async def main():
         await M.wait_for_timeout(500);t=await M.inner_text('#errTurma');check('PIN errado avisa tentativas','PIN errado' in t and '4 tentativas' in t,t)
         await M.screenshot(path=OUT+'t-cel-pin-errado.png')
         await M.fill('#tPin','1234');await M.click('#bTurmaOk');await M.wait_for_selector('#scrMenu:not([hidden])',timeout=5000)
-        check('no celular aparece o mesmo progresso',await M.inner_text('#rTxt')=='5 de 91 fases' and await M.inner_text('#aTxt')=='2 de 12 aulas',(await M.inner_text('#rTxt'),await M.inner_text('#aTxt')))
+        check('no celular aparece o mesmo progresso',await M.inner_text('#rTxt')=='5 de 91 fases' and await M.inner_text('#aTxt')=='2 de 22 aulas',(await M.inner_text('#rTxt'),await M.inner_text('#aTxt')))
         await M.screenshot(path=OUT+'t-cel-menu.png',full_page=True)
         # joga mais no celular e volta para o computador 1
         await M.click('#rGo');await M.wait_for_timeout(3500);f=M.frames[1]
@@ -84,7 +84,7 @@ async def main():
         await P2.goto(B+'/professor.html');await P2.fill('#inEmail','jhef@escola.br');await P2.fill('#inPass','errada');await P2.click('#bIn');await P2.wait_for_timeout(400)
         check('senha errada avisa','errados' in await P2.inner_text('#errIn'))
         await P2.fill('#inPass','segredo123');await P2.click('#bIn');await P2.wait_for_selector('#scrTurmas:not([hidden])',timeout=5000)
-        check('vê a turma criada','7º ano A' in await P2.inner_text('#turmas'))
+        await P2.wait_for_selector('#turmas .tcard',timeout=5000);check('vê a turma criada','7º ano A' in await P2.inner_text('#turmas'))
         await P2.screenshot(path=OUT+'t-prof-cel.png',full_page=True)
         for nome,e in [('professor',eP),('aluno pc',e1),('aluno cel',e2),('local',e3),('prof cel',e4)]:check('sem erros de script: '+nome,not e,e[:2])
         for c in [cP,c1,c2,c3,c4]:await c.close()
