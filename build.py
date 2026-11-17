@@ -19,6 +19,17 @@ def patch(s,a,b,fn):
 
 HEAD='<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
 RESET='<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>\n'
+# Marca: ícone da aba, ícones do celular e a prévia do link (WhatsApp, redes sociais)
+SITE='https://mundo-do-bip.netlify.app/'
+DESC='Programe o robô Bip e aprenda matemática: lógica de programação e aulas em 3D do Fundamental 2.'
+ICONS='<meta name="theme-color" content="#f2c230">\n<link rel="icon" href="favicon.svg" type="image/svg+xml">\n<link rel="apple-touch-icon" href="apple-touch-icon.png">\n<link rel="manifest" href="manifest.webmanifest">\n'
+SHARE=f'<meta name="description" content="{DESC}">\n<meta property="og:type" content="website">\n<meta property="og:title" content="Mundo do Bip">\n<meta property="og:description" content="{DESC}">\n<meta property="og:image" content="{SITE}og.png">\n<meta property="og:url" content="{SITE}">\n<meta property="og:locale" content="pt_BR">\n<meta name="twitter:card" content="summary_large_image">\n'
+MK=os.path.join(F,'marca')
+for a,b in [('icone.svg','favicon.svg'),('apple-touch-icon.png',None),('icon-192.png',None),('icon-512.png',None),('og.png',None),('logo.svg',None),('logo-claro.svg',None)]:
+    shutil.copy(os.path.join(MK,a),os.path.join(OUT,b or a))
+wr(OUT+'/manifest.webmanifest',json.dumps({"name":"Mundo do Bip","short_name":"Mundo do Bip","description":DESC,"lang":"pt-BR","start_url":"./","display":"standalone","background_color":"#e8edf4","theme_color":"#f2c230",
+ "icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"},{"src":"favicon.svg","sizes":"any","type":"image/svg+xml"}]},ensure_ascii=False,indent=1))
+
 # Cada jogo descobre qual aluno está jogando e sabe voltar ao menu
 PID_JS='''const PID=(()=>{const h=location.hash.match(/^#p-([a-z0-9]+)$/i);if(h)return h[1];try{return localStorage.getItem("bipsite-cur")||"visitante"}catch(e){return "visitante"}})();
 function goMenu(){if(window.parent!==window)parent.postMessage({bip:"menu"},"*");else location.href="./"}'''
@@ -37,7 +48,7 @@ fn=src+'/10-body.html';s=rd(fn)
 s=patch(s,'<div class="tools">\n','<div class="tools">\n      <button class="iconbtn" id="menuBtn" aria-label="Voltar ao menu" title="Menu" data-ic="home"></button>\n',fn)
 wr(fn,s)
 subprocess.run(['python3',src+'/build.py',tmp+'/robo.html'],check=True)
-wr(OUT+'/robo.html',HEAD+RESET+rd(tmp+'/robo.html')+'</html>\n')
+wr(OUT+'/robo.html',HEAD+ICONS+RESET+rd(tmp+'/robo.html')+'</html>\n')
 lv=rd(os.path.join(F,'robo','30-levels.js'))
 ROBO=json.loads(subprocess.run(['node','-e',lv.replace('const WORLDS=','globalThis.WORLDS=').replace('const LEVELS=','globalThis.LEVELS=')+';console.log(JSON.stringify(LEVELS.map(l=>[l.t,l.w])))'],capture_output=True,text=True,check=True).stdout)
 shutil.rmtree(tmp)
@@ -46,7 +57,7 @@ shutil.rmtree(tmp)
 fn=os.path.join(F,'academia','academia.html');s=rd(fn)
 s=patch(s,'const KEY="academia-bip-3d-v1";',PID_JS+'\nconst KEY="academia-bip-3d-v1:"+PID;',fn)
 s=patch(s,'<main id="home">\n','<main id="home">\n <div style="margin-bottom:12px"><button class="btn sm" id="toMenu" onclick="goMenu()">← Menu do Bip</button></div>\n',fn)
-s=patch(s,'<title>Academia do Bip</title>',RESET+'<title>Academia do Bip</title>',fn)
+s=patch(s,'<title>Academia do Bip</title>',ICONS+RESET+'<title>Academia do Bip</title>',fn)
 wr(OUT+'/academia.html',s)
 ACAD=[]
 # aulas de cada mundo, na ordem dos mundos (W1, W2, ...): conta os blocos "/* n */{t:" dentro de cada const Wn=[...]
@@ -56,8 +67,10 @@ for m in re.finditer(r'^const W(\d+)=\[(.*?)^\];',s,re.M|re.S):
 # ---------- Menu ----------
 m=rd(os.path.join(F,'menu','index.src.html'))
 m=m.replace('/*ROBO*/[]',json.dumps(ROBO,ensure_ascii=False)).replace('/*ACAD*/[]',json.dumps(ACAD))
+logo=rd(os.path.join(MK,'logo-cor.svg')).replace('<svg xmlns="http://www.w3.org/2000/svg" ','<svg aria-hidden="true" focusable="false" ')
+m=patch(m,'<!--LOGO-->','<span class="sr-only">Mundo do Bip</span>'+logo,'menu')
 cut=m.index('</style>\n')+len('</style>\n')
-wr(OUT+'/index.html',HEAD+'<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n'+m[:cut]+'</head>\n<body>\n'+m[cut:]+'\n</body>\n</html>\n')
+wr(OUT+'/index.html',HEAD+ICONS+SHARE+'<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n'+m[:cut]+'</head>\n<body>\n'+m[cut:]+'\n</body>\n</html>\n')
 
 # ---------- conferência ----------
 for f in ['index.html','robo.html','academia.html']:

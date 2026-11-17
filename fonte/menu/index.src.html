@@ -21,11 +21,11 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
 .wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 
 /* Marca */
-.brand{display:flex;align-items:center;gap:16px}
-.brand .face{width:72px;flex:none}
-.brand h1{font-size:clamp(2rem,6vw,3rem)}
-.brand h1 b{color:var(--run)}
-.brand p{margin:2px 0 0;color:var(--muted)}
+.brand{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.brand h1{margin:0;color:var(--ink);line-height:0}
+.brand h1 svg{width:clamp(220px,40vw,300px);height:auto;display:block}
+.brand p{margin:0;color:var(--muted)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:20px}
 .eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -85,7 +85,6 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
 
 @media (max-width:700px){
  .games{grid-template-columns:1fr}
- .brand .face{width:56px}
  .game .art{height:130px}
  .code{font-size:1.4rem}
 }
@@ -93,7 +92,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
 </style>
 
 <div class="wrap">
- <header class="brand"><div class="face" id="brandFace"></div><div><h1>Mundo do <b>Bip</b></h1><p>Programe o robô e aprenda matemática com ele.</p></div></header>
+ <header class="brand"><h1><!--LOGO--></h1><p>Programe o robô e aprenda matemática com ele.</p></header>
 
  <!-- Tela 1: quem vai jogar -->
  <section class="panel who" id="scrWho">
@@ -162,7 +161,6 @@ try{cur=localStorage.getItem("bipsite-cur")}catch(e){}
 const saveProfiles=()=>ls.set("bipsite-profiles",profiles);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const face=(m="feliz")=>`<svg viewBox="0 0 200 170" style="width:100%;height:auto"><line x1="100" y1="34" x2="100" y2="12" stroke="#3b4250" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="10" r="9" fill="#ee5f2b"/><rect x="18" y="30" width="164" height="124" rx="32" fill="#f2c230" stroke="#b98d10" stroke-width="5"/><rect x="38" y="50" width="124" height="84" rx="20" fill="#172536"/><path d="M62 92q12-17 24 0M114 92q12-17 24 0" stroke="#5ef0e0" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M80 108q20 17 40 0" stroke="#5ef0e0" stroke-width="6" fill="none" stroke-linecap="round"/></svg>`;
-$("brandFace").innerHTML=face();
 
 /* ---- progresso de cada jogo ---- */
 function roboSave(id){return ls.get("robo4:"+id,null)}
