@@ -64,7 +64,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
 .hello .sp{flex:1}
 .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .game{display:flex;flex-direction:column;border-radius:24px;overflow:hidden;border:1px solid var(--line);background:var(--panel)}
-.game .art{height:170px;position:relative;overflow:hidden}
+.game .art{height:170px;position:relative;overflow:hidden;background:#0a1424}
 .game .art svg{position:absolute;inset:0;width:100%;height:100%}
 .game .bd{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
 .game h3{font-size:1.6rem}
@@ -169,14 +169,13 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
    <div class="hello"><div class="av" id="meAv"></div><h2 id="meHi">Olá!</h2><span class="sp"></span><button class="btn" id="bSwitch">Trocar de aluno</button></div>
    <div class="games">
     <article class="game">
-     <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><rect width="400" height="170" fill="#2b3a52"/>
-      <g id="roboArt"></g></svg></div>
+     <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><g id="roboArt"></g></svg></div>
      <div class="bd"><span class="eyebrow">Lógica de programação</span><h3>Robô Programador</h3><p>Monte programas com peças de encaixar e leve o Bip até a bandeira.</p>
       <div class="prog"><div class="row"><span id="rTxt">0 de 0 fases</span><span id="rStar">0 ★</span></div><div class="bar"><i id="rBar" style="background:var(--run)"></i></div></div>
       <button class="btn main go" data-open="robo" id="rGo">Começar</button></div>
     </article>
     <article class="game">
-     <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><rect width="400" height="170" fill="#3b2f78"/><g id="acadArt"></g></svg></div>
+     <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><g id="acadArt"></g></svg></div>
      <div class="bd"><span class="eyebrow">Matemática · Fundamental 2</span><h3>Academia do Bip</h3><p>Aulas em 3D: do primeiro ponto até as funções, com os axiomas de Euclides.</p>
       <div class="prog"><div class="row"><span id="aTxt">0 de 0 aulas</span><span id="aLv">Nível 1</span></div><div class="bar"><i id="aBar" style="background:var(--turn)"></i></div></div>
       <button class="btn main go" data-open="academia" id="aGo">Começar</button></div>
@@ -350,17 +349,124 @@ function closeGame(){$("play").hidden=true;$("frame").src="about:blank";document
 window.addEventListener("message",e=>{if(e.data&&e.data.bip=="menu")closeGame()});
 
 /* ---- ilustrações dos cartões ---- */
-(function(){let g="";for(let r=0;r<4;r++)for(let c=0;c<7;c++)g+=`<rect x="${40+c*46}" y="${18+r*34}" width="42" height="30" rx="6" fill="${(r+c)%2?"#3b4e6b":"#34465f"}"/>`;
- g+=`<path d="M86 52h92v68h92" fill="none" stroke="#f2c230" stroke-width="5" stroke-dasharray="2 10" stroke-linecap="round"/>`+
- `<g transform="translate(70 30)"><rect x="0" y="6" width="32" height="26" rx="7" fill="#f2c230" stroke="#b98d10" stroke-width="3"/><rect x="5" y="11" width="22" height="14" rx="4" fill="#172536"/><rect x="9" y="14" width="4" height="7" rx="2" fill="#5ef0e0"/><rect x="19" y="14" width="4" height="7" rx="2" fill="#5ef0e0"/><circle cx="16" cy="2" r="4" fill="#ee5f2b"/></g>`+
- `<g transform="translate(268 104)"><line x1="0" y1="0" x2="0" y2="-34" stroke="#e8eef6" stroke-width="3"/><path d="M0 -34h20l-6 7 6 7h-20z" fill="#38c172"/></g>`+
- `<g font-family="Baloo 2,system-ui" font-weight="800" font-size="14" fill="#fff"><rect x="300" y="22" width="80" height="24" rx="7" fill="#0e8f86"/><text x="312" y="39">↑ Frente</text><rect x="300" y="52" width="80" height="24" rx="7" fill="#d58200"/><text x="312" y="69">⟲ Repetir</text><rect x="300" y="82" width="80" height="24" rx="7" fill="#6b4fd8"/><text x="312" y="99">↺ Girar</text></g>`;
- document.getElementById("roboArt").innerHTML=g;
- let a="";for(let i=0;i<9;i++)a+=`<line x1="${20+i*45}" y1="150" x2="${120+i*30}" y2="40" stroke="#5c4fb0" stroke-width="1"/>`;
- a+=`<line x1="0" y1="150" x2="400" y2="150" stroke="#5c4fb0"/><line x1="40" y1="120" x2="380" y2="120" stroke="#5c4fb0" opacity=".6"/>`+
- `<circle cx="200" cy="96" r="52" fill="none" stroke="#b59cff" stroke-width="4"/><line x1="200" y1="96" x2="244" y2="68" stroke="#ff8fc0" stroke-width="4"/><circle cx="200" cy="96" r="6" fill="#ee5f2b"/>`+
- `<path d="M60 130L130 50L160 130Z" fill="#5fd08a" fill-opacity=".25" stroke="#5fd08a" stroke-width="3"/><line x1="250" y1="140" x2="390" y2="30" stroke="#f2c230" stroke-width="3"/><circle cx="290" cy="108" r="6" fill="#f2c230"/><circle cx="350" cy="61" r="6" fill="#f2c230"/>`+
- `<text x="390" y="150" text-anchor="end" font-family="Georgia,serif" font-size="18" fill="#f2c230" letter-spacing="3">AXIOMA I</text>`;
+(function(){
+ const N=v=>Math.round(v*10)/10;
+ const stars=(n,w,h,seed,col)=>{let s="",x=seed;for(let i=0;i<n;i++){x=(x*9301+49297)%233280;const a=x/233280;x=(x*9301+49297)%233280;const b=x/233280;x=(x*9301+49297)%233280;const c=x/233280;
+  s+=`<circle cx="${N(a*w)}" cy="${N(b*h)}" r="${N(.4+c*1.1)}" fill="${col}" opacity="${N(.25+c*.6)}"/>`}return s};
+
+ /* ===== Robô Programador: tabuleiro 3D + programa de peças ===== */
+ const W=38,H=19,T=7,OX=266,OY=60;
+ const P=(i,j)=>[OX+(i-j)*W/2,OY+(i+j)*H/2];
+ const path=[[0,0],[1,0],[2,0],[2,1],[2,2],[3,2],[4,2],[4,3],[4,4]];
+ const onPath=(i,j)=>path.some(p=>p[0]==i&&p[1]==j);
+ let r=`<defs>
+  <radialGradient id="rbBg" cx="62%" cy="55%" r="75%"><stop offset="0" stop-color="#1f5560"/><stop offset=".45" stop-color="#14304a"/><stop offset="1" stop-color="#0a1424"/></radialGradient>
+  <linearGradient id="rbTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f5878"/><stop offset="1" stop-color="#31476a"/></linearGradient>
+  <linearGradient id="rbLit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#f2b92a"/></linearGradient>
+  <linearGradient id="rbHead" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe066"/><stop offset="1" stop-color="#e2a915"/></linearGradient>
+  <filter id="rbGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.2"/></filter>
+  <filter id="rbSoft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+ </defs>
+ <rect width="400" height="170" fill="url(#rbBg)"/>${stars(40,400,170,7,"#bfe9ff")}
+ <ellipse cx="${OX}" cy="${OY+46}" rx="120" ry="48" fill="#2fd3c4" opacity=".16" filter="url(#rbSoft)"/>`;
+ // tabuleiro (de trás para a frente)
+ const cells=[];for(let i=0;i<5;i++)for(let j=0;j<5;j++)cells.push([i,j]);cells.sort((a,b)=>(a[0]+a[1])-(b[0]+b[1]));
+ for(const [i,j] of cells){const [x,y]=P(i,j),w=W/2-1.5,h=H/2-.8,lit=onPath(i,j);
+  r+=`<path d="M${x-w} ${y}L${x} ${y+h}V${y+h+T}L${x-w} ${y+T}Z" fill="${lit?"#b07f12":"#1d2b40"}"/>`+
+     `<path d="M${x} ${y+h}L${x+w} ${y}V${y+T}L${x} ${y+h+T}Z" fill="${lit?"#8c640c":"#16223a"}"/>`+
+     `<path d="M${x} ${y-h}L${x+w} ${y}L${x} ${y+h}L${x-w} ${y}Z" fill="${lit?"url(#rbLit)":"url(#rbTop)"}" stroke="${lit?"#fff3b8":"#56719a"}" stroke-width=".8" stroke-opacity="${lit?.9:.6}"/>`}
+ // brilho do caminho
+ const pts=path.map(p=>P(...p).map(N).join(" ")).join(" L");
+ r+=`<path d="M${pts}" fill="none" stroke="#ffd84a" stroke-width="7" stroke-linejoin="round" opacity=".55" filter="url(#rbGlow)"/>`+
+    `<path d="M${pts}" fill="none" stroke="#fff6cf" stroke-width="1.6" stroke-dasharray="1 6" stroke-linecap="round" stroke-linejoin="round"/>`;
+ // bandeira
+ {const [x,y]=P(4,4);r+=`<ellipse cx="${x}" cy="${y}" rx="15" ry="7" fill="#43e08a" opacity=".55" filter="url(#rbGlow)"/>
+  <ellipse cx="${x}" cy="${y}" rx="11" ry="5" fill="none" stroke="#7dffb3" stroke-width="1.4"/>
+  <line x1="${x}" y1="${y}" x2="${x}" y2="${y-36}" stroke="#eef3fa" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M${x+1} ${y-36}q10 -3 20 1q-4 6 0 13q-10 -4 -20 -1z" fill="#38c172" stroke="#1f8f50" stroke-width="1"/>
+  <circle cx="${x}" cy="${y-37}" r="2.2" fill="#f2c230"/>`}
+ // Bip
+ {const [x,y]=P(0,0);r+=`<ellipse cx="${x}" cy="${y+2}" rx="14" ry="5" fill="#000" opacity=".35"/>
+  <g transform="translate(${x-17} ${y-40})">
+   <line x1="17" y1="8" x2="17" y2="1" stroke="#3b4250" stroke-width="2.5" stroke-linecap="round"/>
+   <circle cx="17" cy="0" r="5" fill="#ff7a3d" opacity=".7" filter="url(#rbGlow)"/><circle cx="17" cy="0" r="3.4" fill="#ff7a3d"/><circle cx="16" cy="-1" r="1.1" fill="#fff" opacity=".8"/>
+   <rect x="2" y="7" width="30" height="26" rx="8" fill="url(#rbHead)" stroke="#9c740c" stroke-width="1.6"/>
+   <rect x="4" y="8.5" width="26" height="5" rx="2.5" fill="#fff" opacity=".28"/>
+   <rect x="6.5" y="13" width="21" height="14" rx="4.5" fill="#101b2a"/>
+   <rect x="10.5" y="16" width="3.6" height="7" rx="1.8" fill="#5ef0e0"/><rect x="19.9" y="16" width="3.6" height="7" rx="1.8" fill="#5ef0e0"/>
+   <rect x="9" y="14" width="16" height="11" rx="4" fill="#5ef0e0" opacity=".25" filter="url(#rbGlow)"/>
+   <rect x="9" y="33" width="16" height="6" rx="2.5" fill="#c99512" stroke="#9c740c" stroke-width="1.2"/>
+  </g>`}
+ // programa de peças (à esquerda)
+ const blk=(x,y,w,h,c,d)=>{const p=(yy)=>`M${x+6} ${yy}H${x+10}l3 3.5h8l3 -3.5H${x+w-6}q6 0 6 6V${yy+h-6}q0 6 -6 6H${x+24}l-3 3.5h-8l-3 -3.5H${x+6}q-6 0 -6 -6V${yy+6}q0 -6 6 -6Z`;
+  return `<path d="${p(y+3)}" fill="${d}"/><path d="${p(y)}" fill="${c}"/><path d="M${x+6} ${y+1.5}H${x+w-6}" stroke="#fff" stroke-opacity=".35" stroke-width="1.5" stroke-linecap="round"/>`};
+ r+=`<g transform="translate(0 6)"><g filter="drop-shadow(0 6px 8px rgba(0,0,0,.45))">`+
+  blk(16,26,104,22,"#16a394","#0b6b62")+
+  `<path d="M22 50h6v74h-6q-6 0 -6 -6v-62q0 -6 6 -6z" fill="#e08a12"/>`+
+  blk(16,50,104,22,"#f09a1a","#b0660a")+
+  blk(28,74,92,20,"#16a394","#0b6b62")+
+  blk(28,96,92,20,"#7b5cf0","#4d35b0")+
+  blk(16,118,70,14,"#f09a1a","#b0660a")+
+  `</g><g font-family="Baloo 2,system-ui,sans-serif" font-weight="800" fill="#fff" font-size="12.5">
+   <text x="27" y="42">▶ Iniciar</text><text x="27" y="66">⟳ Repetir <tspan fill="#fff3d0">3</tspan></text>
+   <text x="39" y="89">↑ Frente</text><text x="39" y="111">↻ Girar</text></g></g>`;
+ document.getElementById("roboArt").innerHTML=r;
+
+ /* ===== Academia do Bip: sala 3D com sólidos geométricos ===== */
+ let a=`<defs>
+  <linearGradient id="acSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140d3a"/><stop offset=".62" stop-color="#3a2390"/><stop offset="1" stop-color="#1a1250"/></linearGradient>
+  <radialGradient id="acHz" cx="50%" cy="62%" r="55%"><stop offset="0" stop-color="#ff7ac0" stop-opacity=".55"/><stop offset=".5" stop-color="#8c5cff" stop-opacity=".2"/><stop offset="1" stop-color="#8c5cff" stop-opacity="0"/></radialGradient>
+  <linearGradient id="acFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".1"/><stop offset=".3" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient>
+  <mask id="acMask"><rect y="104" width="400" height="80" fill="url(#acFade)"/></mask>
+  <radialGradient id="acSph" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset=".18" stop-color="#9fe9ff"/><stop offset=".6" stop-color="#2f8fd8"/><stop offset="1" stop-color="#14306e"/></radialGradient>
+  <linearGradient id="acPyL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd76a"/><stop offset="1" stop-color="#f08a1c"/></linearGradient>
+  <linearGradient id="acPyR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2731a"/><stop offset="1" stop-color="#a8460e"/></linearGradient>
+  <linearGradient id="acHead" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe066"/><stop offset="1" stop-color="#e2a915"/></linearGradient>
+  <filter id="acGlow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+  <filter id="acSoft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
+ </defs>
+ <rect width="400" height="170" fill="url(#acSky)"/><rect width="400" height="170" fill="url(#acHz)"/>${stars(45,400,100,3,"#e8dcff")}`;
+ // chão em perspectiva
+ let g="";for(let k=-12;k<=12;k++)g+=`<line x1="${200+k*14}" y1="104" x2="${200+k*95}" y2="185" />`;
+ for(let t=1;t<=7;t++){const y=N(104+80*Math.pow(t/7,1.9));g+=`<line x1="0" y1="${y}" x2="400" y2="${y}"/>`}
+ a+=`<g stroke="#b48cff" stroke-width=".9" mask="url(#acMask)">${g}</g><line x1="0" y1="104" x2="400" y2="104" stroke="#ff9ad2" stroke-width="1.2" opacity=".8"/>`;
+ // símbolos flutuando
+ a+=`<g font-family="Georgia,serif" font-style="italic" fill="#d9c8ff" opacity=".32"><text x="150" y="34" font-size="20">π</text><text x="228" y="26" font-size="15">√x</text><text x="98" y="30" font-size="14">x²</text><text x="352" y="92" font-size="16">∠</text><text x="22" y="26" font-size="13">a+b</text></g>`;
+ // constelação: por dois pontos passa uma reta
+ a+=`<line x1="300" y1="44" x2="398" y2="12" stroke="#ffd84a" stroke-width="1.4" opacity=".75"/><line x1="300" y1="44" x2="398" y2="12" stroke="#ffd84a" stroke-width="5" opacity=".35" filter="url(#acGlow)"/>
+  <circle cx="324" cy="36" r="5" fill="#ffd84a" filter="url(#acGlow)"/><circle cx="324" cy="36" r="2.8" fill="#fff6cf"/><circle cx="370" cy="21" r="5" fill="#ffd84a" filter="url(#acGlow)"/><circle cx="370" cy="21" r="2.8" fill="#fff6cf"/>`;
+ // esfera
+ a+=`<ellipse cx="130" cy="130" rx="27" ry="5.5" fill="#05020f" opacity=".55" filter="url(#acGlow)"/>
+  <circle cx="128" cy="101" r="31" fill="#5ab8ff" opacity=".35" filter="url(#acSoft)"/>
+  <circle cx="128" cy="101" r="27" fill="url(#acSph)"/>
+  <ellipse cx="128" cy="101" rx="27" ry="7.5" fill="none" stroke="#dff6ff" stroke-opacity=".55" stroke-width="1"/>
+  <path d="M128 74a9 27 0 0 0 0 54" fill="none" stroke="#dff6ff" stroke-opacity=".35" stroke-width="1"/>`;
+ // cubo
+ a+=`<ellipse cx="212" cy="128" rx="34" ry="6" fill="#05020f" opacity=".55" filter="url(#acGlow)"/>
+  <path d="M184 76L210 88V122L184 110Z" fill="#1fb3a3"/><path d="M210 88L236 76V110L210 122Z" fill="#0d7a70"/>
+  <path d="M210 64L236 76L210 88L184 76Z" fill="#7ff2df"/>
+  <g fill="none" stroke="#d8fff8" stroke-width="1.2" stroke-linejoin="round" stroke-opacity=".9"><path d="M210 64L236 76L210 88L184 76Z"/><path d="M184 76V110L210 122L236 110V76M210 88V122"/></g>
+  <path d="M210 64L236 76L210 88L184 76Z" fill="#7ff2df" opacity=".5" filter="url(#acGlow)"/>`;
+ // pirâmide
+ a+=`<ellipse cx="292" cy="127" rx="34" ry="6" fill="#05020f" opacity=".55" filter="url(#acGlow)"/>
+  <path d="M290 58L262 116L288 126Z" fill="url(#acPyL)"/><path d="M290 58L288 126L320 113Z" fill="url(#acPyR)"/>
+  <g fill="none" stroke="#fff1c9" stroke-width="1.2" stroke-linejoin="round" stroke-opacity=".9"><path d="M262 116L290 58L320 113L288 126Z M290 58L288 126"/></g>
+  <path d="M262 116L290 58L320 113" fill="none" stroke="#ffd06a" stroke-width="4" opacity=".4" filter="url(#acGlow)"/>`;
+ // Bip professor (com capelo e varinha)
+ a+=`<ellipse cx="52" cy="131" rx="20" ry="4.5" fill="#05020f" opacity=".5" filter="url(#acGlow)"/>
+  <g transform="translate(28 62)">
+   <line x1="44" y1="38" x2="76" y2="30" stroke="#f3e6c8" stroke-width="2.4" stroke-linecap="round"/><circle cx="77" cy="30" r="4" fill="#ffd84a" filter="url(#acGlow)"/><circle cx="77" cy="30" r="2" fill="#fff"/>
+   <rect x="2" y="12" width="44" height="38" rx="12" fill="url(#acHead)" stroke="#9c740c" stroke-width="2"/>
+   <rect x="5" y="14" width="38" height="7" rx="3.5" fill="#fff" opacity=".28"/>
+   <rect x="8" y="20" width="32" height="22" rx="7" fill="#101b2a"/>
+   <path d="M14 33q4 -6 8 0M27 33q4 -6 8 0" stroke="#5ef0e0" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+   <path d="M19 37q5 4 10 0" stroke="#5ef0e0" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+   <rect x="10" y="22" width="28" height="18" rx="6" fill="#5ef0e0" opacity=".18" filter="url(#acGlow)"/>
+   <rect x="13" y="50" width="22" height="9" rx="3.5" fill="#c99512" stroke="#9c740c" stroke-width="1.5"/>
+   <path d="M10 10h28v5q-14 5 -28 0z" fill="#1b1533"/>
+   <path d="M24 -2L48 6L24 14L0 6Z" fill="#241c45" stroke="#4a3d85" stroke-width="1"/>
+   <path d="M24 6L42 8V20" stroke="#ffd84a" stroke-width="1.6" fill="none"/><circle cx="42" cy="21" r="2.4" fill="#ffd84a"/>
+  </g>`;
  document.getElementById("acadArt").innerHTML=a})();
 
 /* link de confirmação de e-mail do professor cai aqui: manda para a área do professor */
