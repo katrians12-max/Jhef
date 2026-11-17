@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Mundo do Bip</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@600&display=swap">
+<style>
+/* Layout: uma coluna central. Tela 1 = quem vai jogar; tela 2 = menu com os dois jogos; o jogo abre por cima, em tela cheia. */
+:root{
+ --bg:#e8edf4;--panel:#ffffff;--ink:#172536;--muted:#586779;--line:#c3cedc;--soft:#f0f4f9;
+ --bip:#f2c230;--bipdk:#b98d10;--run:#ee5f2b;--rundk:#b9441c;--turn:#6b4fd8;--go:#0e8f86;--good:#1b9a52;--bad:#d23f45;
+ --display:"Baloo 2",system-ui,sans-serif;--body:"Atkinson Hyperlegible",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1520;--panel:#172130;--ink:#e8eef6;--muted:#9aa9bb;--line:#2c3a4d;--soft:#111a27;--good:#38c172;--bad:#ff6b70;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1520;--panel:#172130;--ink:#e8eef6;--muted:#9aa9bb;--line:#2c3a4d;--soft:#111a27;--good:#38c172;--bad:#ff6b70;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+ padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible{outline:3px solid var(--run);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+
+/* Marca */
+.brand{display:flex;align-items:center;gap:16px}
+.brand .face{width:72px;flex:none}
+.brand h1{font-size:clamp(2rem,6vw,3rem)}
+.brand h1 b{color:var(--run)}
+.brand p{margin:2px 0 0;color:var(--muted)}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:20px}
+.eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:10px 18px;font-weight:700}
+.btn.main{background:var(--run);border-color:var(--run);color:#fff;box-shadow:0 4px 0 var(--rundk);font-family:var(--display);font-size:1.15rem;padding:9px 22px}
+.btn.main:active{transform:translateY(2px);box-shadow:0 2px 0 var(--rundk)}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Quem vai jogar */
+.who h2{font-size:1.6rem;margin-bottom:12px}
+.profiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:16px}
+.prof{position:relative;display:flex;align-items:center;gap:10px;padding:12px;border-radius:16px;border:2px solid var(--line);background:var(--soft);text-align:left;width:100%}
+.prof:hover{border-color:var(--run)}
+.av{width:44px;height:44px;flex:none;border-radius:13px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.3rem;color:#172536;border:3px solid rgba(0,0,0,.18)}
+.prof .nm{font-weight:700;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prof small{color:var(--muted);font-size:.8rem}
+.prof .tx{min-width:0}
+.rm{position:absolute;top:4px;right:6px;border:none;background:none;color:var(--muted);font-size:.8rem;padding:2px 4px;border-radius:6px}
+.rm:hover{color:var(--bad)}
+.empty{color:var(--muted);margin:0 0 14px}
+.acts{display:flex;gap:10px;flex-wrap:wrap}
+.form{display:flex;flex-direction:column;gap:12px;max-width:440px}
+.form label{font-weight:700;display:flex;flex-direction:column;gap:6px}
+.form input{border:2px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--soft);font-size:1.1rem}
+.form input.code{font-family:var(--mono);letter-spacing:.18em;text-transform:uppercase}
+.colors{display:flex;gap:8px;flex-wrap:wrap}
+.colors button{width:40px;height:40px;border-radius:12px;border:3px solid transparent}
+.colors button[aria-pressed="true"]{border-color:var(--ink)}
+.err{color:var(--bad);font-weight:700;min-height:1.4em;margin:0}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--bad) 10%,var(--panel));border:1px solid var(--bad)}
+
+/* Menu */
+.hello{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hello h2{font-size:1.7rem}
+.hello .sp{flex:1}
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.game{display:flex;flex-direction:column;border-radius:24px;overflow:hidden;border:1px solid var(--line);background:var(--panel)}
+.game .art{height:170px;position:relative;overflow:hidden}
+.game .art svg{position:absolute;inset:0;width:100%;height:100%}
+.game .bd{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.game h3{font-size:1.6rem}
+.game p{margin:0;color:var(--muted)}
+.prog{display:flex;flex-direction:column;gap:6px;margin-top:auto}
+.prog .row{display:flex;justify-content:space-between;font-weight:700;font-size:.92rem;font-variant-numeric:tabular-nums}
+.bar{height:10px;border-radius:9px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px}
+.game .go{align-self:flex-start;margin-top:6px}
+.codebox{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.codebox .tx{flex:1;min-width:220px}
+.codebox .tx p{margin:2px 0 0;color:var(--muted);font-size:.92rem}
+.code{font-family:var(--mono);font-size:1.8rem;letter-spacing:.14em;background:var(--soft);border:2px dashed var(--line);border-radius:14px;padding:6px 16px}
+
+/* Jogo aberto */
+#play{position:fixed;inset:0;z-index:50;background:var(--bg)}
+#play iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+@media (max-width:700px){
+ .games{grid-template-columns:1fr}
+ .brand .face{width:56px}
+ .game .art{height:130px}
+ .code{font-size:1.4rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+ <header class="brand"><div class="face" id="brandFace"></div><div><h1>Mundo do <b>Bip</b></h1><p>Programe o robô e aprenda matemática com ele.</p></div></header>
+
+ <!-- Tela 1: quem vai jogar -->
+ <section class="panel who" id="scrWho">
+  <div id="whoList">
+   <h2>Quem vai jogar?</h2>
+   <div class="profiles" id="profiles"></div>
+   <p class="empty" id="emptyMsg" hidden>Ainda não tem ninguém neste computador. Crie seu perfil para começar!</p>
+   <div class="acts"><button class="btn main" id="bNew">+ Criar meu perfil</button><button class="btn" id="bCode">Tenho um código</button></div>
+  </div>
+  <form class="form" id="fNew" hidden>
+   <h2>Criar meu perfil</h2>
+   <label for="inName">Seu nome<input id="inName" maxlength="24" autocomplete="off" placeholder="Ex.: Ana Clara"></label>
+   <div><b>Cor do seu Bip</b><div class="colors" id="colors"></div></div>
+   <p class="err" id="errNew"></p>
+   <div class="acts"><button class="btn main" type="submit">Começar</button><button class="btn ghost" type="button" data-back>Voltar</button></div>
+  </form>
+  <form class="form" id="fCode" hidden>
+   <h2>Continuar com meu código</h2>
+   <p style="margin:0;color:var(--muted)">Use o código que aparece no menu para continuar de onde parou, em qualquer computador.</p>
+   <label for="inName2">Seu nome<input id="inName2" maxlength="24" autocomplete="off"></label>
+   <label for="inCode">Código<input id="inCode" class="code" maxlength="7" autocomplete="off" placeholder="ABC-DEF"></label>
+   <p class="err" id="errCode"></p>
+   <div class="acts"><button class="btn main" type="submit">Continuar</button><button class="btn ghost" type="button" data-back>Voltar</button></div>
+  </form>
+ </section>
+
+ <!-- Tela 2: menu -->
+ <section id="scrMenu" hidden>
+  <div class="wrap">
+   <div class="hello"><div class="av" id="meAv"></div><h2 id="meHi">Olá!</h2><span class="sp"></span><button class="btn" id="bSwitch">Trocar de aluno</button></div>
+   <div class="games">
+    <article class="game">
+     <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><rect width="400" height="170" fill="#2b3a52"/>
+      <g id="roboArt"></g></svg></div>
+     <div class="bd"><span class="eyebrow">Lógica de programação</span><h3>Robô Programador</h3><p>Monte programas com peças de encaixar e leve o Bip até a bandeira.</p>
+      <div class="prog"><div class="row"><span id="rTxt">0 de 0 fases</span><span id="rStar">0 ★</span></div><div class="bar"><i id="rBar" style="background:var(--run)"></i></div></div>
+      <button class="btn main go" data-open="robo" id="rGo">Começar</button></div>
+    </article>
+    <article class="game">
+     <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><rect width="400" height="170" fill="#3b2f78"/><g id="acadArt"></g></svg></div>
+     <div class="bd"><span class="eyebrow">Matemática · Fundamental 2</span><h3>Academia do Bip</h3><p>Aulas em 3D: do primeiro ponto até as funções, com os axiomas de Euclides.</p>
+      <div class="prog"><div class="row"><span id="aTxt">0 de 0 aulas</span><span id="aLv">Nível 1</span></div><div class="bar"><i id="aBar" style="background:var(--turn)"></i></div></div>
+      <button class="btn main go" data-open="academia" id="aGo">Começar</button></div>
+    </article>
+   </div>
+   <div class="panel codebox">
+    <div class="tx"><span class="eyebrow">Seu código de progresso</span><p>Anote no caderno. Em outro computador, toque em <b>Tenho um código</b> e digite seu nome e este código.</p></div>
+    <div class="code" id="myCode">———</div>
+    <button class="btn" id="bCopy">Copiar</button>
+   </div>
+  </div>
+ </section>
+</div>
+
+<div id="play" hidden><iframe id="frame" title="Jogo" allow="fullscreen"></iframe></div>
+
+<script>
+/* ============ Mundo do Bip: perfis, progresso e código ============ */
+const $=id=>document.getElementById(id);
+const ROBO=[["Um passo", 0], ["Dois passos", 0], ["Conte as casas", 0], ["Girar à esquerda", 0], ["Girar à direita", 0], ["Andar e virar", 0], ["Meia-volta", 0], ["Leia o programa", 0], ["Pegue as estrelas", 0], ["Estrela fora do caminho", 0], ["Desvie da caixa", 0], ["Caminho de estrelas", 0], ["Carteiras espalhadas", 0], ["Conserte o programa", 0], ["Conheça o Repetir", 1], ["Repetir, virar, repetir", 1], ["A escada", 1], ["A rampa", 1], ["O que o Repetir faz?", 1], ["Volta no canteiro", 1], ["O depósito escuro", 1], ["Antes e depois", 1], ["Quantas vezes?", 1], ["Cuidado com o buraco", 2], ["Pule a caixa", 2], ["Não pule a estrela!", 2], ["Buracos em fila", 2], ["Pula e anda", 2], ["Dois buracos juntos", 2], ["Onde ele cai?", 2], ["Pista de saltos", 2], ["A ilha", 2], ["Ida e volta", 3], ["Ronda pela cerca", 3], ["Repetir dentro de Repetir", 3], ["Degraus largos", 3], ["A ordem importa", 3], ["Arando a lavoura", 3], ["Rosa dos ventos", 3], ["O diamante", 3], ["A antena", 3], ["O caracol", 3], ["Primeira pincelada", 4], ["Três casas", 4], ["Linha com Repetir", 4], ["A letra L", 4], ["Quadrado 2 × 2", 4], ["Linha tracejada", 4], ["Contorno do quadrado", 4], ["Retângulo cheio", 4], ["Diagonal", 4], ["A cruz", 4], ["A moldura", 4], ["Quadrado cheio 3 × 3", 4], ["Até a caixa", 5], ["Ande e vire", 5], ["Até onde ele vai?", 5], ["Se tem caixa, vire", 5], ["Sim e não trocados", 5], ["Esquerda ou direita?", 5], ["Corrida com barreiras", 5], ["Buracos no caminho", 5], ["Caixas e buracos", 5], ["O labirinto", 5], ["Use a Peça A", 6], ["Monte a sua peça", 6], ["Peça dentro do Repetir", 6], ["Siga as peças", 6], ["Duas peças", 6], ["Até bater", 6], ["A peça com defeito", 6], ["Três voltas", 6], ["A chave e a porta", 7], ["Duas chaves", 7], ["O portal", 7], ["Olhando para o mesmo lado", 7], ["Pelo portal", 7], ["Dois portais", 7], ["O fosso do castelo", 7], ["Chave antes da porta", 7], ["O castelo", 7], ["Corrida com obstáculos", 8], ["A pirâmide", 8], ["Montanha-russa", 8], ["Programa misterioso", 8], ["Três quarteirões", 8], ["A janela", 8], ["Três quadrados", 8], ["O explorador", 8], ["A torre de rádio", 8], ["A fuga da torre", 8]];   // [título, mundo] de cada fase do Robô Programador, na ordem
+const ACAD=["0-0", "0-1", "0-2", "0-3", "0-4", "0-5", "0-6", "0-7", "0-8", "0-9", "0-10", "0-11"];   // ids das aulas da Academia, na ordem
+const COLORS=[["amarelo","#f2c230"],["laranja","#f59a4c"],["verde","#5fd08a"],["azul","#6fb6ff"],["roxo","#b59cff"],["rosa","#ff8fc0"]];
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},raw(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let profiles=ls.get("bipsite-profiles",[]),cur=null;
+try{cur=localStorage.getItem("bipsite-cur")}catch(e){}
+const saveProfiles=()=>ls.set("bipsite-profiles",profiles);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const face=(m="feliz")=>`<svg viewBox="0 0 200 170" style="width:100%;height:auto"><line x1="100" y1="34" x2="100" y2="12" stroke="#3b4250" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="10" r="9" fill="#ee5f2b"/><rect x="18" y="30" width="164" height="124" rx="32" fill="#f2c230" stroke="#b98d10" stroke-width="5"/><rect x="38" y="50" width="124" height="84" rx="20" fill="#172536"/><path d="M62 92q12-17 24 0M114 92q12-17 24 0" stroke="#5ef0e0" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M80 108q20 17 40 0" stroke="#5ef0e0" stroke-width="6" fill="none" stroke-linecap="round"/></svg>`;
+$("brandFace").innerHTML=face();
+
+/* ---- progresso de cada jogo ---- */
+function roboSave(id){return ls.get("robo4:"+id,null)}
+function acadSave(id){return ls.get("academia-bip-3d-v1:"+id,null)}
+function stats(id){const r=roboSave(id)||{stars:{},skip:{}},a=acadSave(id)||{done:[]};
+ const done=t=>(r.stars&&r.stars[t])||(r.skip&&r.skip[t]);
+ let n=0;while(n<ROBO.length&&done(ROBO[n][0]))n++;
+ const rDone=ROBO.filter(l=>done(l[0])).length,stars=ROBO.reduce((s,l)=>s+((r.stars||{})[l[0]]||0),0);
+ const aset=new Set(a.done||[]);let an=0;while(an<ACAD.length&&aset.has(ACAD[an]))an++;
+ return {n,rDone,stars,an,aDone:ACAD.filter(x=>aset.has(x)).length,xp:(a.done||[]).length*100}}
+
+/* ---- código de progresso: 6 letras guardam fases seguidas, estrelas e aulas ---- */
+const B32="23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+const chk=(n,s,a)=>(n*3+s*7+a*11+13)%32;
+function makeCode(st){const n=Math.min(127,st.n),s=Math.min(511,st.stars),a=Math.min(127,st.an);let v=(n<<21)|(s<<12)|(a<<5)|chk(n,s,a),c="";
+ for(let i=0;i<6;i++){c=B32[v&31]+c;v>>>=5}return c.slice(0,3)+"-"+c.slice(3)}
+function readCode(txt){const c=txt.toUpperCase().replace(/[^0-9A-Z]/g,"").replace(/O/g,"0").replace(/I/g,"1");if(c.length!=6)return null;let v=0;
+ for(const ch of c){const k=B32.indexOf(ch);if(k<0)return null;v=v*32+k}
+ const n=(v>>>21)&127,s=(v>>>12)&511,a=(v>>>5)&127;if((v&31)!=chk(n,s,a)||n>ROBO.length||a>ACAD.length)return null;return {n,s,a}}
+function applyCode(id,{n,s,a}){
+ const stars={},seen={};const base=n?Math.floor(s/n):0,rem=n?s-base*n:0;
+ for(let i=0;i<n;i++){stars[ROBO[i][0]]=Math.max(1,Math.min(3,base+(i<rem?1:0)));seen[ROBO[i][1]]=1}
+ const next=ROBO[Math.min(n,ROBO.length-1)];seen[next[1]]=1;
+ const old=roboSave(id)||{};
+ ls.set("robo4:"+id,{v:1,stars,skip:{},lvl:next[0],snd:old.snd??1,skin:old.skin||"amarelo",seen,all:0,spd:old.spd??1,draft:null});
+ ls.set("academia-bip-3d-v1:"+id,{done:ACAD.slice(0,a)})}
+
+/* ---- tela: quem vai jogar ---- */
+const show=(id)=>{["whoList","fNew","fCode"].forEach(k=>$(k).hidden=k!=id)};
+let pending=null;
+function drawWho(){$("scrWho").hidden=false;$("scrMenu").hidden=true;show("whoList");
+ $("emptyMsg").hidden=profiles.length>0;
+ $("profiles").innerHTML=profiles.map(p=>{const st=stats(p.id);return `<div><button class="prof" data-p="${p.id}"><span class="av" style="background:${p.color}">${esc(p.name[0].toUpperCase())}</span><span class="tx"><span class="nm">${esc(p.name)}</span><small>${st.rDone} fases · ${st.aDone} aulas</small></span></button>`+
+  (pending==p.id?`<div class="confirm"><span>Apagar ${esc(p.name)} e o progresso?</span><button class="btn" data-del="${p.id}">Apagar</button><button class="btn ghost" data-keep>Cancelar</button></div>`:`<button class="rm" data-rm="${p.id}" aria-label="Remover ${esc(p.name)}">✕</button>`)+`</div>`}).join("")}
+$("profiles").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.p)return enter(b.dataset.p);
+ if(b.dataset.rm){pending=b.dataset.rm;return drawWho()}
+ if(b.dataset.keep!=null){pending=null;return drawWho()}
+ if(b.dataset.del){profiles=profiles.filter(p=>p.id!=b.dataset.del);saveProfiles();try{localStorage.removeItem("robo4:"+b.dataset.del);localStorage.removeItem("academia-bip-3d-v1:"+b.dataset.del)}catch(e){}pending=null;drawWho()}});
+let pick=COLORS[0][1];
+$("colors").innerHTML=COLORS.map(([n,c],i)=>`<button type="button" style="background:${c}" data-c="${c}" aria-label="${n}" aria-pressed="${i==0}"></button>`).join("");
+$("colors").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;pick=b.dataset.c;$("colors").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x==b))};
+$("bNew").onclick=()=>{show("fNew");$("errNew").textContent="";$("inName").value="";$("inName").focus()};
+$("bCode").onclick=()=>{show("fCode");$("errCode").textContent="";$("inName2").value="";$("inCode").value="";$("inName2").focus()};
+document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>show("whoList"));
+const newId=()=>Math.random().toString(36).slice(2,10);
+const clean=s=>s.trim().replace(/\s+/g," ").replace(/(^|\s)(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+$("fNew").onsubmit=e=>{e.preventDefault();const name=clean($("inName").value);
+ if(name.length<2)return $("errNew").textContent="Escreva seu nome (pelo menos 2 letras).";
+ if(profiles.some(p=>p.name.toLowerCase()==name.toLowerCase()))return $("errNew").textContent="Já existe um perfil com esse nome aqui. Escolha ele na lista ou use outro nome.";
+ const p={id:newId(),name,color:pick};profiles.push(p);saveProfiles();enter(p.id)};
+$("inCode").oninput=e=>{let v=e.target.value.toUpperCase().replace(/[^0-9A-Z]/g,"").slice(0,6);e.target.value=v.length>3?v.slice(0,3)+"-"+v.slice(3):v};
+$("fCode").onsubmit=e=>{e.preventDefault();const name=clean($("inName2").value),c=readCode($("inCode").value);
+ if(name.length<2)return $("errCode").textContent="Escreva seu nome.";
+ if(!c)return $("errCode").textContent="Esse código não existe. Confira as letras e os números (são 6, como ABC-DEF).";
+ let p=profiles.find(q=>q.name.toLowerCase()==name.toLowerCase());if(!p){p={id:newId(),name,color:COLORS[profiles.length%COLORS.length][1]};profiles.push(p);saveProfiles()}
+ applyCode(p.id,c);enter(p.id)};
+
+/* ---- tela: menu ---- */
+function enter(id){cur=id;ls.raw("bipsite-cur",id);drawMenu()}
+function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
+ $("scrWho").hidden=true;$("scrMenu").hidden=false;
+ $("meAv").style.background=p.color;$("meAv").textContent=p.name[0].toUpperCase();$("meHi").textContent=`Olá, ${p.name.split(" ")[0]}!`;
+ const st=stats(p.id);
+ $("rTxt").textContent=`${st.rDone} de ${ROBO.length} fases`;$("rStar").textContent=`${st.stars} ★`;$("rBar").style.width=st.rDone/ROBO.length*100+"%";
+ $("rGo").textContent=st.rDone?"Continuar":"Começar";
+ $("aTxt").textContent=`${st.aDone} de ${ACAD.length} aulas`;$("aLv").textContent=`Nível ${Math.floor(st.xp/300)+1}`;$("aBar").style.width=st.aDone/ACAD.length*100+"%";
+ $("aGo").textContent=st.aDone?"Continuar":"Começar";
+ $("myCode").textContent=makeCode(st)}
+$("bSwitch").onclick=()=>{cur=null;try{localStorage.removeItem("bipsite-cur")}catch(e){}drawWho()};
+$("bCopy").onclick=()=>{const t=$("myCode").textContent;const done=()=>{$("bCopy").textContent="Copiado!";setTimeout(()=>$("bCopy").textContent="Copiar",1500)};
+ try{navigator.clipboard.writeText(t).then(done,()=>sel())}catch(e){sel()}
+ function sel(){const r=document.createRange();r.selectNodeContents($("myCode"));const s=getSelection();s.removeAllRanges();s.addRange(r)}};
+
+/* ---- abrir e fechar os jogos ---- */
+document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{if(!cur)return;$("frame").src=b.dataset.open+".html#p-"+cur;$("play").hidden=false;document.body.style.overflow="hidden"});
+function closeGame(){$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";drawMenu()}
+window.addEventListener("message",e=>{if(e.data&&e.data.bip=="menu")closeGame()});
+
+/* ---- ilustrações dos cartões ---- */
+(function(){let g="";for(let r=0;r<4;r++)for(let c=0;c<7;c++)g+=`<rect x="${40+c*46}" y="${18+r*34}" width="42" height="30" rx="6" fill="${(r+c)%2?"#3b4e6b":"#34465f"}"/>`;
+ g+=`<path d="M86 52h92v68h92" fill="none" stroke="#f2c230" stroke-width="5" stroke-dasharray="2 10" stroke-linecap="round"/>`+
+ `<g transform="translate(70 30)"><rect x="0" y="6" width="32" height="26" rx="7" fill="#f2c230" stroke="#b98d10" stroke-width="3"/><rect x="5" y="11" width="22" height="14" rx="4" fill="#172536"/><rect x="9" y="14" width="4" height="7" rx="2" fill="#5ef0e0"/><rect x="19" y="14" width="4" height="7" rx="2" fill="#5ef0e0"/><circle cx="16" cy="2" r="4" fill="#ee5f2b"/></g>`+
+ `<g transform="translate(268 104)"><line x1="0" y1="0" x2="0" y2="-34" stroke="#e8eef6" stroke-width="3"/><path d="M0 -34h20l-6 7 6 7h-20z" fill="#38c172"/></g>`+
+ `<g font-family="Baloo 2,system-ui" font-weight="800" font-size="14" fill="#fff"><rect x="300" y="22" width="80" height="24" rx="7" fill="#0e8f86"/><text x="312" y="39">↑ Frente</text><rect x="300" y="52" width="80" height="24" rx="7" fill="#d58200"/><text x="312" y="69">⟲ Repetir</text><rect x="300" y="82" width="80" height="24" rx="7" fill="#6b4fd8"/><text x="312" y="99">↺ Girar</text></g>`;
+ document.getElementById("roboArt").innerHTML=g;
+ let a="";for(let i=0;i<9;i++)a+=`<line x1="${20+i*45}" y1="150" x2="${120+i*30}" y2="40" stroke="#5c4fb0" stroke-width="1"/>`;
+ a+=`<line x1="0" y1="150" x2="400" y2="150" stroke="#5c4fb0"/><line x1="40" y1="120" x2="380" y2="120" stroke="#5c4fb0" opacity=".6"/>`+
+ `<circle cx="200" cy="96" r="52" fill="none" stroke="#b59cff" stroke-width="4"/><line x1="200" y1="96" x2="244" y2="68" stroke="#ff8fc0" stroke-width="4"/><circle cx="200" cy="96" r="6" fill="#ee5f2b"/>`+
+ `<path d="M60 130L130 50L160 130Z" fill="#5fd08a" fill-opacity=".25" stroke="#5fd08a" stroke-width="3"/><line x1="250" y1="140" x2="390" y2="30" stroke="#f2c230" stroke-width="3"/><circle cx="290" cy="108" r="6" fill="#f2c230"/><circle cx="350" cy="61" r="6" fill="#f2c230"/>`+
+ `<text x="390" y="150" text-anchor="end" font-family="Georgia,serif" font-size="18" fill="#f2c230" letter-spacing="3">AXIOMA I</text>`;
+ document.getElementById("acadArt").innerHTML=a})();
+
+if(cur&&profiles.some(p=>p.id==cur))drawMenu();else drawWho();
+</script>
+
+</body>
+</html>

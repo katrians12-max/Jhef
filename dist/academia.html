@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<title>Academia do Bip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+/* Academia do Bip — trilha de matemática do Fundamental 2 com o robô Bip em 3D */
+:root{
+ --bg:#e8edf4;--panel:#fff;--ink:#172536;--muted:#586779;--line:#c3cedc;--soft:#f0f4f9;
+ --go:#0e8f86;--turn:#6b4fd8;--loop:#d58200;--cond:#2f6fd6;--paint:#d93a7f;--run:#ee5f2b;--star:#f0ad00;--good:#1b9a52;--bad:#d23f45;
+ --display:"Baloo 2",system-ui,sans-serif;--body:"Atkinson Hyperlegible",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1520;--panel:#172130;--ink:#e8eef6;--muted:#9aa9bb;--line:#2c3a4d;--soft:#111a27;--good:#38c172;--bad:#ff6b70;--star:#ffc93a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1520;--panel:#172130;--ink:#e8eef6;--muted:#9aa9bb;--line:#2c3a4d;--soft:#111a27;--good:#38c172;--bad:#ff6b70;--star:#ffc93a;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible{outline:3px solid var(--run);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1}
+.hidden{display:none!important}
+
+/* ---------- Mapa da trilha ---------- */
+#home{max-width:920px;margin:0 auto;padding:18px 16px 40px}
+.hero{display:flex;align-items:center;gap:18px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px 20px;margin-bottom:14px}
+.hero .bipmini{width:86px;flex:none}
+.hero h1{font-size:2rem}.hero h1 b{color:var(--run)}
+.hero p{margin:4px 0 0;color:var(--muted)}
+.hero .info{flex:1;min-width:0}
+.lvl{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.lvl .n{font-family:var(--display);font-weight:800;font-size:1.1rem}
+.lvl .xb{flex:1;min-width:120px;height:9px;background:var(--line);border-radius:9px;overflow:hidden}
+.lvl .xb i{display:block;height:100%;background:linear-gradient(90deg,var(--turn),var(--run))}
+.lvl small{color:var(--muted)}
+.axs{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:.8rem;color:var(--muted);font-weight:700;letter-spacing:.05em}
+.axs span{width:34px;height:24px;border-radius:6px;display:grid;place-items:center;border:1px solid var(--line);font-family:Georgia,serif;font-size:.8rem;color:var(--muted)}
+.axs span.on{background:linear-gradient(#ffe58a,var(--star));border-color:var(--star);color:#5a3a00}
+.world{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:14px;margin-bottom:12px}
+.world.lock{opacity:.7}
+.wh{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.wh .wn{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:800;font-size:1.2rem;flex:none}
+.wh h2{font-size:1.3rem}.wh p{margin:0;color:var(--muted);font-size:.9rem}
+.wh .wc{margin-left:auto;font-weight:700;font-size:.85rem;color:var(--muted);white-space:nowrap}
+.soon{display:flex;flex-wrap:wrap;gap:6px}
+.soon span{padding:3px 10px;border-radius:99px;background:var(--soft);border:1px solid var(--line);font-size:.82rem;color:var(--muted)}
+.tagsoon{display:inline-block;margin-top:2px;padding:2px 10px;border-radius:99px;border:1px solid var(--line);font-size:.72rem;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.trail{display:flex;flex-direction:column;gap:8px}
+.les{display:flex;align-items:center;gap:12px;background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:10px 12px;text-align:left;width:100%}
+.les .num{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;border:2px solid var(--line);color:var(--muted);background:var(--panel)}
+.les .ico{width:46px;height:46px;flex:none;border-radius:12px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.1rem;background:var(--panel);border:1px solid var(--line)}
+.les .tx{flex:1;min-width:0}
+.les .tag{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.les h3{font-size:1.08rem;margin:1px 0}
+.les p{margin:0;color:var(--muted);font-size:.86rem}
+.les .go{flex:none;padding:7px 12px;border-radius:12px;font-weight:700;font-size:.88rem;border:1px solid var(--line);background:var(--panel);white-space:nowrap;text-align:center}
+.les .go small{display:block;font-size:.7rem;opacity:.85}
+.les.next{border:2px solid var(--run);background:var(--panel)}
+.les.next .num,.les.next .go{background:var(--run);border-color:var(--run);color:#fff}
+.les.done .num{background:var(--good);border-color:var(--good);color:#fff}
+.les.done .tag{color:var(--good)}
+.les.lock{opacity:.55;cursor:not-allowed}
+.foot{margin-top:14px;color:var(--muted);font-size:.85rem;text-align:center}
+
+/* ---------- Aula ---------- */
+#lesson{height:100vh;height:100dvh;display:flex;flex-direction:column;padding:10px 16px 12px;gap:10px;max-width:1400px;margin:0 auto}
+.ltop{display:flex;align-items:center;gap:12px;flex:none}
+.ltop .ln{font-family:var(--display);font-weight:800;color:var(--run);white-space:nowrap}
+.ltop .lt{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:32vw}
+.bar{flex:1;height:8px;border-radius:9px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--turn),var(--run));border-radius:9px;transition:width .4s}
+.ltop .pc{font-weight:700;font-size:.9rem;width:3.2em;text-align:right}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:9px 16px;font-weight:700}
+.btn.sm{padding:6px 12px;border-radius:11px;font-size:.9rem}
+.btn.main{background:var(--run);border-color:var(--run);color:#fff;box-shadow:0 4px 0 #b9441c;font-family:var(--display);font-size:1.1rem;padding:8px 22px}
+.btn.main:active{transform:translateY(2px);box-shadow:0 2px 0 #b9441c}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.lbody{flex:1;min-height:0;display:grid;grid-template-columns:1fr;grid-template-rows:1fr auto auto;gap:10px}
+#stage{position:relative;min-height:0;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:var(--soft)}
+#cv,#cv canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#ov{position:absolute;left:50%;top:14px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:calc(100% - 28px);max-width:760px}
+#ov>*{pointer-events:auto}
+#act{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;width:calc(100% - 24px);max-width:820px}
+#act:empty,#ov:empty{display:none}
+.hintcam{position:absolute;right:12px;top:10px;font-size:.75rem;color:var(--muted);background:color-mix(in srgb,var(--panel) 80%,transparent);padding:3px 9px;border-radius:99px;pointer-events:none}
+.sayrow{display:flex;align-items:flex-end;gap:12px}
+.sayrow .face{width:74px;flex:none}
+#say{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:10px 18px;position:relative;min-height:64px}
+#say:before{content:"";position:absolute;left:-9px;bottom:20px;width:16px;height:16px;background:var(--panel);border-left:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg)}
+#say .who{font-size:.72rem;font-weight:700;letter-spacing:.1em;color:var(--run)}
+#say .txt{font-size:1.12rem;margin-top:2px}
+#say .txt b{color:var(--turn)}
+#say.ok{border-color:var(--good)}#say.ok .who{color:var(--good)}
+#say.no{border-color:var(--bad)}#say.no .who{color:var(--bad)}
+.nav{display:flex;justify-content:space-between;gap:10px}
+
+.panel{background:color-mix(in srgb,var(--panel) 94%,transparent);border:1px solid var(--line);border-radius:16px;padding:10px 14px;box-shadow:0 8px 24px rgba(10,20,40,.12);text-align:center}
+.q{font-family:var(--display);font-weight:800;font-size:clamp(1.15rem,2.6vw,1.6rem);line-height:1.15;margin-bottom:8px}
+.opts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.opt{min-width:84px;padding:8px 16px;border-radius:14px;border:2px solid var(--line);background:var(--panel);font-family:var(--display);font-weight:800;font-size:1.12rem;box-shadow:0 4px 0 var(--line)}
+.opt:hover{border-color:var(--turn)}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 15%,var(--panel));box-shadow:0 4px 0 var(--good)}
+.opt.wrong{border-color:var(--bad);opacity:.6;box-shadow:none}
+.tools{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+.blk{border:none;border-radius:12px;padding:8px 13px;color:#fff;font-weight:700;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.blk.f{background:var(--go)}.blk.t{background:var(--turn)}.blk.rep{background:var(--loop)}
+.prog{display:flex;gap:5px;flex-wrap:wrap;min-height:38px;align-items:center;justify-content:center;border:2px dashed var(--line);border-radius:12px;padding:5px 10px;margin-bottom:8px}
+.prog span{border-radius:8px;padding:2px 9px;font-weight:700;color:#fff;font-size:.88rem}
+.prog .ph{color:var(--muted);font-size:.88rem;font-weight:400}
+.readout{font-family:var(--display);font-weight:800;font-size:1.5rem}
+input[type=range]{width:min(420px,70vw);accent-color:var(--run)}
+.axcard{border:2px solid var(--star);background:color-mix(in srgb,var(--star) 14%,var(--panel));border-radius:18px;padding:12px 22px;text-align:center;box-shadow:0 10px 30px rgba(120,80,0,.18)}
+.axcard .k{font-size:.72rem;font-weight:700;letter-spacing:.14em;color:var(--loop)}
+.axcard h3{font-family:Georgia,serif;letter-spacing:.06em;font-size:1.4rem;margin:2px 0}
+.axcard p{margin:0;font-size:1.05rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;width:100%}
+.card{border:2px solid var(--line);border-radius:14px;padding:8px 10px;text-align:center;background:var(--panel);font-family:var(--display);font-weight:800;font-size:1.15rem}
+.card small{display:block;font-family:var(--body);font-weight:400;font-size:.82rem;color:var(--muted)}
+.badge{display:flex;flex-direction:column;align-items:center;gap:6px;border:2px solid var(--star);border-radius:22px;padding:16px 30px;background:color-mix(in srgb,var(--star) 12%,var(--panel));text-align:center;box-shadow:0 10px 30px rgba(120,80,0,.2)}
+.badge .medal{width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe58a,var(--star) 60%,#b97c00);display:grid;place-items:center;font-size:1.8rem;color:#6b4400;font-family:var(--display);font-weight:800;box-shadow:0 5px 0 #a06c00}
+.badge .xp{color:var(--loop);font-weight:700}
+.load{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted)}
+
+@media (max-width:760px){
+ #lesson{padding:8px 10px 10px;gap:8px}
+ .ltop .lt{display:none}
+ .sayrow .face{width:52px}
+ #say{padding:8px 12px}#say .txt{font-size:.98rem}
+ .hero{flex-direction:column;text-align:center}.lvl,.axs{justify-content:center}
+ .les .ico{display:none}
+ .wh .wc{display:none}
+ .opt{min-width:64px;font-size:1rem;padding:7px 12px}
+ .hintcam{display:none}
+ .q{font-size:1.05rem}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ======== MAPA ======== -->
+<main id="home">
+ <div style="margin-bottom:12px"><button class="btn sm" id="toMenu" onclick="goMenu()">← Menu do Bip</button></div>
+ <section class="hero">
+  <div class="bipmini" id="heroBip"></div>
+  <div class="info">
+   <h1>Academia do <b>Bip</b></h1>
+   <p>A matemática do Fundamental 2, do primeiro ponto até as funções. Ande, toque, gire e programe com o Bip.</p>
+   <div class="lvl"><span class="n" id="lvN">Nível 1</span><div class="xb"><i id="lvB"></i></div><small id="lvT">0 XP</small></div>
+   <div class="axs">AXIOMAS DE EUCLIDES <span data-ax="I">I</span><span data-ax="II">II</span><span data-ax="III">III</span><span data-ax="IV">IV</span><span data-ax="V">V</span></div>
+  </div>
+ </section>
+ <div id="worlds"></div>
+ <p class="foot">O progresso fica salvo neste aparelho.</p>
+</main>
+
+<!-- ======== AULA ======== -->
+<section id="lesson" class="hidden">
+ <div class="ltop">
+  <span class="ln" id="lnum">AULA 01</span><span class="lt" id="ltit"></span>
+  <div class="bar"><i id="lbar"></i></div><span class="pc" id="lpc">0%</span>
+  <button class="btn sm" id="exit">Sair ✕</button>
+ </div>
+ <div class="lbody">
+  <div id="stage"><div id="cv"></div><div class="load" id="load">Carregando o cenário 3D…</div><div class="hintcam">arraste para girar a câmera</div><div id="ov"></div><div id="act"></div></div>
+  <div class="sayrow"><div class="face" id="face"></div><div id="say" aria-live="polite"><div class="who">BIP</div><div class="txt" id="txt"></div></div></div>
+  <div class="nav"><button class="btn" id="back">← Voltar</button><button class="btn main" id="next">Prosseguir →</button></div>
+ </div>
+</section>
+
+<script>
+/* =====================================================================
+   ACADEMIA DO BIP
+   - Cada MUNDO tem AULAS; cada aula tem PASSOS.
+   - Passo: m (cara do Bip), t (fala), set() monta a cena, play() anima,
+     a (atividade: opt, pick, turn, slider, prog). O botão Prosseguir só
+     libera quando a animação termina ou o aluno acerta a atividade.
+   - Coordenadas das aulas são as do plano: (x, y), com y "para o fundo".
+   ===================================================================== */
+const $=id=>document.getElementById(id);
+const M=n=>String(n).replace(/-/g,"−");
+const D2R=Math.PI/180;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const dark=()=>document.documentElement.dataset.theme=="dark"||(document.documentElement.dataset.theme!="light"&&matchMedia("(prefers-color-scheme: dark)").matches);
+
+/* ---------- Bip 2D (rosto ao lado da fala e no mapa) ---------- */
+const FACE2D=m=>`<svg viewBox="0 0 200 170" style="width:100%;height:auto"><line x1="100" y1="34" x2="100" y2="12" stroke="#3b4250" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="10" r="9" fill="#ee5f2b"/>
+<rect x="18" y="30" width="164" height="124" rx="32" fill="#f2c230" stroke="#b98d10" stroke-width="5"/><rect x="38" y="50" width="124" height="84" rx="20" fill="#172536"/>${FACES[m]||FACES.normal}</svg>`;
+const FACES={
+ normal:`<rect x="66" y="70" width="18" height="28" rx="9" fill="#5ef0e0"/><rect x="116" y="70" width="18" height="28" rx="9" fill="#5ef0e0"/><path d="M86 112q14 9 28 0" stroke="#5ef0e0" stroke-width="5" fill="none" stroke-linecap="round"/>`,
+ feliz:`<path d="M62 92q12-17 24 0M114 92q12-17 24 0" stroke="#5ef0e0" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M80 108q20 17 40 0" stroke="#5ef0e0" stroke-width="6" fill="none" stroke-linecap="round"/>`,
+ pensa:`<rect x="72" y="64" width="16" height="22" rx="8" fill="#5ef0e0"/><rect x="122" y="64" width="16" height="22" rx="8" fill="#5ef0e0"/><path d="M88 114h24" stroke="#5ef0e0" stroke-width="5" stroke-linecap="round"/>`,
+ ops:`<path d="M64 74l18 18M82 74l-18 18M118 74l18 18M136 74l-18 18" stroke="#ff8a8a" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="114" r="7" fill="none" stroke="#ff8a8a" stroke-width="5"/>`};
+FACES.festa=FACES.feliz;FACES.aponta=FACES.normal;
+
+/* =====================================================================
+   MOTOR 3D
+   ===================================================================== */
+let R,scene,cam,root,floorMat,bigGrid,smallGrid,bip,ok3d=false;
+const camS={th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0},camGoal={...camS};
+const P3=(x,y,h=0)=>new THREE.Vector3(x,h,-y);
+const mat=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.55,metalness:.05,...o});
+let runId=0;
+
+function tween(ms,fn){const id=runId;return new Promise(res=>{const t0=performance.now();const f=now=>{if(id!=runId)return res(false);const k=Math.min(1,(now-t0)/ms);fn(k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2,k);if(k<1)requestAnimationFrame(f);else res(true)};requestAnimationFrame(f)})}
+const wait=ms=>{const id=runId;return new Promise(r=>setTimeout(()=>r(id==runId),ms))};
+
+function init3d(){if(ok3d)return true;if(!window.THREE){$("load").textContent="Não foi possível carregar o 3D. Verifique a internet e recarregue a página.";return false}
+ R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(2,devicePixelRatio));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+ $("cv").appendChild(R.domElement);
+ scene=new THREE.Scene();cam=new THREE.PerspectiveCamera(42,1,.1,300);
+ scene.add(new THREE.HemisphereLight(0xffffff,0x8b9bb0,.85));
+ const sun=new THREE.DirectionalLight(0xffffff,.75);sun.position.set(6,14,8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-10,right:10,top:10,bottom:-10});scene.add(sun);
+ floorMat=mat(0xf6f8fb,{roughness:.9});const fl=new THREE.Mesh(new THREE.PlaneGeometry(400,400),floorMat);fl.rotation.x=-Math.PI/2;fl.receiveShadow=true;scene.add(fl);
+ bigGrid=new THREE.GridHelper(120,120,0xd5dde8,0xe2e8f0);bigGrid.position.y=.002;scene.add(bigGrid);
+ smallGrid=new THREE.GridHelper(12,12,0x9fb0c6,0xb9c6d6);smallGrid.position.y=.004;scene.add(smallGrid);
+ const edge=new THREE.Mesh(new THREE.RingGeometry(0,0,4),mat(0));edge.visible=false;
+ root=new THREE.Group();scene.add(root);
+ bip=makeBip();scene.add(bip.g);
+ theme3d();matchMedia("(prefers-color-scheme: dark)").addEventListener("change",theme3d);
+ new ResizeObserver(size).observe($("stage"));size();
+ setupPointer();
+ let last=performance.now();const loop=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;
+  for(const k in camGoal)camS[k]+=(camGoal[k]-camS[k])*Math.min(1,dt*4);
+  const {th,ph,r,tx,tz}=camS;cam.position.set(tx+r*Math.sin(ph)*Math.cos(th),r*Math.cos(ph),tz+r*Math.sin(ph)*Math.sin(th));cam.lookAt(tx,0,tz);
+  bip.tick(dt,now/1000);root.children.forEach(o=>o.userData.tick&&o.userData.tick(now/1000));R.render(scene,cam);requestAnimationFrame(loop)};
+ requestAnimationFrame(loop);ok3d=true;$("load").remove();return true}
+function theme3d(){const d=dark(),bg=d?0x0e1520:0xe8edf4;scene.background=new THREE.Color(bg);scene.fog=new THREE.Fog(bg,18,40);
+ floorMat.color.setHex(d?0x162131:0xf6f8fb);
+ [bigGrid,smallGrid].forEach((g,i)=>{const c=d?(i?0x3a4b63:0x223047):(i?0x9fb0c6:0xdbe2ec);[].concat(g.material).forEach(m=>{m.vertexColors=false;m.color.setHex(c);m.needsUpdate=true})})}
+function size(){const s=$("stage"),w=s.clientWidth,h=s.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();
+ if(w<600)camGoal.r=Math.max(camGoal.r,18)}
+function camTo(o){Object.assign(camGoal,o);const w=$("stage").clientWidth;if(w<600&&o.r)camGoal.r=o.r*1.25}
+
+/* Câmera: arrastar gira; toque sem arrastar = escolher ponto no chão */
+let onPick=null;
+function setupPointer(){const el=R.domElement;let down=null,drag=false;
+ el.addEventListener("pointerdown",e=>{down={x:e.clientX,y:e.clientY,th:camGoal.th,ph:camGoal.ph};drag=false;el.setPointerCapture(e.pointerId)});
+ el.addEventListener("pointermove",e=>{if(!down)return;const dx=e.clientX-down.x,dy=e.clientY-down.y;if(Math.hypot(dx,dy)>6)drag=true;
+  if(drag){camGoal.th=down.th+dx*.008;camGoal.ph=Math.max(.3,Math.min(1.35,down.ph-dy*.006))}});
+ el.addEventListener("pointerup",e=>{if(!down)return;const wasDrag=drag;down=null;if(!wasDrag&&onPick){const p=floorAt(e);if(p)onPick(p)}});
+ el.addEventListener("wheel",e=>{e.preventDefault();camGoal.r=Math.max(8,Math.min(34,camGoal.r*(1+Math.sign(e.deltaY)*.08)))},{passive:false})}
+function floorAt(e){const r=R.domElement.getBoundingClientRect(),v=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
+ const rc=new THREE.Raycaster();rc.setFromCamera(v,cam);const hit=new THREE.Vector3();if(!rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),hit))return null;
+ const x=Math.round(hit.x),y=Math.round(-hit.z);if(Math.abs(x)>6||Math.abs(y)>6)return null;return [x,y]}
+
+/* ---------- O Bip em 3D ---------- */
+function faceTex(m){const c=document.createElement("canvas");c.width=256;c.height=160;const g=c.getContext("2d");g.fillStyle="#172536";g.fillRect(0,0,256,160);
+ g.strokeStyle=g.fillStyle=m=="ops"?"#ff8a8a":"#5ef0e0";g.lineCap="round";g.lineWidth=14;
+ const eyes=(y,h)=>{g.beginPath();g.roundRect(70,y,30,h,15);g.roundRect(156,y,30,h,15);g.fill()};
+ if(m=="feliz"||m=="festa"){g.beginPath();g.moveTo(66,82);g.quadraticCurveTo(85,50,104,82);g.moveTo(152,82);g.quadraticCurveTo(171,50,190,82);g.stroke();g.beginPath();g.moveTo(96,110);g.quadraticCurveTo(128,140,160,110);g.stroke()}
+ else if(m=="ops"){g.beginPath();[[70,52],[156,52]].forEach(([x,y])=>{g.moveTo(x,y);g.lineTo(x+30,y+34);g.moveTo(x+30,y);g.lineTo(x,y+34)});g.stroke();g.lineWidth=9;g.beginPath();g.arc(128,120,12,0,7);g.stroke()}
+ else if(m=="pensa"){eyes(34,36);g.beginPath();g.moveTo(108,122);g.lineTo(150,122);g.stroke()}
+ else{eyes(44,46);g.lineWidth=10;g.beginPath();g.moveTo(106,118);g.quadraticCurveTo(128,132,150,118);g.stroke()}
+ const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t}
+function makeBip(){const g=new THREE.Group(),inner=new THREE.Group(),Y=mat(0xf2c230,{roughness:.4}),Dk=mat(0x3b4250,{roughness:.6}),Or=mat(0xee5f2b,{emissive:0xee5f2b,emissiveIntensity:.35});
+ g.add(inner);const s=.68;inner.scale.set(s,s,s);
+ const box=(w,h,d,m,x,y,z,p=inner)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(x,y,z);b.castShadow=true;p.add(b);return b};
+ const legs=[-.25,.25].map(x=>{const p=new THREE.Group();p.position.set(x,.75,0);inner.add(p);box(.26,.6,.3,Dk,0,-.3,0,p);box(.34,.14,.46,Dk,0,-.66,.06,p);return p});
+ const body=new THREE.Group();inner.add(body);
+ box(1,.75,.7,Y,0,1.12,0,body);const chest=box(.36,.26,.04,Or,0,1.14,.36,body);
+ const head=box(1.3,.9,.9,Y,0,1.98,0,body);
+ const scr=new THREE.Mesh(new THREE.PlaneGeometry(1.04,.65),new THREE.MeshBasicMaterial({map:faceTex("feliz")}));scr.position.set(0,1.98,.452);body.add(scr);
+ const ant=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.35),Dk);ant.position.set(0,2.6,0);body.add(ant);
+ const bulb=new THREE.Mesh(new THREE.SphereGeometry(.12,16,12),Or);bulb.position.set(0,2.8,0);body.add(bulb);
+ const arms=[-1,1].map(sd=>{const p=new THREE.Group();p.position.set(sd*.62,1.38,0);body.add(p);box(.2,.6,.2,Dk,0,-.3,0,p);const h=new THREE.Mesh(new THREE.SphereGeometry(.16,16,12),Y);h.position.set(0,-.65,0);h.castShadow=true;p.add(h);return p});
+ const sh=new THREE.Mesh(new THREE.CircleGeometry(.5,24),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.12}));sh.rotation.x=-Math.PI/2;sh.position.y=.01;g.add(sh);
+ const B={g,x:0,y:0,a:90,walking:0,mood:"feliz",fix:0,last:0,
+  place(x,y,a){B.x=x;B.y=y;if(a!=null)B.a=a;B.last=performance.now();B.sync()},
+  sync(){g.position.copy(P3(B.x,B.y));g.rotation.y=(B.a+90)*D2R},
+  face(m){if(m==B.mood)return;B.mood=m;scr.material.map.dispose();scr.material.map=faceTex(m);scr.material.needsUpdate=true},
+  tick(dt,t){if(!B.walking&&!B.fix&&performance.now()-B.last>900){const ca=Math.atan2(-cam.position.z-B.y,cam.position.x-B.x)/D2R,d=((ca-B.a)%360+540)%360-180;if(Math.abs(d)>1){B.a+=d*Math.min(1,dt*3);B.sync()}}
+   const w=B.walking,sw=Math.sin(t*11)*.6*w;legs[0].rotation.x=sw;legs[1].rotation.x=-sw;
+   let la=-sw*.8,ra=sw*.8,lz=0,rz=0,jump=0;
+   if(!w){if(B.mood=="aponta"){rz=2.5}else if(B.mood=="festa"){lz=-2.6;rz=2.6;jump=Math.abs(Math.sin(t*6))*.35}else if(B.mood=="pensa"){ra=-1.9;rz=.5}else if(B.mood=="ops"){lz=-.5;rz=.5}}
+   arms[0].rotation.set(la,0,lz);arms[1].rotation.set(ra,0,rz);
+   body.position.y=Math.sin(t*2.4)*.03+(w?Math.abs(Math.sin(t*11))*.06:0);inner.position.y=jump;bulb.material.emissiveIntensity=.3+.3*(Math.sin(t*5)>0)},
+  async turnTo(a){let d=((a-B.a)%360+540)%360-180;if(Math.abs(d)<.5){B.a=a;return true}const a0=B.a;return await tween(Math.abs(d)*4+120,k=>{B.a=a0+d*k;B.last=performance.now();B.sync()})},
+  async turn(d){const a0=B.a;return await tween(Math.abs(d)*5+150,k=>{B.a=a0+d*k;B.last=performance.now();B.sync()})},
+  async walk(pts,o={}){for(const [x,y] of pts){const dx=x-B.x,dy=y-B.y,L=Math.hypot(dx,dy);if(L<1e-6)continue;
+    if(!o.noTurn&&!(await B.turnTo(Math.atan2(dy,dx)/D2R)))return false;
+    const x0=B.x,y0=B.y;let tr=null;if(o.trail)tr=seg([x0,y0],[x0,y0],{color:o.trail,w:o.w||.07});
+    B.walking=1;const okk=await tween(L*(o.ms||420),(k,lin)=>{B.x=x0+dx*lin;B.y=y0+dy*lin;B.sync();if(tr)tr.set([x0,y0],[B.x,B.y]);o.each&&o.each(B.x,B.y)});B.walking=0;B.last=performance.now();if(!okk)return false}
+   return true}};
+ B.sync();return B}
+
+/* ---------- Peças do cenário (todas entram em "root" e saem na troca de passo) ---------- */
+const COL={pt:0xee5f2b,reta:0x6b4fd8,seg:0x0e8f86,semi:0x2f6fd6,arc:0xd58200,poly:0xd93a7f,good:0x1b9a52,ink:0x172536};
+function clearStage(){while(root.children.length){const o=root.children.pop();o.traverse(n=>{n.geometry&&n.geometry.dispose();if(n.material){(n.material.map&&n.material.map.dispose());n.material.dispose()}})}}
+function add(o){root.add(o);return o}
+function label(txt,x,y,h=.9,o={}){const c=document.createElement("canvas"),g=c.getContext("2d"),fs=64;g.font=`800 ${fs}px "Baloo 2",system-ui,sans-serif`;
+ const w=Math.ceil(g.measureText(txt).width)+36;c.width=w;c.height=fs+30;g.font=`800 ${fs}px "Baloo 2",system-ui,sans-serif`;
+ g.fillStyle=o.bg||"rgba(255,255,255,.92)";g.beginPath();g.roundRect(2,2,w-4,fs+26,22);g.fill();g.fillStyle=o.color||"#172536";g.textAlign="center";g.textBaseline="middle";g.fillText(txt,w/2,fs/2+17);
+ const t=new THREE.CanvasTexture(c),sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true}));const sc=(o.size||.55);sp.scale.set(sc*w/(fs+30),sc,1);sp.position.copy(P3(x,y,h));sp.renderOrder=10;return add(sp)}
+function pt(name,x,y,o={}){const g=new THREE.Group(),c=o.color||COL.pt;
+ const s=new THREE.Mesh(new THREE.SphereGeometry(.16,20,14),mat(c,{emissive:c,emissiveIntensity:.25}));s.position.y=.16;s.castShadow=true;g.add(s);
+ const ring=new THREE.Mesh(new THREE.RingGeometry(.2,.3,28),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.5}));ring.rotation.x=-Math.PI/2;ring.position.y=.012;g.add(ring);
+ g.position.copy(P3(x,y));if(o.pulse)g.userData.tick=t=>{const k=1+.25*Math.sin(t*4);ring.scale.set(k,k,k)};add(g);
+ if(name)label(name,x,y,.75,{size:.5});return g}
+function seg(a,b,o={}){const m=new THREE.Mesh(new THREE.CylinderGeometry(1,1,1,10),mat(o.color||COL.seg,{emissive:o.color||COL.seg,emissiveIntensity:.15,transparent:o.op!=null,opacity:o.op??1}));
+ m.castShadow=true;add(m);const w=o.w||.06;
+ m.set=(a,b)=>{const A=P3(a[0],a[1],o.h??.07),Bv=P3(b[0],b[1],o.h??.07),L=A.distanceTo(Bv);m.visible=L>1e-4;m.scale.set(w,Math.max(L,1e-4),w);m.position.copy(A).add(Bv).multiplyScalar(.5);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),Bv.clone().sub(A).normalize().lengthSq()?Bv.clone().sub(A).normalize():new THREE.Vector3(0,1,0))};m.set(a,b);return m}
+function dir(a,b){const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);return [dx/L,dy/L]}
+function reta(a,b,o={}){const [ux,uy]=dir(a,b);return seg([a[0]-ux*60,a[1]-uy*60],[a[0]+ux*60,a[1]+uy*60],{color:COL.reta,...o})}
+function semi(a,b,o={}){const [ux,uy]=dir(a,b);return seg(a,[a[0]+ux*60,a[1]+uy*60],{color:COL.semi,...o})}
+function arrowTip(a,b,o={}){const [ux,uy]=dir(a,b),c=new THREE.Mesh(new THREE.ConeGeometry(.16,.4,14),mat(o.color||COL.semi));c.position.copy(P3(b[0],b[1],.07));c.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(ux,0,-uy));return add(c)}
+function arc(v,a1,a2,r,o={}){const c=o.color||COL.arc,g=new THREE.Group();
+ const fill=new THREE.Mesh(new THREE.CircleGeometry(r,48,a1*D2R,(a2-a1)*D2R),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.22,side:2,depthWrite:false}));
+ const edge=new THREE.Mesh(new THREE.RingGeometry(r-.05,r+.05,48,1,a1*D2R,(a2-a1)*D2R),new THREE.MeshBasicMaterial({color:c,side:2}));
+ [fill,edge].forEach(m=>{m.rotation.x=-Math.PI/2;g.add(m)});fill.position.y=.02;edge.position.y=.03;g.position.copy(P3(v[0],v[1]));add(g);
+ if(o.txt){const mid=(a1+a2)/2*D2R,rr=r+.65;label(o.txt,v[0]+Math.cos(mid)*rr,v[1]+Math.sin(mid)*rr,.3,{size:.45,color:"#8a5600"})}return g}
+function rightMark(v,a,s=.5,o={}){const u=[Math.cos(a*D2R),Math.sin(a*D2R)],w=[Math.cos((a+90)*D2R),Math.sin((a+90)*D2R)],p1=[v[0]+u[0]*s,v[1]+u[1]*s],p3=[v[0]+w[0]*s,v[1]+w[1]*s],p2=[p1[0]+w[0]*s,p1[1]+w[1]*s];
+ seg(p1,p2,{color:o.color||COL.arc,w:.035});seg(p3,p2,{color:o.color||COL.arc,w:.035})}
+function poly(pts,o={}){const sh=new THREE.Shape(pts.map(p=>new THREE.Vector2(p[0],p[1])));const m=new THREE.Mesh(new THREE.ShapeGeometry(sh),new THREE.MeshBasicMaterial({color:o.color||COL.poly,transparent:true,opacity:o.op??.22,side:2,depthWrite:false}));
+ m.rotation.x=-Math.PI/2;m.position.y=.015;add(m);if(o.edges!==false)pts.forEach((p,i)=>seg(p,pts[(i+1)%pts.length],{color:o.color||COL.poly,w:.05}));if(o.names)pts.forEach((p,i)=>o.names[i]&&pt(o.names[i],p[0],p[1],{color:o.color||COL.poly}));if(o.txt){const c=pts.reduce((s,p)=>[s[0]+p[0]/pts.length,s[1]+p[1]/pts.length],[0,0]);label(o.txt,c[0],c[1],.4,{size:.42})}return m}
+function circ(c,r,o={}){const m=new THREE.Mesh(new THREE.RingGeometry(r-.05,r+.05,96),new THREE.MeshBasicMaterial({color:o.color||COL.reta,side:2}));m.rotation.x=-Math.PI/2;m.position.copy(P3(c[0],c[1],.03));add(m);
+ if(o.fill){const f=new THREE.Mesh(new THREE.CircleGeometry(r,96),new THREE.MeshBasicMaterial({color:o.color||COL.reta,transparent:true,opacity:.12,side:2,depthWrite:false}));f.rotation.x=-Math.PI/2;f.position.copy(P3(c[0],c[1],.02));add(f)}return m}
+function flag(x,y){const g=new THREE.Group();const p=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,1.4),mat(0x3b4250));p.position.y=.7;g.add(p);
+ const f=new THREE.Mesh(new THREE.PlaneGeometry(.6,.38),new THREE.MeshStandardMaterial({color:0x1b9a52,side:2}));f.position.set(.3,1.2,0);g.add(f);g.position.copy(P3(x,y));g.userData.tick=t=>{f.rotation.y=Math.sin(t*3)*.25};return add(g)}
+function plane3(A,B,C,o={}){const a=new THREE.Vector3(...A),b=new THREE.Vector3(...B),c=new THREE.Vector3(...C);
+ const n=b.clone().sub(a).cross(c.clone().sub(a)).normalize(),cen=a.clone().add(b).add(c).multiplyScalar(1/3);
+ const m=new THREE.Mesh(new THREE.PlaneGeometry(o.size||9,o.size||9),new THREE.MeshBasicMaterial({color:o.color||COL.reta,transparent:true,opacity:.2,side:2,depthWrite:false}));
+ m.position.copy(cen);m.lookAt(cen.clone().add(n));add(m);const e=new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),new THREE.LineBasicMaterial({color:o.color||COL.reta}));e.position.copy(m.position);e.quaternion.copy(m.quaternion);add(e);return m}
+function post(x,y,h){const p=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,h),mat(0x9aa9bb));p.position.copy(P3(x,y,h/2));add(p);const s=new THREE.Mesh(new THREE.SphereGeometry(.16,20,14),mat(COL.pt,{emissive:COL.pt,emissiveIntensity:.25}));s.position.copy(P3(x,y,h));add(s);return s}
+
+/* ---------- Painéis do palco ---------- */
+const ov=h=>{$("ov").innerHTML=h};
+const actP=h=>{$("act").innerHTML=h};
+const AX=(n,t)=>`<div class="axcard"><div class="k">EUCLIDES · c. 300 a.C.</div><h3>AXIOMA ${n}</h3><p>${t}</p></div>`;
+const CARDS=l=>`<div class="cards">${l.map(c=>`<div class="card">${c[0]}<small>${c[1]}</small></div>`).join("")}</div>`;
+
+/* =====================================================================
+   CONTEÚDO — MUNDOS E AULAS
+   ===================================================================== */
+const B=()=>bip;
+const W1=[
+/* 1 */{t:"O ponto",d:"De onde a matemática começa: a ideia de posição.",i:"•",steps:[
+ {m:"feliz",t:"Oi! Eu sou o <b>Bip</b>. Na Academia, vamos construir a matemática do zero, um bloco de cada vez. Arraste o cenário para girar a câmera!",set(){B().place(0,0,90);camTo({th:Math.PI/2-.35,ph:.92,r:15,tx:0,tz:0})},async play(){await B().turn(360)}},
+ {m:"pensa",t:"Há uns 2300 anos, o grego <b>Euclides</b> organizou a geometria começando pelas ideias mais simples. E a mais simples de todas é o <b>ponto</b>.",set(){B().place(-3,-1,45);ov(`<div class="axcard"><div class="k">ALEXANDRIA · c. 300 a.C.</div><h3>EUCLIDES</h3><p>“Os Elementos”: o livro que começou tudo.</p></div>`)}},
+ {m:"aponta",t:"Um ponto marca uma <b>posição</b>. Ele não tem tamanho, nem largura, nem altura: é só um lugar. Aqui eu desenho com uma bolinha, mas o ponto de verdade é invisível!",set(){B().place(-2,-1,30);pt("A",1,1,{pulse:1})}},
+ {m:"normal",t:"Damos nome aos pontos com <b>letras maiúsculas</b>: A, B, C… Veja: vou visitar cada um.",set(){B().place(-3,-2,0);pt("A",-1,2);pt("B",2,0);pt("C",3,3)},async play(){await B().walk([[-1,2],[2,0],[3,3]])}},
+ {m:"normal",t:"Sua vez! Toque no chão em <b>3 lugares diferentes</b> para marcar os pontos A, B e C.",set(){B().place(0,-4,90)},
+  a:{k:"pick",n:3,names:["A","B","C"],check:async p=>{await B().walk(p);return {ok:1,msg:"Visitei os três! Cada ponto é uma <b>posição</b> diferente no plano."}}}},
+ {m:"pensa",t:"Uma pergunta rápida.",a:{k:"opt",q:"O que um ponto representa?",o:["Uma posição","Um pedaço de linha","Uma bolinha com tamanho"],ans:0,ok:"Isso! Um ponto é só uma <b>posição</b>, sem tamanho.",no:"Lembre: o ponto não tem tamanho. Ele marca um lugar."},set(){pt("P",0,1,{pulse:1});B().place(-2,-1,30)}},
+ {m:"festa",end:1,t:"Pronto: temos o primeiro bloco da geometria. Na próxima aula, ligamos dois pontos!",set(){B().place(0,0,-90)},badge:["•","O ponto","Tudo começa com uma posição."]}]},
+
+/* 2 */{t:"A reta",d:"Axioma I: por dois pontos passa uma única reta.",i:"↔",ax:"I",steps:[
+ {m:"pensa",t:"Tenho dois pontos, <b>A</b> e <b>B</b>. Se eu for de um até o outro sempre em frente, sem virar, que caminho eu faço?",set(){pt("A",-3,0);pt("B",2,1);B().place(-3,0,0)}},
+ {m:"normal",t:"Andando reto de A até B, desenho uma linha. Se essa linha continuar <b>para sempre, nos dois sentidos</b>, ela se chama <b>reta</b>.",set(){pt("A",-3,0);pt("B",2,1);B().place(-3,0,0)},
+  async play(){if(!(await B().walk([[2,1]],{trail:COL.reta})))return;const r=reta([-3,0],[2,1],{op:0});const m=r.material;await tween(900,k=>{m.opacity=k});m.transparent=false;label("reta AB",5,2,.4,{size:.45,color:"#6b4fd8"})}},
+ {m:"aponta",t:"Euclides colocou essa ideia como uma verdade de partida, que não precisa de prova. É o primeiro <b>axioma</b>.",set(){pt("A",-3,0);pt("B",2,1);reta([-3,0],[2,1]);B().place(2,-2,90);ov(AX("I","Por dois pontos diferentes passa uma <b>única</b> reta."))}},
+ {m:"normal",t:"Teste o axioma! Toque em <b>dois pontos</b> do chão. Eu traço a reta que passa por eles.",set(){B().place(0,-4,90)},
+  a:{k:"pick",n:2,names:["A","B"],check:async p=>{if(!(await B().walk([p[0],p[1]],{trail:COL.reta})))return;reta(p[0],p[1]);return {ok:1,msg:"Viu? Por esses dois pontos passa <b>só uma</b> reta. Não existe outra!"}}}},
+ {m:"pensa",t:"E por <b>um ponto só</b>? Olhe: passam <b>infinitas</b> retas! Por isso um ponto sozinho não basta para escolher uma reta.",set(){pt("P",0,0);B().place(-3,-3,45)},
+  async play(){for(let a=0;a<180;a+=30){const r=reta([0,0],[Math.cos(a*D2R),Math.sin(a*D2R)],{op:.85});if(!(await wait(350)))return}}},
+ {m:"aponta",t:"Pontos que estão na <b>mesma reta</b> se chamam <b>colineares</b>. A, B e C são colineares. D não é: está fora da reta.",set(){reta([-4,-2],[4,2]);pt("A",-4,-2);pt("B",0,0);pt("C",2,1);pt("D",-1,3,{color:COL.poly});B().place(3,-3,135)}},
+ {m:"normal",t:"Hora do desafio.",a:{k:"opt",q:"Quantas retas passam por dois pontos diferentes?",o:["Nenhuma","Exatamente uma","Infinitas"],ans:1,ok:"Exato! Esse é o <b>Axioma I</b>.",no:"Lembre do teste que você fez: apareceu uma reta só."},set(){pt("A",-2,0);pt("B",2,0);B().place(0,-3,90)}},
+ {m:"festa",end:1,t:"Você conquistou o <b>Axioma I</b> de Euclides! Ele é a base de tudo o que vem depois.",set(){B().place(0,0,-90)},badge:["I","Axioma I","Por dois pontos passa uma única reta."]}]},
+
+/* 3 */{t:"Segmento e semirreta",d:"Axioma II: pedaços de reta e o prolongamento sem fim.",i:"—",ax:"II",steps:[
+ {m:"aponta",t:"Quando ando de A até B e paro, desenho só um pedaço da reta: um <b>segmento</b>. Ele tem começo e fim. Escrevemos <b>AB</b> com um tracinho em cima.",set(){pt("A",-3,0);pt("B",2,0);B().place(-3,0,0)},async play(){await B().walk([[2,0]],{trail:COL.seg})}},
+ {m:"aponta",t:"Já a <b>semirreta</b> tem um começo, mas não tem fim. É como a luz de uma lanterna: sai de um ponto e vai embora para sempre.",set(){B().place(-4,-2,90)},async play(){pt("O",-3,1);const s=seg([-3,1],[-3,1],{color:COL.semi});await tween(1400,k=>s.set([-3,1],[-3+60*k*k,1]))}},
+ {m:"pensa",t:"Euclides também disse que <b>todo segmento pode ser prolongado</b> em linha reta, sem fim. Veja o segmento CD crescer!",set(){B().place(-1,-3,90);ov(AX("II","Todo segmento pode ser <b>prolongado</b> continuamente em linha reta."))},
+  async play(){pt("C",-1,1);pt("D",1,1);const s=seg([-1,1],[1,1],{color:COL.seg});await wait(600);await tween(2000,k=>s.set([-1-40*k,1],[1+40*k,1]))}},
+ {m:"normal",t:"Que figura é esta?",set(){pt("O",-2,0);semi([-2,0],[0,1]);B().place(-3,-3,60)},a:{k:"opt",q:"Começa em O e não tem fim. Que figura é?",o:["Reta","Segmento","Semirreta"],ans:2,ok:"Isso: <b>semirreta</b>. Tem origem, mas não tem fim.",no:"Ela tem começo (o ponto O), mas não tem fim."}},
+ {m:"normal",t:"E esta?",set(){pt("E",-3,1);pt("F",2,-1);seg([-3,1],[2,-1]);B().place(0,-3,90)},a:{k:"opt",q:"Começa em E e termina em F. Que figura é?",o:["Reta","Segmento","Semirreta"],ans:1,ok:"Certo: o <b>segmento EF</b>. Tem começo e fim.",no:"Ela tem começo E e fim F."}},
+ {m:"normal",t:"Toque no ponto onde esta semirreta <b>começa</b> (a origem).",set(){semi([1,-2],[-1,2]);B().place(3,-3,135)},a:{k:"pick",n:1,mark:0,check:async p=>{if(p[0][0]==1&&p[0][1]==-2){await B().walk([[1,-2]]);return {ok:1,msg:"Isso! A origem é onde a semirreta começa."}}return {ok:0,msg:"Ali não. Procure a ponta que <b>não</b> continua para sempre."}}}},
+ {m:"festa",end:1,t:"Agora você conhece reta, segmento e semirreta, e conquistou o <b>Axioma II</b>!",set(){B().place(0,0,-90)},badge:["II","Axioma II","Todo segmento pode ser prolongado."]}]},
+
+/* 4 */{t:"O plano",d:"A superfície sem fim e as dimensões.",i:"▱",steps:[
+ {m:"aponta",t:"O chão onde eu ando lembra um <b>plano</b>: uma superfície lisa, sem espessura, que se estende para todos os lados, sem fim. Veja como ele some no horizonte.",set(){B().place(0,0,90);camTo({ph:1.28,r:15,th:Math.PI/2})},async play(){await B().walk([[0,4]]);await B().walk([[0,0]])}},
+ {m:"pensa",t:"Um plano também pode ficar inclinado. <b>Três pontos que não estão na mesma reta</b> definem um único plano. Veja: um dos pontos está no alto de uma haste.",set(){camTo({ph:.95,r:16,th:Math.PI/2-.5});pt("A",-3,-2);pt("B",3,-2);post(0,2,2.5);label("C",0,2,3.1,{size:.5});plane3([-3,0,2],[3,0,2],[0,2.5,-2]);B().place(-4,-4,45)}},
+ {m:"normal",t:"Toque em <b>3 pontos que NÃO estejam na mesma reta</b>. Eles vão formar um pedaço do plano.",set(){camTo({ph:.92,r:15,th:Math.PI/2-.35});B().place(-5,-5,45)},
+  a:{k:"pick",n:3,names:["A","B","C"],check:async p=>{const [a,b,c]=p,cr=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+   if(cr==0)return {ok:0,retry:1,msg:"Esses três estão na <b>mesma reta</b> (são colineares). Com eles dá para fazer infinitos planos girando em volta da reta. Tente outros!"};
+   poly(p,{color:COL.reta,op:.3});await B().walk([a,b,c,a],{trail:COL.reta});return {ok:1,msg:"Isso! Três pontos <b>não colineares</b> determinam um único plano."}}}},
+ {m:"normal",t:"Pense no seu dia a dia.",a:{k:"opt",q:"Uma folha de papel bem esticada lembra:",o:["um ponto","uma reta","um plano"],ans:2,ok:"Certo! Uma superfície lisa lembra um <b>plano</b>.",no:"A folha é uma superfície, não uma linha."},set(){B().place(0,0,-90)}},
+ {m:"aponta",t:"Repare: o ponto não tem nenhuma dimensão. A reta tem uma. O plano tem duas. E o espaço onde vivemos tem três!",set(){B().place(-4,-3,45);pt("",-3,2);seg([-1,2],[1,2],{color:COL.reta});poly([[2,1],[4,1],[4,3],[2,3]],{color:COL.reta});
+  const cube=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.4,1.4),mat(COL.poly,{transparent:true,opacity:.55}));cube.position.copy(P3(4.5,-1.5,.7));cube.castShadow=true;add(cube);
+  ov(CARDS([["Ponto","0 dimensões"],["Reta","1 dimensão"],["Plano","2 dimensões"],["Espaço","3 dimensões"]]))}},
+ {m:"festa",end:1,t:"Ponto, reta, plano e espaço: você já conhece os blocos básicos da geometria!",set(){B().place(0,0,-90)},badge:["▱","O plano","Superfície sem fim, duas dimensões."]}]},
+
+/* 5 */{t:"Medindo distâncias",d:"Unidade de medida, comprimento e conversões.",i:"📏",steps:[
+ {m:"aponta",t:"Para medir, escolhemos uma <b>unidade</b>. Aqui, o lado de cada quadradinho do chão vale <b>1 unidade</b>: um passo meu.",set(){B().place(-3,0,0);pt("A",-3,0);pt("B",2,0)}},
+ {m:"normal",t:"Medir é contar <b>quantas unidades cabem</b>. Vou andar de A até B contando os passos…",set(){B().place(-3,0,0);pt("A",-3,0);pt("B",2,0)},
+  async play(){for(let i=1;i<=5;i++){if(!(await B().walk([[-3+i,0]],{trail:COL.seg})))return;label(String(i),-3+i-.5,0,.5,{size:.5,color:"#0e8f86"})}label("AB = 5 unidades",-.5,-1.5,.3,{size:.55})}},
+ {m:"normal",t:"Conte os quadradinhos.",set(){pt("C",-2,2);pt("D",2,2);seg([-2,2],[2,2]);B().place(-2,-1,90)},a:{k:"opt",q:"Quanto mede o segmento CD?",o:["3","4","5"],ans:1,ok:"Isso: <b>CD = 4 unidades</b>.",no:"Conte os lados dos quadradinhos de C até D."}},
+ {m:"aponta",t:"No dia a dia usamos unidades combinadas por todo mundo: o <b>metro</b> e seus parentes.",set(){B().place(0,-2,90);ov(CARDS([["1 km","= 1000 m"],["1 m","= 100 cm"],["1 cm","= 10 mm"]]))}},
+ {m:"normal",t:"Uma conversão rápida.",a:{k:"opt",q:"Quantos centímetros tem 2 metros?",o:["20","200","2000"],ans:1,ok:"Certo! 2 × 100 = <b>200 cm</b>.",no:"Cada metro tem 100 cm."},set(){B().place(0,0,-90)}},
+ {m:"normal",t:"Marque um ponto a <b>exatamente 3 unidades</b> de A, na mesma linha horizontal.",set(){pt("A",0,0);B().place(0,-3,90)},
+  a:{k:"pick",n:1,names:["B"],check:async p=>{const [x,y]=p[0];if(y==0&&Math.abs(x)==3){await B().walk([[0,0],[x,0]],{trail:COL.seg});return {ok:1,msg:"Perfeito! <b>AB = 3 unidades</b>."}}return {ok:0,msg:`Esse ponto não está a 3 unidades de A na horizontal. Conte 3 quadradinhos para a direita ou para a esquerda.`}}}},
+ {m:"festa",end:1,t:"Agora você sabe medir! Toda medida é uma comparação com uma unidade.",set(){B().place(0,0,-90)},badge:["📏","Medidor","Comprimento e unidades."]}]},
+
+/* 6 */{t:"O giro do Bip",d:"Ângulos: volta, meia-volta e ângulo reto (Axioma IV).",i:"∠",ax:"IV",steps:[
+ {fix:1,m:"feliz",t:"Quando eu giro, eu abro um <b>ângulo</b>. Uma volta completa mede <b>360 graus</b> (360°).",set(){B().place(0,0,0)},async play(){const a=arc([0,0],0,1,1.6);await B().turn(360);arc([0,0],0,359.9,1.6,{txt:"360°"})}},
+ {m:"aponta",t:"Ângulo é a abertura entre duas <b>semirretas</b> que saem do mesmo ponto. Esse ponto é o <b>vértice</b>.",set(){B().place(-4,-2,30);pt("V",0,0);semi([0,0],[1,0]);label("vértice",0,-.8,.3,{size:.4})},
+  async play(){const s=semi([0,0],[1,0]);let ar=null;await tween(1500,k=>{const a=60*k;s.set([0,0],[Math.cos(a*D2R)*60,Math.sin(a*D2R)*60])});arc([0,0],0,60,2,{txt:"60°"})}},
+ {fix:1,m:"aponta",t:"Um quarto de volta mede <b>90°</b>: é o <b>ângulo reto</b>, o canto de um quadrado. Marcamos com um quadradinho.",set(){B().place(0,0,0)},async play(){await wait(300);await B().turn(90);semi([0,0],[1,0]);semi([0,0],[0,1]);rightMark([0,0],0,.6);label("90°",1,1,.3,{size:.45,color:"#8a5600"})}},
+ {m:"normal",t:"Gire até eu olhar para a <b>bandeira</b>. Cada toque gira 45°.",set(){B().place(0,0,0);flag(Math.cos(135*D2R)*4,Math.sin(135*D2R)*4)},a:{k:"turn",step:45,target:135}},
+ {m:"normal",t:"Pergunta de giro.",a:{k:"opt",q:"Meia-volta mede quantos graus?",o:["90°","180°","360°"],ans:1,ok:"Isso! Meia-volta = <b>180°</b>, metade de 360°.",no:"Uma volta inteira tem 360°. E a metade?"},set(){B().place(0,0,0)}},
+ {m:"pensa",t:"Euclides percebeu algo importante: um ângulo reto é sempre igual a outro ângulo reto, não importa a posição.",set(){B().place(0,-3,90);[[-3,1,0],[2,0,35]].forEach(([x,y,a])=>{semi([x,y],[x+Math.cos(a*D2R),y+Math.sin(a*D2R)],{w:.04});semi([x,y],[x+Math.cos((a+90)*D2R),y+Math.sin((a+90)*D2R)],{w:.04});rightMark([x,y],a,.6)});ov(AX("IV","Todos os ângulos retos são <b>iguais</b> entre si."))}},
+ {m:"festa",end:1,t:"Você conquistou o <b>Axioma IV</b>! Agora já sabe o que é um ângulo.",set(){B().place(0,0,-90)},badge:["IV","Axioma IV","Todos os ângulos retos são iguais."]}]},
+
+/* 7 */{t:"Tipos de ângulo",d:"Agudo, reto, obtuso e raso; complementares e suplementares.",i:"⦟",steps:[
+ {m:"aponta",t:"Os ângulos têm nomes de acordo com a abertura. Veja o ângulo crescer de 0° até 180°.",set(){B().place(-4,-3,45);ov(CARDS([["Agudo","menor que 90°"],["Reto","igual a 90°"],["Obtuso","entre 90° e 180°"],["Raso","igual a 180°"]]))},
+  async play(){pt("",0,0);semi([0,0],[1,0]);const s=semi([0,0],[1,0]);await tween(3000,k=>{const a=180*k;s.set([0,0],[Math.cos(a*D2R)*60,Math.sin(a*D2R)*60])});arc([0,0],0,180,1.6,{txt:"180°"})}},
+ {m:"normal",t:"Use o controle e abra um ângulo <b>obtuso</b>.",set(){B().place(-4,-3,45)},a:{k:"slider",test:a=>a>90&&a<180,ok:"Isso! Entre 90° e 180°: <b>obtuso</b>.",no:""}},
+ {m:"normal",t:"Classifique.",set(){angleFig(35);B().place(-3,-3,45)},a:{k:"opt",q:"Que tipo de ângulo é este (35°)?",o:["Agudo","Reto","Obtuso"],ans:0,ok:"Certo: menor que 90°, <b>agudo</b>.",no:"Compare com o canto de um quadrado (90°)."}},
+ {m:"normal",t:"E este?",set(){angleFig(150);B().place(3,-3,135)},a:{k:"opt",q:"Que tipo de ângulo é este (150°)?",o:["Agudo","Raso","Obtuso"],ans:2,ok:"Isso: maior que 90° e menor que 180°, <b>obtuso</b>.",no:"Ele é maior que 90°, mas não chega a 180°."}},
+ {m:"aponta",t:"Dois ângulos que juntos dão <b>90°</b> são <b>complementares</b>. Que juntos dão <b>180°</b> são <b>suplementares</b>. Aqui: 120° + 60° = 180°.",set(){B().place(-4,-3,45);semi([0,0],[1,0]);semi([0,0],[-1,0]);semi([0,0],[Math.cos(120*D2R),Math.sin(120*D2R)]);arc([0,0],0,120,1.4,{txt:"120°"});arc([0,0],120,180,1.9,{color:COL.poly,txt:"60°"})}},
+ {m:"normal",t:"Desafio.",a:{k:"opt",q:"Qual é o suplemento de 120°?",o:["60°","30°","240°"],ans:0,ok:"Certo! 180° − 120° = <b>60°</b>.",no:"Suplementares somam 180°."},set(){B().place(0,0,-90)}},
+ {m:"festa",end:1,t:"Você já classifica qualquer ângulo!",set(){B().place(0,0,-90)},badge:["⦟","Classificador","Agudo, reto, obtuso e raso."]}]},
+
+/* 8 */{t:"Paralelas e perpendiculares",d:"Axioma V: retas que nunca se encontram.",i:"∥",ax:"V",steps:[
+ {m:"aponta",t:"Duas retas que se cruzam formando <b>quatro ângulos retos</b> são <b>perpendiculares</b>, como as linhas de uma cruz.",set(){B().place(-4,-3,45);reta([-1,0],[1,0]);reta([0,-1],[0,1],{color:COL.semi});[0,90,180,270].forEach(a=>rightMark([0,0],a,.45))}},
+ {m:"normal",t:"Retas <b>paralelas</b> estão no mesmo plano e <b>nunca se encontram</b>, por mais que se estendam. Vou andar entre elas…",set(){reta([-1,1],[1,1]);reta([-1,-1],[1,-1]);B().place(-5,0,0)},async play(){await B().walk([[5,0]]);}},
+ {m:"pensa",t:"O quinto axioma é o mais famoso. Escrito do jeito moderno, ele diz:",set(){reta([-1,-1],[1,-1]);label("r",-5,-.5,.3,{size:.5,color:"#6b4fd8"});pt("P",0,2);B().place(3,-3,135);ov(AX("V","Por um ponto fora de uma reta passa <b>uma única</b> reta paralela a ela."))}},
+ {m:"normal",t:"Qual das retas que passam por P é paralela à reta <b>r</b>?",set(){reta([-1,-1],[1,-1]);label("r",-5,-.5,.3,{size:.5,color:"#6b4fd8"});pt("P",0,2);
+  reta([0,2],[1,2.6],{color:COL.good});reta([0,2],[1,2],{color:COL.semi});reta([0,2],[1,1.5],{color:COL.run||0xee5f2b});
+  label("verde",4.5,4.6,.3,{size:.42,color:"#1b9a52"});label("azul",5,2.5,.3,{size:.42,color:"#2f6fd6"});label("laranja",4.5,-.2,.3,{size:.42,color:"#ee5f2b"});B().place(-4,-4,45)},
+  a:{k:"opt",q:"Qual é a paralela a r?",o:["verde","azul","laranja"],ans:1,ok:"Isso! A <b>azul</b> nunca encontra r. É a única!",no:"Essa vai acabar cruzando a reta r em algum lugar. Procure a que fica sempre à mesma distância."}},
+ {m:"normal",t:"No mundo real.",a:{k:"opt",q:"Os dois trilhos de uma ferrovia são retas…",o:["paralelas","perpendiculares","que se cruzam"],ans:0,ok:"Certo! Eles nunca se encontram: <b>paralelos</b>.",no:"Os trilhos nunca se encontram."},set(){B().place(0,0,-90);reta([-1,.6],[1,.6],{color:0x586779});reta([-1,-.6],[1,-.6],{color:0x586779});for(let x=-6;x<=6;x++)seg([x,-.9],[x,.9],{color:0x8a6a4a,w:.08,h:.03})}},
+ {m:"festa",end:1,t:"Você completou os <b>5 axiomas de Euclides</b>! Com eles, dá para construir toda a geometria plana.",set(){B().place(0,0,-90)},badge:["V","Axioma V","Retas paralelas nunca se encontram."]}]},
+
+/* 9 */{t:"Polígonos: o Bip desenha",d:"Figuras fechadas: lados, vértices e ângulos.",i:"⬠",steps:[
+ {m:"aponta",t:"Um <b>polígono</b> é uma figura fechada feita só de segmentos. Vou andar e desenhar um pentágono!",set(){B().place(...pentP[0],0)},async play(){if(!(await B().walk([...pentP.slice(1),pentP[0]],{trail:COL.poly})))return;poly(pentP,{edges:false,txt:"pentágono"})}},
+ {m:"aponta",t:"Cada segmento é um <b>lado</b>. Cada canto é um <b>vértice</b>. Os polígonos ganham nome pelo número de lados.",set(){poly(pentP,{names:["A","B","C","D","E"]});B().place(-5,-4,45);ov(CARDS([["3 lados","triângulo"],["4 lados","quadrilátero"],["5 lados","pentágono"],["6 lados","hexágono"]]))}},
+ {m:"normal",t:"Programe como no Robô Programador! Faça eu desenhar um <b>quadrado de lado 3</b>. Dica: use o Repetir.",set(){B().place(-1.5,-1.5,0)},
+  a:{k:"prog",blocks:[["Andar 3","f",3],["Girar 90°","t",90],["Girar 120°","t",120],["Girar 60°","t",60]],check:(v,turns)=>v.closed&&v.n==4&&turns.every(t=>t==90),ok:"Lindo! 4 lados iguais e 4 ângulos retos: um <b>quadrado</b>.",no:"Ainda não virou um quadrado. Um quadrado tem 4 lados e 4 cantos de 90°."}},
+ {m:"normal",t:"Conte os lados.",a:{k:"opt",q:"Um hexágono tem quantos lados?",o:["5","6","8"],ans:1,ok:"Isso: <b>6 lados</b>, como os favos de mel.",no:"Hexa = seis."},set(){const h=[...Array(6)].map((_,i)=>[Math.cos(i*60*D2R)*2.5,Math.sin(i*60*D2R)*2.5]);poly(h,{color:COL.loop});B().place(-5,-3,45)}},
+ {m:"festa",end:1,t:"Você já desenha polígonos programando!",set(){B().place(0,0,-90)},badge:["⬠","Desenhista","Polígonos: lados e vértices."]}]},
+
+/* 10 */{t:"Triângulos",d:"Tipos de triângulo e a soma dos ângulos: 180°.",i:"△",steps:[
+ {m:"aponta",t:"Pelos lados, os triângulos são: <b>equilátero</b> (3 lados iguais), <b>isósceles</b> (2 iguais) e <b>escaleno</b> (todos diferentes).",set(){B().place(0,-5,90);
+  poly([[-6,0],[-3,0],[-4.5,2.6]],{color:COL.seg,txt:"equilátero"});poly([[-1.2,0],[1.2,0],[0,3.4]],{color:COL.poly,txt:"isósceles"});poly([[3,0],[6,0],[3.8,2]],{color:COL.semi,txt:"escaleno"})}},
+ {m:"pensa",t:"Agora um segredo de todo triângulo: some os três ângulos internos…",set(){triFig();B().place(-5,-3,45)}},
+ {m:"aponta",t:"…e o resultado é sempre <b>180°</b>! Juntando os três ângulos lado a lado, eles formam um ângulo raso: meia-volta.",set(){triFig();B().place(-5,-3,45)},
+  async play(){await wait(400);const v=[1,-2.5];seg([v[0]-3,v[1]],[v[0]+3,v[1]],{color:0x586779,w:.04});
+   const A=triAng(),rd=A.map(x=>Math.round(x[0]));rd[2]=180-rd[0]-rd[1];let s=0;for(const [i,[a,c]] of A.entries()){if(!(await wait(500)))return;arc(v,s,s+a,1.1,{color:c,txt:rd[i]+"°"});s+=a}label("= 180°",v[0]+2.6,v[1]-1,.3,{size:.5})}},
+ {m:"normal",t:"Programe um triângulo <b>equilátero</b>! Cada canto interno mede 60°, então eu preciso girar o que falta para meia-volta.",set(){B().place(-1.5,-1.5,0)},
+  a:{k:"prog",blocks:[["Andar 3","f",3],["Girar 90°","t",90],["Girar 120°","t",120],["Girar 60°","t",60]],check:(v,turns)=>v.closed&&v.n==3&&turns.every(t=>t==120),ok:"Perfeito! Girei 120° em cada canto (180° − 60°): <b>triângulo equilátero</b>.",no:"Não fechou um triângulo. Pense: 180° − 60° = ?"}},
+ {m:"normal",t:"Use a soma dos ângulos.",a:{k:"opt",q:"Um triângulo tem ângulos de 50° e 60°. Quanto mede o terceiro?",o:["70°","90°","110°"],ans:0,ok:"Isso! 180° − 50° − 60° = <b>70°</b>.",no:"Os três somam 180°."},set(){B().place(0,0,-90)}},
+ {m:"festa",end:1,t:"Os triângulos não têm mais segredos para você!",set(){B().place(0,0,-90)},badge:["△","Triangulador","Soma dos ângulos = 180°."]}]},
+
+/* 11 */{t:"Quadriláteros",d:"Quadrado, retângulo, losango, paralelogramo e trapézio.",i:"▭",steps:[
+ {m:"aponta",t:"A família dos quadriláteros: todos têm 4 lados, mas cada um tem suas regras.",set(){camTo({r:18});B().place(0,-5.5,90);
+  poly([[-6,1.5],[-4,1.5],[-4,3.5],[-6,3.5]],{color:COL.seg,txt:"quadrado"});poly([[-2.5,1.5],[1.5,1.5],[1.5,3.5],[-2.5,3.5]],{color:COL.semi,txt:"retângulo"});
+  poly([[4.5,.8],[5.8,2.5],[4.5,4.2],[3.2,2.5]],{color:COL.poly,txt:"losango"});poly([[-5.5,-2.5],[-2,-2.5],[-1,-.5],[-4.5,-.5]],{color:COL.loop,txt:"paralelogramo"});poly([[1,-2.5],[5,-2.5],[4,-.5],[2,-.5]],{color:COL.reta,txt:"trapézio"})}},
+ {m:"normal",t:"Qual é qual?",a:{k:"opt",q:"Qual tem 4 lados iguais e 4 ângulos retos?",o:["Losango","Quadrado","Trapézio"],ans:1,ok:"Isso! O <b>quadrado</b>. (O losango tem lados iguais, mas não precisa ter ângulos retos.)",no:"Lados iguais E ângulos retos ao mesmo tempo."},set(){B().place(0,-4,90)}},
+ {m:"normal",t:"Mais uma.",a:{k:"opt",q:"Qual tem só um par de lados paralelos?",o:["Trapézio","Retângulo","Paralelogramo"],ans:0,ok:"Certo: o <b>trapézio</b>.",no:"Retângulo e paralelogramo têm dois pares de lados paralelos."},set(){poly([[-2,-1],[2,-1],[1,1],[-1,1]],{color:COL.reta});B().place(-4,-3,45)}},
+ {m:"aponta",t:"Uma diagonal divide qualquer quadrilátero em <b>dois triângulos</b>. Cada um soma 180°, então os ângulos do quadrilátero somam <b>360°</b>.",set(){const q=[[-3,-2],[3,-2],[2,2],[-2,1.5]];poly(q,{color:COL.loop});B().place(-5,-4,45)},
+  async play(){const s=seg([-3,-2],[-3,-2],{color:COL.poly});await tween(1000,k=>s.set([-3,-2],[-3+5*k,-2+4*k]));poly([[-3,-2],[3,-2],[2,2]],{color:COL.seg,edges:false,txt:"180°"});poly([[-3,-2],[2,2],[-2,1.5]],{color:COL.semi,edges:false,txt:"180°"})}},
+ {m:"normal",t:"Desafio.",a:{k:"opt",q:"Um quadrilátero tem ângulos de 90°, 90° e 100°. E o quarto?",o:["80°","90°","100°"],ans:0,ok:"Isso! 360° − 280° = <b>80°</b>.",no:"Os quatro somam 360°."},set(){B().place(0,0,-90)}},
+ {m:"festa",end:1,t:"Você conhece toda a família dos quadriláteros!",set(){B().place(0,0,-90)},badge:["▭","Família dos 4 lados","Quadriláteros somam 360°."]}]},
+
+/* 12 */{t:"O círculo",d:"Axioma III: centro, raio, diâmetro e o número π.",i:"◯",ax:"III",steps:[
+ {fix:1,m:"aponta",t:"Fui amarrado ao ponto <b>O</b> por uma corda de 3 unidades. Se eu andar com a corda sempre esticada…",set(){pt("O",0,0);B().place(3,0,90)},
+  async play(){const rope=seg([0,0],[3,0],{color:0x8a6a4a,w:.03,h:.5});let prev=[3,0];B().walking=1;
+   const okk=await tween(4200,(k,lin)=>{const a=lin*Math.PI*2,p=[3*Math.cos(a),3*Math.sin(a)];B().x=p[0];B().y=p[1];B().a=a/D2R+90;B().sync();rope.set([0,0],p);if(Math.hypot(p[0]-prev[0],p[1]-prev[1])>.25){seg(prev,p,{color:COL.reta,w:.06});prev=p}});
+   B().walking=0;if(okk)circ([0,0],3,{fill:1})}},
+ {m:"aponta",t:"…desenho uma <b>circunferência</b>: todos os pontos dela ficam à <b>mesma distância</b> do centro O. A região de dentro é o <b>círculo</b>.",set(){circ([0,0],3,{fill:1});pt("O",0,0);B().place(3,0,90)}},
+ {m:"aponta",t:"Essa distância é o <b>raio</b>. O segmento que atravessa passando pelo centro é o <b>diâmetro</b>: vale dois raios.",set(){circ([0,0],3,{fill:1});pt("O",0,0);seg([0,0],[2.12,2.12],{color:COL.poly});label("raio = 3",1.5,2.3,.3,{size:.45});seg([-3,0],[3,0],{color:COL.seg});label("diâmetro = 6",0,-.7,.3,{size:.45});B().place(-5,-4,45);
+  ov(AX("III","Com qualquer centro e qualquer raio, podemos traçar uma <b>circunferência</b>."))}},
+ {m:"normal",t:"Toque em um ponto que esteja <b>exatamente na circunferência</b> de raio 3.",set(){circ([0,0],3);pt("O",0,0);B().place(-5,-5,45)},
+  a:{k:"pick",n:1,check:async p=>{const [x,y]=p[0];if(x*x+y*y==9){await B().walk([[x,y]]);return {ok:1,msg:`Isso! (${M(x)}, ${M(y)}) fica a 3 unidades de O.`}}return {ok:0,msg:"Esse ponto não está na linha da circunferência. Ande 3 casas a partir do centro, em linha reta."}}}},
+ {m:"pensa",t:"Se você contornar qualquer circunferência e dividir pelo diâmetro, sempre dá o mesmo número: <b>π ≈ 3,14</b>. Por isso: comprimento = π × diâmetro.",set(){circ([0,0],2.5,{fill:1});B().place(-5,-3,45);ov(CARDS([["π ≈ 3,14","sempre o mesmo"],["C = π · d","comprimento"],["d = 2 · r","diâmetro"]]))}},
+ {m:"normal",t:"Desafio final do Mundo 1!",a:{k:"opt",q:"Se o raio mede 4, quanto mede o diâmetro?",o:["2","4","8"],ans:2,ok:"Isso! Diâmetro = 2 × 4 = <b>8</b>.",no:"O diâmetro vale dois raios."},set(){circ([0,0],4,{fill:1});pt("O",0,0);B().place(0,-5.5,90)}},
+ {m:"festa",end:1,t:"Você completou o <b>Mundo 1</b>! Da ideia de ponto até o círculo. Agora vamos para os números!",set(){B().place(0,0,-90)},badge:["III","Axioma III","Fundamentos da Geometria completos!"]}]}
+];
+const pentP=[...Array(5)].map((_,i)=>[Math.round(Math.cos((90+i*72)*D2R)*3*100)/100,Math.round(Math.sin((90+i*72)*D2R)*3*100)/100]);
+const TRI=[[-3,0],[3,0],[0.8,3.5]];
+function triAng(){const ang=(p,q,r)=>{const a=[q[0]-p[0],q[1]-p[1]],b=[r[0]-p[0],r[1]-p[1]];return Math.acos((a[0]*b[0]+a[1]*b[1])/Math.hypot(...a)/Math.hypot(...b))/D2R};
+ return [[ang(TRI[0],TRI[1],TRI[2]),COL.seg],[ang(TRI[2],TRI[0],TRI[1]),COL.poly],[ang(TRI[1],TRI[2],TRI[0]),COL.semi]]}
+function triFig(){poly(TRI,{color:COL.loop});const A=triAng(),d=(p,q)=>Math.atan2(q[1]-p[1],q[0]-p[0])/D2R;
+ arc(TRI[0],0,A[0][0],.8,{color:A[0][1]});arc(TRI[1],180-A[2][0],180,.8,{color:A[2][1]});const a0=d(TRI[2],TRI[0]);arc(TRI[2],a0,a0+A[1][0],.8,{color:A[1][1]})}
+function angleFig(a){pt("",0,0);semi([0,0],[1,0]);semi([0,0],[Math.cos(a*D2R),Math.sin(a*D2R)]);arc([0,0],0,a,1.5,{txt:a+"°"})}
+
+const WORLDS=[
+ {t:"Fundamentos da Geometria",d:"Do ponto ao círculo: os 5 axiomas de Euclides.",c:"#6b4fd8",L:W1},
+ {t:"Números naturais",d:"Contar, o sistema decimal e as quatro operações.",c:"#0e8f86",soon:["Contar e agrupar","Sistema decimal","Adição e subtração","Multiplicação","Divisão","Expressões numéricas","Múltiplos e divisores","Números primos","MMC e MDC","Potência e raiz"]},
+ {t:"Frações e decimais",d:"Partes do inteiro, números decimais e porcentagem.",c:"#d93a7f",soon:["O que é fração","Frações equivalentes","Comparar frações","Somar e subtrair frações","Multiplicar e dividir frações","Números decimais","Operações com decimais","Porcentagem","Razão"]},
+ {t:"Números inteiros",d:"Números negativos, operações e plano cartesiano.",c:"#2f6fd6",soon:["Abaixo de zero","Reta numérica","Somar e subtrair inteiros","Regra de sinais","Plano cartesiano","Números racionais"]},
+ {t:"Álgebra",d:"Letras no lugar de números: equações e proporções.",c:"#d58200",soon:["Expressões algébricas","Princípio da igualdade","Equações do 1º grau","Inequações","Proporção e regra de três","Sistemas de equações"]},
+ {t:"Medidas e espaço",d:"Perímetro, área, volume e transformações.",c:"#1b9a52",soon:["Perímetro","Área do retângulo e do quadrado","Área do triângulo","Área do círculo","Volume","Simetria","Congruência de triângulos","Transformações no plano"]},
+ {t:"Potências e radicais",d:"Expoentes, raízes, notação científica e fatoração.",c:"#ee5f2b",soon:["Propriedades das potências","Notação científica","Raízes","Produtos notáveis","Fatoração"]},
+ {t:"Funções e o 9º ano",d:"Funções, 2º grau, Pitágoras, semelhança e trigonometria.",c:"#172536",soon:["Ideia de função","Função afim","Equação do 2º grau","Teorema de Pitágoras","Semelhança e Tales","Razões trigonométricas","Estatística","Probabilidade"]}];
+
+/* =====================================================================
+   PROGRESSO
+   ===================================================================== */
+const PID=(()=>{const h=location.hash.match(/^#p-([a-z0-9]+)$/i);if(h)return h[1];try{return localStorage.getItem("bipsite-cur")||"visitante"}catch(e){return "visitante"}})();
+function goMenu(){if(window.parent!==window)parent.postMessage({bip:"menu"},"*");else location.href="./"}
+const KEY="academia-bip-3d-v1:"+PID;let save={done:[]};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.done))save=s}catch(e){}
+const store=()=>{try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}};
+const lid=(w,l)=>w+"-"+l;
+const XP_LESSON=100,XP_LEVEL=300;
+
+function drawHome(){$("heroBip").innerHTML=FACE2D("feliz");
+ const done=new Set(save.done),xp=done.size*XP_LESSON,lv=Math.floor(xp/XP_LEVEL)+1;
+ $("lvN").textContent="Nível "+lv;$("lvB").style.width=(xp%XP_LEVEL)/XP_LEVEL*100+"%";$("lvT").textContent=`${xp} XP · faltam ${XP_LEVEL-xp%XP_LEVEL} para o nível ${lv+1}`;
+ const axs=new Set();WORLDS.forEach((W,wi)=>(W.L||[]).forEach((L,li)=>{if(L.ax&&done.has(lid(wi,li)))axs.add(L.ax)}));
+ document.querySelectorAll(".axs span").forEach(s=>s.classList.toggle("on",axs.has(s.dataset.ax)));
+ let h="";WORLDS.forEach((W,wi)=>{
+  if(!W.L){h+=`<section class="world lock"><div class="wh"><span class="wn" style="background:${W.c}">${wi+1}</span><div><h2>${W.t}</h2><p>${W.d}</p><span class="tagsoon">EM CONSTRUÇÃO</span></div></div><div class="soon">${W.soon.map(s=>`<span>${s}</span>`).join("")}</div></section>`;return}
+  const n=W.L.filter((_,li)=>done.has(lid(wi,li))).length,next=W.L.findIndex((_,li)=>!done.has(lid(wi,li)));
+  h+=`<section class="world"><div class="wh"><span class="wn" style="background:${W.c}">${wi+1}</span><div><h2>${W.t}</h2><p>${W.d}</p></div><span class="wc">${n} de ${W.L.length}</span></div><div class="trail">`+
+  W.L.map((L,li)=>{const d=done.has(lid(wi,li)),st=d?"done":li==next?"next":"lock";
+   return `<button class="les ${st}" data-w="${wi}" data-l="${li}"><span class="num">${d?"✓":li+1}</span><span class="ico">${L.i}</span><span class="tx"><span class="tag">Aula ${String(li+1).padStart(2,"0")}${L.ax?" · Axioma "+L.ax:""}${d?" · concluída":""}</span><h3>${L.t}</h3><p>${L.d}</p></span><span class="go">${d?"Rever →":st=="lock"?"🔒":"Começar →"}<small>+${XP_LESSON} XP</small></span></button>`}).join("")+`</div></section>`});
+ $("worlds").innerHTML=h}
+$("worlds").addEventListener("click",e=>{const b=e.target.closest(".les");if(!b||b.classList.contains("lock"))return;openLesson(+b.dataset.w,+b.dataset.l)});
+
+/* =====================================================================
+   AULA: passos e atividades
+   ===================================================================== */
+let cw=0,cl=0,step=0,solved=false,busy=false;
+const LES=()=>WORLDS[cw].L[cl];
+function openLesson(w,l){cw=w;cl=l;step=0;$("home").classList.add("hidden");$("lesson").classList.remove("hidden");if(!init3d())return;size();camTo({th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0});show()}
+function closeLesson(){runId++;onPick=null;$("lesson").classList.add("hidden");$("home").classList.remove("hidden");drawHome();window.scrollTo(0,0)}
+function say(t,cls="",m){const s=$("say");s.className=cls;$("txt").innerHTML=t;s.querySelector(".who").textContent=cls=="ok"?"BIP · ACERTOU!":cls=="no"?"BIP · QUASE!":"BIP";if(m){$("face").innerHTML=FACE2D(m);bip&&bip.face(m)}}
+function setMood(m){$("face").innerHTML=FACE2D(m);bip.face(m)}
+async function show(){const L=LES(),S=L.steps[step],n=L.steps.length,id=++runId;
+ $("lnum").textContent="AULA "+String(cl+1).padStart(2,"0");$("ltit").textContent=`Mundo ${cw+1} · ${L.t}`;
+ const pc=Math.round(step/(n-1)*100);$("lbar").style.width=pc+"%";$("lpc").textContent=pc+"%";
+ $("back").style.visibility=step?"visible":"hidden";$("next").textContent=S.end?"Concluir aula ✓":"Prosseguir →";
+ onPick=null;ov("");actP("");clearStage();bip.walking=0;bip.fix=S.fix||(S.a&&/turn|prog/.test(S.a.k))?1:0;
+ solved=!S.a;say(S.t,"",S.m);
+ if(S.set)S.set();
+ if(S.badge)ov(`<div class="badge"><div class="medal">${S.badge[0]}</div><h2>${S.badge[1]}</h2><div>${S.badge[2]}</div><div class="xp">+${XP_LESSON} XP</div></div>`);
+ if(S.a)setup(S.a,S);
+ $("next").disabled=!solved||!!S.play;
+ if(S.play){await S.play();if(id==runId&&!S.a)$("next").disabled=false}}
+function win(msg){solved=true;$("next").disabled=false;say(msg,"ok","festa");const id=runId;setTimeout(()=>{if(id==runId&&solved)setMood("feliz")},1800)}
+function miss(msg){say(msg,"no","ops")}
+
+function setup(a,S){
+ if(a.k=="opt"){actP(`<div class="panel"><div class="q">${a.q}</div><div class="opts">${a.o.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join("")}</div></div>`);
+  $("act").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(solved)return;const i=+b.dataset.i;
+   if(i==a.ans){b.classList.add("right");$("act").querySelectorAll(".opt").forEach(x=>x.disabled=true);win(a.ok)}else{b.classList.add("wrong");b.disabled=true;miss(a.no)}})}
+ if(a.k=="pick"){let pts=[];actP(`<div class="panel tools"><span>Toque no chão · <b id="pc">0</b> de ${a.n}</span><button class="btn sm" id="pclr">Limpar</button></div>`);
+  const reset=()=>{const id=runId;clearStage();S.set&&S.set();pts=[];$("pc").textContent=0;say(S.t,"",S.m)};
+  $("pclr").onclick=()=>{if(busy||solved)return;runId++;show()};
+  onPick=async p=>{if(busy||solved)return;if(pts.some(q=>q[0]==p[0]&&q[1]==p[1]))return miss("Esse ponto já foi marcado. Escolha outro lugar.");
+   pts.push(p);if(a.mark!==0)pt(a.names?a.names[pts.length-1]:"",p[0],p[1]);$("pc").textContent=pts.length;
+   if(pts.length==a.n){busy=true;const r=await a.check(pts);busy=false;if(!r)return;if(r.ok)win(r.msg);else{miss(r.msg);if(a.n>1){const id=runId;await wait(1400);if(id==runId&&!solved){const t=$("txt").innerHTML;runId++;await show();say(t,"no","ops")}}else pts=[]}}}}
+ if(a.k=="turn"){let h=bip.a;const base=bip.a;const draw=()=>{const d=((h-base)%360+360)%360;$("tv").textContent=d+"°";clearStage();S.set();bip.place(bip.x,bip.y,h);if(d)arc([0,0],base,base+d,1.4,{txt:d+"°"})};
+  actP(`<div class="panel tools"><button class="blk t" id="tl">↺ Girar ${a.step}° (esquerda)</button><span class="readout" id="tv">0°</span><button class="blk t" id="tr">↻ Girar ${a.step}° (direita)</button></div>`);
+  const go=async d=>{if(busy||solved)return;busy=true;await bip.turn(d);h+=d;busy=false;draw();const g=((h-base)%360+360)%360;
+   if(g==a.target)win(`Isso! Girei <b>${a.target}°</b> para a esquerda (sentido anti-horário) e agora olho para a bandeira.`);else say(`Girei ${g}° no total. Continue até olhar para a bandeira.`,"",S.m)};
+  $("tl").onclick=()=>go(a.step);$("tr").onclick=()=>go(-a.step)}
+ if(a.k=="slider"){actP(`<div class="panel"><div class="readout"><span id="sv">0°</span> · <span id="st">nulo</span></div><input type="range" min="0" max="180" step="5" value="30" id="sl" aria-label="Abertura do ângulo"></div>`);
+  const typ=a=>a==0?"nulo":a<90?"agudo":a==90?"reto":a<180?"obtuso":"raso";
+  const upd=()=>{const v=+$("sl").value;clearStage();S.set();pt("",0,0);semi([0,0],[1,0]);semi([0,0],[Math.cos(v*D2R),Math.sin(v*D2R)]);if(v==90)rightMark([0,0],0,.6);else if(v)arc([0,0],0,v,1.5,{txt:v+"°"});
+   $("sv").textContent=v+"°";$("st").textContent=typ(v);if(!solved&&a.test(v))win(a.ok)};$("sl").oninput=upd;upd()}
+ if(a.k=="prog"){let list=[],rep=1;const BL=a.blocks,cls={f:"f",t:"t"};
+  actP(`<div class="panel"><div class="prog" id="pl"></div><div class="tools">${BL.map((b,i)=>`<button class="blk ${b[1]}" data-b="${i}">${b[0]}</button>`).join("")}<button class="blk rep" id="prep">Repetir tudo: 1×</button><button class="btn sm" id="pclr">Limpar</button><button class="btn main" id="prun" style="font-size:1rem;padding:6px 16px">▶ Executar</button></div></div>`);
+  const draw=()=>{$("pl").innerHTML=list.length?(rep>1?`<span style="background:var(--loop)">Repetir ${rep}× [</span>`:"")+list.map(i=>`<span style="background:var(--${BL[i][1]=="f"?"go":"turn"})">${BL[i][0]}</span>`).join("")+(rep>1?`<span style="background:var(--loop)">]</span>`:""):'<span class="ph">Toque nos blocos para montar o programa</span>';$("prep").textContent=`Repetir tudo: ${rep}×`};draw();
+  const st={x:bip.x,y:bip.y,a:bip.a};
+  $("act").querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>{if(busy||solved||list.length>=10)return;list.push(+b.dataset.b);draw()});
+  $("prep").onclick=()=>{if(busy||solved)return;rep=rep%6+1;draw()};
+  $("pclr").onclick=()=>{if(busy||solved)return;list=[];rep=1;draw();clearStage();S.set&&S.set();bip.place(st.x,st.y,st.a);say(S.t,"",S.m)};
+  $("prun").onclick=async()=>{if(busy||solved||!list.length)return;busy=true;clearStage();S.set&&S.set();bip.place(st.x,st.y,st.a);say("Executando…","",S.m);
+   const verts=[[st.x,st.y]],turns=[];let pend=0;
+   for(let r=0;r<rep;r++)for(const i of list){const [,k,v]=BL[i];
+    if(k=="f"){if(pend){turns.push(pend);pend=0}const nx=bip.x+Math.cos(bip.a*D2R)*v,ny=bip.y+Math.sin(bip.a*D2R)*v;if(!(await bip.walk([[nx,ny]],{trail:COL.poly,noTurn:1,ms:300}))){busy=false;return}verts.push([bip.x,bip.y])}
+    else{if(!(await bip.turn(v))){busy=false;return}pend+=v}}
+   if(pend)turns.push(pend);busy=false;
+   const last=verts[verts.length-1],closed=verts.length>2&&Math.hypot(last[0]-verts[0][0],last[1]-verts[0][1])<.01;
+   const uniq=[];verts.slice(0,-1).forEach(v=>{if(!uniq.some(u=>Math.hypot(u[0]-v[0],u[1]-v[1])<.01))uniq.push(v)});
+   const res={closed,n:closed?verts.length-1:uniq.length};const tr=closed?turns.slice(0,res.n).map(t=>((t%360)+360)%360):turns;
+   if(closed&&res.n==uniq.length&&a.check(res,tr)){poly(uniq,{edges:false});win(a.ok)}else miss(a.no)}}}
+
+$("next").onclick=()=>{const L=LES();if(!solved||$("next").disabled)return;
+ if(L.steps[step].end){const k=lid(cw,cl);if(!save.done.includes(k))save.done.push(k);store();return closeLesson()}
+ step++;show()};
+$("back").onclick=()=>{if(busy||!step)return;step--;show()};
+$("exit").onclick=closeLesson;
+document.addEventListener("keydown",e=>{if($("lesson").classList.contains("hidden")||e.target.tagName=="INPUT")return;if(e.key=="ArrowRight"&&!$("next").disabled)$("next").click();if(e.key=="ArrowLeft")$("back").click();if(e.key=="Escape")closeLesson()});
+drawHome();
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand"><span id="brandFace"></span><h1>Robô <span>Programador</span></h1></div>
+    <nav class="lvnav" aria-label="Fases">
+      <button class="iconbtn" id="prevLv" aria-label="Fase anterior" data-ic="left"></button>
+      <button class="lvcur" id="lvToggle" aria-haspopup="dialog" aria-label="Abrir o mapa de fases"><span class="wbadge" id="lvBadge">1</span><span class="lvtxt"><small id="lvWorld"></small><b id="lvName"></b></span></button>
+      <button class="iconbtn" id="nextLv" aria-label="Próxima fase" data-ic="right"></button>
+    </nav>
+    <div class="tools">
+      <button class="starct" id="starBtn" aria-label="Estrelas conquistadas. Abrir o mapa de fases" data-ic="star"><b id="starTotal">0</b><small id="starMax"></small></button>
+      <button class="iconbtn" id="sndBtn" aria-label="Ligar ou desligar o som"></button>
+      <button class="iconbtn" id="cfgBtn" aria-label="Opções" data-ic="sliders"></button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stage">
+      <div class="talk" id="talk">
+        <div class="face" id="face"></div>
+        <div class="bubble" id="bubble" aria-live="polite">
+          <div class="bhead"><span class="lvtag" id="lvTag"></span><span class="kind" id="lvKind" hidden></span></div>
+          <p id="say"></p>
+          <div class="blinks" id="blinks"></div>
+        </div>
+        <button class="tipbtn" id="tipBtn" hidden data-ic="bulb" aria-label="Ver uma dica"><span>Dica</span></button>
+      </div>
+      <div class="board" id="board">
+        <div class="hud" id="hud"></div>
+        <span class="hint3d">Arraste para girar a câmera</span>
+      </div>
+    </section>
+
+    <section class="bench">
+      <div class="card">
+        <div class="chead"><h2 id="edTitle">Meu programa</h2><div class="meter" id="meter"></div></div>
+        <div class="editor">
+          <div class="palette" id="palette" aria-label="Peças disponíveis"></div>
+          <div class="ws" id="ws"></div>
+        </div>
+        <div class="answers" id="answers" hidden></div>
+        <div class="ctrls" id="ctrls">
+          <button class="btn primary" id="run"></button>
+          <button class="btn" id="step" data-ic="step" aria-label="Executar passo a passo" title="Executa uma peça de cada vez"><span class="lbl">Passo a passo</span></button>
+          <span class="grow"></span>
+          <button class="btn sq" id="reset" data-ic="home" aria-label="Voltar o Bip ao início" title="Voltar o Bip ao início"></button>
+          <button class="btn sq" id="undo" data-ic="undo" aria-label="Desfazer" title="Desfazer"></button>
+          <button class="btn sq" id="clear" data-ic="trash" aria-label="Apagar tudo" title="Apagar tudo"></button>
+          <button class="btn sq spd" id="spdBtn" aria-label="Mudar a velocidade" title="Velocidade">2×</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="mapModal" hidden role="dialog" aria-modal="true" aria-label="Mapa de fases"><div class="sheet map" id="mapSheet"></div></div>
+<div class="modal" id="introModal" hidden role="dialog" aria-modal="true" aria-label="Novo mundo"><div class="sheet intro" id="introSheet"></div></div>
+<div class="modal" id="winModal" hidden role="dialog" aria-modal="true" aria-label="Fase concluída"><div class="sheet win" id="winSheet"></div></div>
+<div class="modal" id="cfgModal" hidden role="dialog" aria-modal="true" aria-label="Opções"><div class="sheet cfg" id="cfgSheet"></div></div>
