@@ -18,7 +18,8 @@ Site no ar: https://mundo-do-bip.netlify.app
 
 1. Mude os arquivos em `fonte/`.
 2. Rode `python3 build.py` (precisa de Python 3 e Node).
-3. Envie para o GitHub. O Netlify publica sozinho em cerca de 1 minuto.
+3. Envie para o GitHub. O Netlify publica sozinho em cerca de 1 minuto
+   (projeto **mundo-do-bip** no Netlify, ligado a este repositório, pasta `dist`).
 
 ## Regras para não perder o progresso dos alunos
 
