@@ -43,6 +43,14 @@ s=patch(s,'function persist(){try{localStorage.setItem("robo4",JSON.stringify(sa
 s,k=re.subn(r' <div class="row"><span><b>Liberar todas as fases</b>.*?</div>\n','',s,count=1);assert k==1
 s=patch(s,'loadSave();if(!SKINS[save.skin]','loadSave();save.all=0;if(!SKINS[save.skin]',fn)
 s=patch(s,'$("cfgBtn").onclick=ACTS.cfg;','$("cfgBtn").onclick=ACTS.cfg;$("menuBtn").onclick=goMenu;',fn)
+# Bipcoins: aviso de quantas moedas a fase deu, e a pintura comprada na loja vira a cor do Bip
+BV=rd(os.path.join(F,'comum','bipvisual.js'))
+COINSVG=re.search(r"const COIN='(<svg.*?</svg>)'",BV).group(1).replace('class="coin"','style="width:30px;height:30px;flex:none"')
+PAINT={m.group(1):m.group(2) for m in re.finditer(r'I\("pintura","([^"]+)","[^"]*","[^"]*",\d+,\{c:"(#[0-9a-fA-F]{6})"',BV)}
+s=patch(s,'function finishLevel(nv){const L=LEVELS[lvl],n=countBlocks(P),quiz=L.type=="quiz",before=totalStars();','let COINGAIN=0;\nfunction finishLevel(nv){const L=LEVELS[lvl],n=countBlocks(P),quiz=L.type=="quiz",before=totalStars(),had=save.stars[L.t]||0;',fn)
+s=patch(s,'rank=rankOf(after)[0]>before?rankOf(after)[1]:null;showWin(st,n,nv,skin,rank)}','rank=rankOf(after)[0]>before?rankOf(after)[1]:null;COINGAIN=(had?0:10)+5*(Math.max(had,st)-had);showWin(st,n,nv,skin,rank)}',fn)
+s=patch(s,'  (rank?`<div class="prize">','  (COINGAIN?`<div class="prize">'+COINSVG+'<span><b>+${COINGAIN} Bipcoins</b> para gastar na Loja do Bip</span></div>`:"")+\n  (rank?`<div class="prize">',fn)
+s=patch(s,'loadSave();save.all=0;if(!SKINS[save.skin]','loadSave();save.all=0;try{const LJ=JSON.parse(localStorage.getItem("bipsite-loja:"+PID)||"null"),pc='+json.dumps(PAINT)+'[LJ&&LJ.look&&LJ.look.pintura];if(pc&&LJ.look.pintura!="p-amarelo"){SKINS.loja=pc;SKIN_AT.loja=0;SKIN_NAME.loja="da Loja";save.skin="loja"}}catch(e){}if(!SKINS[save.skin]',fn)
 wr(fn,s)
 fn=src+'/10-body.html';s=rd(fn)
 s=patch(s,'<div class="tools">\n','<div class="tools">\n      <button class="iconbtn" id="menuBtn" aria-label="Voltar ao menu" title="Menu" data-ic="home"></button>\n',fn)
@@ -54,7 +62,9 @@ ROBO=json.loads(subprocess.run(['node','-e',lv.replace('const WORLDS=','globalTh
 shutil.rmtree(tmp)
 
 # ---------- Academia do Bip: progresso por aluno e botão de menu ----------
+BIPVJS=rd(os.path.join(F,'comum','bipvisual.js'))
 fn=os.path.join(F,'academia','academia.html');s=rd(fn)
+s=patch(s,'three.min.js"></script>\n','three.min.js"></script>\n<script>'+BIPVJS+'</script>\n',fn)
 s=patch(s,'const KEY="academia-bip-3d-v1";',PID_JS+'\nconst KEY="academia-bip-3d-v1:"+PID;',fn)
 s=patch(s,'<main id="home">\n','<main id="home">\n <div style="margin-bottom:12px"><button class="btn sm" id="toMenu" onclick="goMenu()">← Menu do Bip</button></div>\n',fn)
 s=patch(s,'<title>Academia do Bip</title>',ICONS+RESET+'<title>Academia do Bip</title>',fn)
@@ -71,6 +81,7 @@ def page(src,out,extra_head=''):
     m=rd(os.path.join(F,'menu',src))
     m=m.replace('/*ROBO*/[]',json.dumps(ROBO,ensure_ascii=False)).replace('/*ACAD*/[]',json.dumps(ACAD)).replace('/*ROBO_N*/0',str(len(ROBO)))
     m=patch(m,'<!--LOGO-->','<span class="sr-only">Mundo do Bip</span>'+logo if 'sr-only' in m else logo,src)
+    m=m.replace('<script>/*BIPV*/</script>','<script>'+BIPVJS+'</script>').replace('<script>/*LOBBY*/</script>','<script>'+rd(os.path.join(F,'menu','lobby.js'))+'</script>')
     m=m.replace('<script>\n',NUV+'<script>\n',1)
     cut=m.index('</style>\n')+len('</style>\n')
     wr(OUT+'/'+out,HEAD+ICONS+extra_head+'<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n'+m[:cut]+'</head>\n<body>\n'+m[cut:]+'\n</body>\n</html>\n')

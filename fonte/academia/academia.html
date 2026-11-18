@@ -31,6 +31,8 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1}
 .hero p{margin:4px 0 0;color:var(--muted)}
 .hero .info{flex:1;min-width:0}
 .lvl{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.coinrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--display);font-weight:800;font-size:1.5rem;padding:4px 14px 4px 6px;border-radius:99px;background:color-mix(in srgb,#f2b20a 18%,var(--panel));border:1px solid color-mix(in srgb,#f2b20a 50%,var(--line));font-variant-numeric:tabular-nums}
+.coinrow .coin{width:30px;height:30px}.coin{width:1.1em;height:1.1em;vertical-align:-.2em}
 .lvl .n{font-family:var(--display);font-weight:800;font-size:1.1rem}
 .lvl .xb{flex:1;min-width:120px;height:9px;background:var(--line);border-radius:9px;overflow:hidden}
 .lvl .xb i{display:block;height:100%;background:linear-gradient(90deg,var(--turn),var(--run))}
@@ -152,7 +154,7 @@ input[type=range]{width:min(420px,70vw);accent-color:var(--run)}
   <div class="info">
    <h1>Academia do <b>Bip</b></h1>
    <p>A matemática do Fundamental 2, do primeiro ponto até as funções. Ande, toque, gire e programe com o Bip.</p>
-   <div class="lvl"><span class="n" id="lvN">Nível 1</span><div class="xb"><i id="lvB"></i></div><small id="lvT">0 XP</small></div>
+   <div class="lvl"><span class="coinrow" id="coinRow"></span><small id="coinTxt"></small></div>
    <div class="axs">AXIOMAS DE EUCLIDES <span data-ax="I">I</span><span data-ax="II">II</span><span data-ax="III">III</span><span data-ax="IV">IV</span><span data-ax="V">V</span></div>
   </div>
  </section>
@@ -190,7 +192,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const dark=()=>document.documentElement.dataset.theme=="dark"||(document.documentElement.dataset.theme!="light"&&matchMedia("(prefers-color-scheme: dark)").matches);
 
 /* ---------- Bip 2D (rosto ao lado da fala e no mapa) ---------- */
-const FACE2D=m=>`<svg viewBox="0 0 200 170" style="width:100%;height:auto"><line x1="100" y1="34" x2="100" y2="12" stroke="#3b4250" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="10" r="9" fill="#ee5f2b"/>
+const FACE2D_BASE=m=>`<svg viewBox="0 0 200 170" style="width:100%;height:auto"><line x1="100" y1="34" x2="100" y2="12" stroke="#3b4250" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="10" r="9" fill="#ee5f2b"/>
 <rect x="18" y="30" width="164" height="124" rx="32" fill="#f2c230" stroke="#b98d10" stroke-width="5"/><rect x="38" y="50" width="124" height="84" rx="20" fill="#172536"/>${FACES[m]||FACES.normal}</svg>`;
 const FACES={
  normal:`<rect x="66" y="70" width="18" height="28" rx="9" fill="#5ef0e0"/><rect x="116" y="70" width="18" height="28" rx="9" fill="#5ef0e0"/><path d="M86 112q14 9 28 0" stroke="#5ef0e0" stroke-width="5" fill="none" stroke-linecap="round"/>`,
@@ -264,34 +266,11 @@ function confetti(x,y,n=46){if(!fx)return;const cols=[0xf2c230,0xee5f2b,0x0e8f86
    if(m.position.y<.02){m.position.y=.02;v.set(0,0,0);rv.set(0,0,0)}m.material.opacity=Math.max(0,1-(life-1.6)/0.8);return life<2.4};fx.add(m)}}
 
 /* ---------- O Bip em 3D ---------- */
-const FTX={};
-function faceTex(m){if(FTX[m])return FTX[m];const c=document.createElement("canvas");c.width=256;c.height=160;const g=c.getContext("2d");g.fillStyle="#172536";g.fillRect(0,0,256,160);
- g.strokeStyle=g.fillStyle=m=="ops"?"#ff8a8a":"#5ef0e0";g.lineCap="round";g.lineWidth=14;
- const eyes=(y,h)=>{g.beginPath();g.roundRect(70,y,30,h,15);g.roundRect(156,y,30,h,15);g.fill()};
- if(m=="feliz"||m=="festa"){g.beginPath();g.moveTo(66,82);g.quadraticCurveTo(85,50,104,82);g.moveTo(152,82);g.quadraticCurveTo(171,50,190,82);g.stroke();g.beginPath();g.moveTo(96,110);g.quadraticCurveTo(128,140,160,110);g.stroke()}
- else if(m=="ops"){g.beginPath();[[70,52],[156,52]].forEach(([x,y])=>{g.moveTo(x,y);g.lineTo(x+30,y+34);g.moveTo(x+30,y);g.lineTo(x,y+34)});g.stroke();g.lineWidth=9;g.beginPath();g.arc(128,120,12,0,7);g.stroke()}
- else if(m=="pisca"){g.lineWidth=12;g.beginPath();g.moveTo(70,70);g.lineTo(100,70);g.moveTo(156,70);g.lineTo(186,70);g.stroke();g.lineWidth=10;g.beginPath();g.moveTo(106,118);g.quadraticCurveTo(128,132,150,118);g.stroke()}
- else if(m=="pensa"){eyes(34,36);g.beginPath();g.moveTo(108,122);g.lineTo(150,122);g.stroke()}
- else{eyes(44,46);g.lineWidth=10;g.beginPath();g.moveTo(106,118);g.quadraticCurveTo(128,132,150,118);g.stroke()}
- const t=new THREE.CanvasTexture(c);t.anisotropy=4;return FTX[m]=t}
-function makeBip(){const g=new THREE.Group(),inner=new THREE.Group(),Y=mat(0xf2c230,{roughness:.4}),Dk=mat(0x3b4250,{roughness:.6}),Or=mat(0xee5f2b,{emissive:0xee5f2b,emissiveIntensity:.35});
- g.add(inner);const s=.68;inner.scale.set(s,s,s);
- const box=(w,h,d,m,x,y,z,p=inner)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(x,y,z);b.castShadow=true;p.add(b);return b};
- const legs=[-.25,.25].map(x=>{const p=new THREE.Group();p.position.set(x,.75,0);inner.add(p);box(.26,.6,.3,Dk,0,-.3,0,p);box(.34,.14,.46,Dk,0,-.66,.06,p);return p});
- const body=new THREE.Group();inner.add(body);
- box(1,.75,.7,Y,0,1.12,0,body);const chest=box(.36,.26,.04,Or,0,1.14,.36,body);
- const head=box(1.3,.9,.9,Y,0,1.98,0,body);
- const scr=new THREE.Mesh(new THREE.PlaneGeometry(1.04,.65),new THREE.MeshBasicMaterial({map:faceTex("feliz")}));scr.position.set(0,1.98,.452);body.add(scr);
- const ant=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.35),Dk);ant.position.set(0,2.6,0);body.add(ant);
- const bulb=new THREE.Mesh(new THREE.SphereGeometry(.12,16,12),Or);bulb.position.set(0,2.8,0);body.add(bulb);
- const glow=new THREE.PointLight(0xff8a4c,.6,3.2);glow.position.set(0,2.8,.2);body.add(glow);
- const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xff9a5c,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));halo.scale.set(.9,.9,1);halo.position.set(0,2.8,0);body.add(halo);
- const arms=[-1,1].map(sd=>{const p=new THREE.Group();p.position.set(sd*.62,1.38,0);body.add(p);box(.2,.6,.2,Dk,0,-.3,0,p);const h=new THREE.Mesh(new THREE.SphereGeometry(.16,16,12),Y);h.position.set(0,-.65,0);h.castShadow=true;p.add(h);return p});
- const sh=new THREE.Mesh(new THREE.CircleGeometry(.5,24),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.12}));sh.rotation.x=-Math.PI/2;sh.position.y=.01;g.add(sh);
+function makeBip(){const P=BIPV.buildBody(),{g,inner,body,legs,arms,scr,bulb,glow,halo,s}=P;BIPV.dress(P,myLook());
  const B={g,x:0,y:0,h:0,a:90,walking:0,wv:0,ph:0,mood:"feliz",fix:0,last:0,blinkAt:2,squash:0,
   place(x,y,a){B.x=x;B.y=y;if(a!=null)B.a=a;B.last=performance.now();B.sync()},
   sync(){g.position.copy(P3(B.x,B.y,B.h));g.rotation.y=(B.a+90)*D2R},
-  face(m){if(m==B.mood)return;B.mood=m;scr.material.map=faceTex(m);scr.material.needsUpdate=true;if(m=="festa")B.squash=1},
+  face(m){if(m==B.mood)return;B.mood=m;BIPV.setMood(P,m);if(m=="festa")B.squash=1},
   tick(dt,t){if(!B.walking&&!B.fix&&performance.now()-B.last>900){const ca=Math.atan2(-cam.position.z-B.y,cam.position.x-B.x)/D2R,d=((ca-B.a)%360+540)%360-180;if(Math.abs(d)>1){B.a+=d*Math.min(1,dt*3);B.sync()}}
    /* andar: a força do passo (wv) sobe e desce aos poucos, sem trancos */
    B.wv+=(B.walking-B.wv)*Math.min(1,dt*7);const w=B.wv;B.ph+=dt*10.5*Math.max(w,.0001);
@@ -309,9 +288,10 @@ function makeBip(){const g=new THREE.Group(),inner=new THREE.Group(),Y=mat(0xf2c
    B.squash=Math.max(0,B.squash-dt*3.5);const sq=Math.sin(B.squash*Math.PI)*.12;
    inner.scale.set(s*(1+sq*.6),s*(1-sq),s*(1+sq*.6));
    body.position.y=Math.sin(t*2.4)*.035+Math.abs(Math.sin(B.ph))*.07*w;inner.position.y=jump;
-   const pulse=.5+.5*Math.sin(t*4);bulb.material.emissiveIntensity=.35+.45*pulse;glow.intensity=.35+.5*pulse;halo.material.opacity=.45+.4*pulse;
+   const pulse=.5+.5*Math.sin(t*4);glow.intensity=.35+.5*pulse;halo.material.opacity=.45+.4*pulse;
    /* piscar */
-   if(t>B.blinkAt){B.blinkAt=t+2.5+Math.random()*3;if(/normal|aponta|pensa/.test(B.mood)){scr.material.map=faceTex("pisca");setTimeout(()=>{scr.material.map=faceTex(B.mood)},130)}}},
+   if(t>B.blinkAt){B.blinkAt=t+2.5+Math.random()*3;if(/normal|aponta|pensa/.test(B.mood)){scr.material.map=BIPV.faceTex("pisca",P.look);setTimeout(()=>{scr.material.map=BIPV.faceTex(B.mood,P.look)},130)}}
+   BIPV.tick(P,t,dt)},
   async turnTo(a){let d=((a-B.a)%360+540)%360-180;if(Math.abs(d)<.5){B.a=a;return true}const a0=B.a;return await tween(Math.abs(d)*4+120,k=>{B.a=a0+d*k;B.last=performance.now();B.sync()})},
   async turn(d){const a0=B.a;return await tween(Math.abs(d)*5+150,k=>{B.a=a0+d*k;B.last=performance.now();B.sync()})},
   async walk(pts,o={}){for(const [x,y] of pts){const dx=x-B.x,dy=y-B.y,L=Math.hypot(dx,dy);if(L<1e-6)continue;
@@ -746,14 +726,17 @@ const KEY="academia-bip-3d-v1";let save={done:[]};
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.done))save=s}catch(e){}
 const store=()=>{try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}};
 const lid=(w,l)=>w+"-"+l;
-const XP_LESSON=100,XP_LEVEL=300;
+const XP_LESSON=BIPV.POR_AULA;
 
 /* um mundo abre quando todas as aulas do mundo anterior foram concluídas */
 function worldOpen(wi,done){if(wi==0)return true;const P=WORLDS[wi-1];return !!P.L&&P.L.every((_,li)=>done.has(lid(wi-1,li)))}
 let unlockMsg="";
+/* visual do Bip (comprado na loja do menu) */
+const myLook=()=>BIPV.loja(typeof PID!="undefined"?PID:"visitante").look;
+const FACE2D=m=>BIPV.face2d(myLook(),m);
 function drawHome(){$("heroBip").innerHTML=FACE2D("feliz");
- const done=new Set(save.done),xp=done.size*XP_LESSON,lv=Math.floor(xp/XP_LEVEL)+1;
- $("lvN").textContent="Nível "+lv;$("lvB").style.width=(xp%XP_LEVEL)/XP_LEVEL*100+"%";$("lvT").textContent=`${xp} XP · faltam ${XP_LEVEL-xp%XP_LEVEL} para o nível ${lv+1}`;
+ const done=new Set(save.done),saldo=BIPV.saldo(typeof PID!="undefined"?PID:"visitante");
+ $("coinRow").innerHTML=`${BIPV.COIN}${BIPV.fmt(saldo)}`;$("coinTxt").textContent=`Bipcoins · cada aula vale ${XP_LESSON}. Gaste na Loja do Bip, no menu.`;
  const axs=new Set();WORLDS.forEach((W,wi)=>(W.L||[]).forEach((L,li)=>{if(L.ax&&done.has(lid(wi,li)))axs.add(L.ax)}));
  document.querySelectorAll(".axs span").forEach(s=>s.classList.toggle("on",axs.has(s.dataset.ax)));
  let h="";WORLDS.forEach((W,wi)=>{
@@ -761,7 +744,7 @@ function drawHome(){$("heroBip").innerHTML=FACE2D("feliz");
   const n=W.L.filter((_,li)=>done.has(lid(wi,li))).length,open=worldOpen(wi,done),next=open?W.L.findIndex((_,li)=>!done.has(lid(wi,li))):-1;
   h+=`<section class="world${open?"":" lock"}"><div class="wh"><span class="wn" style="background:${W.c}">${wi+1}</span><div><h2>${W.t}</h2><p>${W.d}</p>${open?"":`<span class="tagsoon">🔒 TERMINE O MUNDO ${wi} PARA ABRIR</span>`}</div><span class="wc">${n} de ${W.L.length}</span></div><div class="trail">`+
   W.L.map((L,li)=>{const d=done.has(lid(wi,li)),st=d?"done":li==next?"next":"lock";
-   return `<button class="les ${st}" data-w="${wi}" data-l="${li}"><span class="num">${d?"✓":li+1}</span><span class="ico">${L.i}</span><span class="tx"><span class="tag">Aula ${String(li+1).padStart(2,"0")}${L.ax?" · Axioma "+L.ax:""}${d?" · concluída":""}</span><h3>${L.t}</h3><p>${L.d}</p></span><span class="go">${d?"Rever →":st=="lock"?"🔒":"Começar →"}<small>+${XP_LESSON} XP</small></span></button>`}).join("")+`</div></section>`});
+   return `<button class="les ${st}" data-w="${wi}" data-l="${li}"><span class="num">${d?"✓":li+1}</span><span class="ico">${L.i}</span><span class="tx"><span class="tag">Aula ${String(li+1).padStart(2,"0")}${L.ax?" · Axioma "+L.ax:""}${d?" · concluída":""}</span><h3>${L.t}</h3><p>${L.d}</p></span><span class="go">${d?"Rever →":st=="lock"?"🔒":"Começar →"}<small>+${XP_LESSON} ${BIPV.COIN}</small></span></button>`}).join("")+`</div></section>`});
  $("worlds").innerHTML=(unlockMsg?`<div class="unlock" role="status"><span style="font-size:2rem">🎉</span><div><b>${unlockMsg}</b>${/liberado/.test(unlockMsg)?"<div>Role a página para começar.</div>":""}</div></div>`:"")+h;unlockMsg=""}
 $("worlds").addEventListener("click",e=>{const b=e.target.closest(".les");if(!b||b.classList.contains("lock"))return;openLesson(+b.dataset.w,+b.dataset.l)});
 
@@ -781,7 +764,7 @@ async function show(){const L=LES(),S=L.steps[step],n=L.steps.length,id=++runId;
  onPick=null;ov("");actP("");clearStage();bip.walking=0;bip.fix=S.fix||(S.a&&/turn|prog/.test(S.a.k))?1:0;
  solved=!S.a;say(S.t,"",S.m);
  if(S.set)S.set();
- if(S.badge)ov(`<div class="badge"><div class="medal">${S.badge[0]}</div><h2>${S.badge[1]}</h2><div>${S.badge[2]}</div><div class="xp">+${XP_LESSON} XP</div></div>`);
+ if(S.badge)ov(`<div class="badge"><div class="medal">${S.badge[0]}</div><h2>${S.badge[1]}</h2><div>${S.badge[2]}</div><div class="xp">+${XP_LESSON} ${BIPV.COIN} Bipcoins</div></div>`);
  if(S.a)setup(S.a,S);
  $("next").disabled=!solved||!!S.play;
  if(S.play){await S.play();if(id==runId&&!S.a)$("next").disabled=false}}

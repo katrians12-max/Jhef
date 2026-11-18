@@ -98,12 +98,93 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
 .foot{display:flex;justify-content:center;gap:8px;color:var(--muted);font-size:.9rem;flex-wrap:wrap}
 .foot a{color:var(--turn);font-weight:700}
 
+/* Saguão 3D */
+.lobby{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,1fr);gap:16px;align-items:stretch}
+.stage{position:relative;border-radius:26px;overflow:hidden;min-height:580px;color:#fff;isolation:isolate;
+ background:radial-gradient(ellipse 70% 45% at 50% 88%,#4a2a8a 0%,rgba(74,42,138,0) 70%),radial-gradient(ellipse 60% 60% at 50% 30%,#1f2c5c 0%,#121a3a 55%,#090d20 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.st-3d{position:absolute;inset:0;z-index:0}
+.lobby-cv{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;touch-action:pan-y;cursor:grab}
+.st-fallback{position:absolute;left:50%;top:50%;width:200px;transform:translate(-50%,-50%)}
+.st-top{position:absolute;inset:14px 14px auto 14px;z-index:2;display:flex;align-items:center;gap:10px;flex-wrap:wrap;pointer-events:none}
+.st-top>*{pointer-events:auto}
+.glass{background:rgba(12,18,40,.55);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:16px;color:#fff}
+.who-chip{display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px}
+.who-chip b{font-family:var(--display);font-size:1.2rem;display:block;line-height:1.1}
+.who-chip small{opacity:.75;font-size:.8rem}
+.who-chip .av{width:40px;height:40px}
+.coins{margin-left:auto;display:flex;align-items:center;gap:8px;padding:6px 16px 6px 8px;font-family:var(--display);font-weight:800;font-size:1.35rem;font-variant-numeric:tabular-nums}
+.coins small{font-family:var(--body);font-weight:700;font-size:.72rem;opacity:.8;letter-spacing:.06em;text-transform:uppercase}
+.coin{width:1.15em;height:1.15em;flex:none;vertical-align:-.18em}
+.coins .coin{width:30px;height:30px}
+.coins.bump{animation:bump .6s ease}
+@keyframes bump{30%{transform:scale(1.15)}}
+.st-bottom{position:absolute;left:0;right:0;bottom:14px;z-index:2;display:flex;justify-content:center;padding-inline:14px}
+.gestos{display:flex;gap:6px;padding:6px;flex-wrap:wrap;justify-content:center}
+.gestos button{border:none;background:rgba(255,255,255,.08);color:#fff;border-radius:12px;padding:6px 8px;font-weight:700;font-size:.8rem;display:flex;align-items:center;gap:5px}
+.gestos button:hover{background:rgba(255,255,255,.2)}
+.gestos button span{font-size:1.15rem}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.shopcard{position:relative;display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:22px;border:none;text-align:left;color:#fff;overflow:hidden;
+ background:linear-gradient(135deg,#ff8a2c 0%,#ee5f2b 45%,#c2306a 100%);box-shadow:0 6px 0 #9a2350,0 14px 30px rgba(194,48,106,.35)}
+.shopcard:active{transform:translateY(3px);box-shadow:0 3px 0 #9a2350}
+.shopcard .ic{font-size:2.6rem;line-height:1;filter:drop-shadow(0 3px 0 rgba(0,0,0,.2))}
+.shopcard h3{font-size:1.7rem;color:#fff}
+.shopcard p{margin:0;font-size:.88rem;opacity:.95}
+.shopcard .dest{position:absolute;right:-6px;top:8px;transform:rotate(8deg);background:#ffd24a;color:#5a3a00;font-weight:800;font-size:.72rem;padding:3px 12px;border-radius:8px;letter-spacing:.04em}
+.side .game .art{height:96px}
+.side .game .bd{padding:12px 16px 14px;gap:8px}
+.side .game h3{font-size:1.35rem}
+.side .game p{font-size:.88rem}
+.endrow{display:flex;justify-content:flex-end}
+
+/* Loja */
+.shop{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px;align-items:start}
+.shop .stage{min-height:600px;position:sticky;top:12px}
+.sel{position:absolute;left:14px;right:14px;bottom:14px;z-index:2;padding:12px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sel .nm{flex:1;min-width:150px}
+.sel .nm b{font-family:var(--display);font-size:1.3rem;display:block;line-height:1.1}
+.rar{display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 9px;border-radius:99px;color:#fff;background:var(--rc)}
+.sel .msg{flex-basis:100%;margin:0;font-size:.88rem;opacity:.9;min-height:1.2em}
+.btn.buy{background:linear-gradient(#ffd24a,#f2b20a);border-color:#c98a00;color:#4a3000;font-family:var(--display);font-size:1.1rem;box-shadow:0 4px 0 #a87000}
+.btn.buy:disabled{opacity:.55;box-shadow:none}
+.btn.wear{background:var(--go);border-color:var(--go);color:#fff;box-shadow:0 4px 0 #0a6a63}
+.shop-list h2{font-size:1.8rem}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 14px}
+.tabs button{border:1px solid var(--line);background:var(--soft);border-radius:99px;padding:5px 12px;font-weight:700;font-size:.88rem}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
+.item{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px 8px;border-radius:16px;border:2px solid var(--line);background:var(--soft);text-align:center;
+ background-image:linear-gradient(180deg,color-mix(in srgb,var(--rc) 22%,transparent),transparent 60%)}
+.item[data-r="lendario"]{border-color:color-mix(in srgb,var(--rc) 70%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--rc) 40%,transparent),0 6px 18px color-mix(in srgb,var(--rc) 30%,transparent)}
+.item[data-r="epico"]{border-color:color-mix(in srgb,var(--rc) 55%,var(--line))}
+.item[aria-pressed="true"]{outline:3px solid var(--run);outline-offset:1px}
+.item .th{width:64px;height:48px;display:grid;place-items:center;font-size:2rem;line-height:1}
+.item .th img{width:64px;height:40px;border-radius:8px}
+.item .sw{width:44px;height:44px;border-radius:50%;border:3px solid rgba(0,0,0,.15)}
+.item .sw.tela{border-radius:12px;width:56px;height:36px;background:#172536!important;display:grid;place-items:center}
+.item .sw.tela i{width:12px;height:18px;border-radius:6px;box-shadow:0 0 8px var(--ec);background:var(--ec);margin:0 4px}
+.item .n{font-weight:700;font-size:.85rem;line-height:1.15}
+.item .pr{font-family:var(--display);font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
+.item .pr.own{color:var(--go);font-family:var(--body);font-size:.8rem}
+.item .pr.lack{opacity:.55}
+.item .rd{position:absolute;top:6px;left:6px;width:9px;height:9px;border-radius:50%;background:var(--rc)}
+
 /* Jogo aberto */
 #play{position:fixed;inset:0;z-index:50;background:var(--bg)}
 #play iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
+@media (max-width:1100px){.gestos button b{display:none}}
+@media (max-width:860px){
+ .lobby,.shop{grid-template-columns:1fr}
+ .stage{min-height:440px}
+ .shop .stage{min-height:400px;position:relative;top:0}
+}
 @media (max-width:700px){
  .games{grid-template-columns:1fr}
+ .coins{font-size:1.1rem}.coins .coin{width:24px;height:24px}
+ .gestos button b{display:none}
+ .who-chip small{display:none}.who-chip{padding-right:10px}.who-chip b{font-size:1rem}.who-chip .av{width:32px;height:32px;font-size:1rem}
+ .coins{padding:4px 10px 4px 6px}.coins small{display:none}
  .game .art{height:130px}
  .code{font-size:1.4rem}
 }
@@ -163,24 +244,37 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
   </form>
  </section>
 
- <!-- Tela 2: menu -->
+ <!-- Tela 2: saguão (menu) -->
  <section id="scrMenu" hidden>
   <div class="wrap">
-   <div class="hello"><div class="av" id="meAv"></div><h2 id="meHi">Olá!</h2><span class="sp"></span><button class="btn" id="bSwitch">Trocar de aluno</button></div>
-   <div class="games">
-    <article class="game">
-     <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><g id="roboArt"></g></svg></div>
-     <div class="bd"><span class="eyebrow">Lógica de programação</span><h3>Robô Programador</h3><p>Monte programas com peças de encaixar e leve o Bip até a bandeira.</p>
-      <div class="prog"><div class="row"><span id="rTxt">0 de 0 fases</span><span id="rStar">0 ★</span></div><div class="bar"><i id="rBar" style="background:var(--run)"></i></div></div>
-      <button class="btn main go" data-open="robo" id="rGo">Começar</button></div>
-    </article>
-    <article class="game">
-     <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><g id="acadArt"></g></svg></div>
-     <div class="bd"><span class="eyebrow">Matemática · Fundamental 2</span><h3>Academia do Bip</h3><p>Aulas em 3D: do primeiro ponto até as funções, com os axiomas de Euclides.</p>
-      <div class="prog"><div class="row"><span id="aTxt">0 de 0 aulas</span><span id="aLv">Nível 1</span></div><div class="bar"><i id="aBar" style="background:var(--turn)"></i></div></div>
-      <button class="btn main go" data-open="academia" id="aGo">Começar</button></div>
-    </article>
+   <div class="lobby">
+    <div class="stage" id="stage">
+     <div class="st-3d" id="st3d"><div class="st-fallback" id="stFallback" hidden></div></div>
+     <div class="st-top">
+      <div class="who-chip glass"><div class="av" id="meAv"></div><div><b id="meHi">Olá!</b><small id="meSub">Toque no Bip ou arraste para girar</small></div></div>
+      <div class="coins glass" id="coins" title="Seus Bipcoins"><span id="coinIc"></span><span><b id="coinN">0</b><br><small>Bipcoins</small></span></div>
+     </div>
+     <div class="st-bottom"><div class="gestos glass" role="group" aria-label="Gestos do Bip">
+      <button data-g="acenar"><span>👋</span><b>Acenar</b></button><button data-g="dancar"><span>💃</span><b>Dançar</b></button><button data-g="comemorar"><span>🎉</span><b>Festa</b></button>
+      <button data-g="forca"><span>💪</span><b>Força</b></button><button data-g="pensar"><span>🤔</span><b>Pensar</b></button><button data-g="girar"><span>🔄</span><b>Girar</b></button></div></div>
+    </div>
+    <div class="side">
+     <button class="shopcard" id="bLoja"><span class="ic">🛒</span><span><h3>Loja do Bip</h3><p id="lojaSub">Personalize seu robô com Bipcoins</p></span><span class="dest" id="lojaDest">DESTAQUE</span></button>
+     <article class="game">
+       <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><g id="roboArt"></g></svg></div>
+       <div class="bd"><span class="eyebrow">Lógica de programação</span><h3>Robô Programador</h3><p>Monte programas com peças de encaixar e leve o Bip até a bandeira.</p>
+        <div class="prog"><div class="row"><span id="rTxt">0 de 0 fases</span><span id="rStar">0 ★</span></div><div class="bar"><i id="rBar" style="background:var(--run)"></i></div></div>
+        <button class="btn main go" data-open="robo" id="rGo">Começar</button></div>
+      </article>
+     <article class="game">
+       <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><g id="acadArt"></g></svg></div>
+       <div class="bd"><span class="eyebrow">Matemática · Fundamental 2</span><h3>Academia do Bip</h3><p>Aulas em 3D: do primeiro ponto até as funções, com os axiomas de Euclides.</p>
+        <div class="prog"><div class="row"><span id="aTxt">0 de 0 aulas</span><span id="aLv"></span></div><div class="bar"><i id="aBar" style="background:var(--turn)"></i></div></div>
+        <button class="btn main go" data-open="academia" id="aGo">Começar</button></div>
+      </article>
+    </div>
    </div>
+   <div class="endrow"><button class="btn" id="bSwitch">Trocar de aluno</button></div>
    <div class="panel cloudbox" id="cloudBox" hidden>
     <div class="tx"><span class="eyebrow" id="cloudTurma">Turma</span><p>Seu progresso fica salvo na nuvem. Em outro computador, entre na turma com seu apelido e PIN.</p></div>
     <span class="sync" id="syncTxt" aria-live="polite">Salvo</span>
@@ -193,11 +287,33 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
    </div>
   </div>
  </section>
+
+ <!-- Tela 3: loja -->
+ <section id="scrLoja" hidden>
+  <div class="wrap">
+   <div class="shop">
+    <div class="stage" id="shopStage">
+     <div class="st-3d" id="shop3d"></div>
+     <div class="st-top"><button class="btn glass" id="bLojaVoltar">← Voltar</button><div class="coins glass"><span id="coinIc2"></span><span><b id="coinN2">0</b><br><small>Bipcoins</small></span></div></div>
+     <div class="sel glass" id="sel" aria-live="polite"></div>
+    </div>
+    <div class="panel shop-list">
+     <h2>Loja do Bip</h2>
+     <p class="hint" style="margin:2px 0 0;color:var(--muted)">Ganhe Bipcoins passando de fase no Robô Programador e concluindo aulas na Academia. Toque num item para experimentar.</p>
+     <div class="tabs" role="tablist" id="tabs"></div>
+     <div class="items" id="items"></div>
+    </div>
+   </div>
+  </div>
+ </section>
  <p class="foot" id="foot" hidden>É professor? <a href="professor.html">Área do professor →</a></p>
 </div>
 
 <div id="play" hidden><iframe id="frame" title="Jogo" allow="fullscreen"></iframe></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>/*BIPV*/</script>
+<script>/*LOBBY*/</script>
 <script>
 /* ============ Mundo do Bip: perfis, progresso e código ============ */
 const $=id=>document.getElementById(id);
@@ -240,7 +356,7 @@ function applyCode(id,{n,s,a}){
 /* ---- tela: quem vai jogar ---- */
 const show=(id)=>{["whoList","fNew","fCode","fTurma","fTurmaNova"].forEach(k=>$(k).hidden=k!=id)};
 let pending=null;
-function drawWho(){$("scrWho").hidden=false;$("scrMenu").hidden=true;show("whoList");
+function drawWho(){$("scrWho").hidden=false;$("scrMenu").hidden=true;$("scrLoja").hidden=true;show("whoList");
  $("emptyMsg").hidden=profiles.length>0;
  $("ctaTurma").hidden=!NUVEM.on;$("foot").hidden=!NUVEM.on;
  $("profiles").innerHTML=profiles.map(p=>{const st=stats(p.id);return `<div><button class="prof" data-p="${p.id}"><span class="av" style="background:${p.color}">${esc(p.name[0].toUpperCase())}</span><span class="tx"><span class="nm">${esc(p.name)}</span><small>${st.rDone} fases · ${st.aDone} aulas</small>${p.cloud?`<span class="tag">☁ ${esc(p.cloud.turma.nome)}</span>`:""}</span></button>`+
@@ -250,7 +366,7 @@ $("profiles").addEventListener("click",e=>{const b=e.target.closest("button");if
  if(b.dataset.rm){pending=b.dataset.rm;return drawWho()}
  if(b.dataset.keep!=null){pending=null;return drawWho()}
  if(b.dataset.del){const p=profiles.find(q=>q.id==b.dataset.del);if(p&&p.cloud)NUVEM.rpc("aluno_sair",{p_token:p.cloud.token}).catch(()=>{});forget(b.dataset.del);pending=null;drawWho()}});
-function forget(id){profiles=profiles.filter(p=>p.id!=id);saveProfiles();try{localStorage.removeItem("robo4:"+id);localStorage.removeItem("academia-bip-3d-v1:"+id)}catch(e){}}
+function forget(id){profiles=profiles.filter(p=>p.id!=id);saveProfiles();try{localStorage.removeItem("robo4:"+id);localStorage.removeItem("academia-bip-3d-v1:"+id);localStorage.removeItem("bipsite-loja:"+id)}catch(e){}}
 let pick=COLORS[0][1];
 $("colors").innerHTML=COLORS.map(([n,c],i)=>`<button type="button" style="background:${c}" data-c="${c}" aria-label="${n}" aria-pressed="${i==0}"></button>`).join("");
 $("colors2").innerHTML=$("colors").innerHTML;
@@ -275,14 +391,17 @@ $("fCode").onsubmit=e=>{e.preventDefault();const name=clean($("inName2").value),
 
 /* ---- turma na nuvem: entrar, criar acesso e juntar o progresso ---- */
 const cid=uuid=>"c"+uuid.replace(/-/g,"");
-const KEYS={robo:id=>"robo4:"+id,academia:id=>"academia-bip-3d-v1:"+id};
+const KEYS={robo:id=>"robo4:"+id,academia:id=>"academia-bip-3d-v1:"+id,loja:id=>"bipsite-loja:"+id};
+/* loja: junta os itens comprados nos dois lugares; o visual é o mais recente */
+function mergeLoja(a,b){if(!a)return b;if(!b)return a;const n=(a.t||0)>=(b.t||0)?a:b;return {owned:[...new Set([...(a.owned||[]),...(b.owned||[])])],look:n.look||{},t:Math.max(a.t||0,b.t||0)}}
 function mergeRobo(a,b){if(!a)return b;if(!b)return a;const r={...b,...a,v:1,all:0},st={...(b.stars||{})};
  for(const k in a.stars||{})st[k]=Math.max(st[k]||0,a.stars[k]);r.stars=st;const sk={...(b.skip||{}),...(a.skip||{})};for(const k in st)delete sk[k];r.skip=sk;
  r.seen={...(b.seen||{}),...(a.seen||{})};const n=x=>Object.keys(x.stars||{}).length+Object.keys(x.skip||{}).length;r.lvl=n(a)>=n(b)?a.lvl:b.lvl;return r}
 const mergeAcad=(a,b)=>(a||b)?{done:[...new Set([...((a&&a.done)||[]),...((b&&b.done)||[])])]}:null;
 function absorb(p,remote){/* junta o que está na nuvem com o que está neste computador */
  const r=mergeRobo(roboSave(p.id),remote.robo||null),a=mergeAcad(acadSave(p.id),remote.academia||null);
- if(r)ls.set(KEYS.robo(p.id),r);if(a)ls.set(KEYS.academia(p.id),a)}
+ if(r)ls.set(KEYS.robo(p.id),r);if(a)ls.set(KEYS.academia(p.id),a);
+ const l=mergeLoja(ls.get(KEYS.loja(p.id),null),remote.loja||null);if(l)ls.set(KEYS.loja(p.id),l)}
 function cloudLogin(res){const id=cid(res.aluno_id);let p=profiles.find(q=>q.id==id);
  const c={token:res.token,turma:res.turma,apelido:res.apelido};
  if(p){p.name=res.apelido;p.color=res.cor;p.cloud=c}else{p={id,name:res.apelido,color:res.cor,cloud:c};profiles.push(p)}
@@ -309,10 +428,11 @@ $("fTurmaNova").onsubmit=e=>{e.preventDefault();const err=$("errNova");err.textC
 let pushed={},syncState="ok";
 function setSync(t,bad){syncState=bad?"erro":"ok";const el=$("syncTxt");if(el){el.textContent=t;el.classList.toggle("off",!!bad)}}
 async function push(p,keepalive){if(!p||!p.cloud||!NUVEM.on)return;
- for(const jogo of ["robo","academia"]){const d=ls.get(KEYS[jogo](p.id),null);if(!d)continue;const s=JSON.stringify(d);if(pushed[p.id+jogo]===s)continue;
+ for(const jogo of ["robo","academia","loja"]){const d=ls.get(KEYS[jogo](p.id),null);if(!d)continue;const s=JSON.stringify(d);if(pushed[p.id+jogo]===s)continue;
   try{await NUVEM.rpc("aluno_salvar",{p_token:p.cloud.token,p_jogo:jogo,p_dados:d},null,keepalive);pushed[p.id+jogo]=s;
    setSync("✓ Salvo às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}))}
-  catch(x){if(x.code=="sessao_expirada"){setSync("Entre de novo para salvar",true);p.cloud.expired=1;saveProfiles()}else setSync("Sem internet: salvo neste computador",true);return}}}
+  catch(x){if(x.code=="jogo_invalido"||x.code=="dados_invalidos")continue;  /* banco ainda sem a parte da loja: guarda só neste computador */
+   if(x.code=="sessao_expirada"){setSync("Entre de novo para salvar",true);p.cloud.expired=1;saveProfiles()}else setSync("Sem internet: salvo neste computador",true);return}}}
 async function pull(p){/* ao escolher o perfil: busca o que está na nuvem */
  try{const res=await NUVEM.rpc("aluno_dados",{p_token:p.cloud.token});p.cloud.turma=res.turma;delete p.cloud.expired;saveProfiles();absorb(p,res.progresso||{});return true}
  catch(x){if(x.code=="sessao_expirada"){show("fTurma");$("scrWho").hidden=false;$("scrMenu").hidden=true;$("tCod").value=p.cloud.turma.codigo.slice(0,3)+"-"+p.cloud.turma.codigo.slice(3);$("tApe").value=p.name;$("tPin").value="";$("errTurma").textContent=erroBip(x);$("tPin").focus();return false}
@@ -332,11 +452,21 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  const st=stats(p.id);
  $("rTxt").textContent=`${st.rDone} de ${ROBO.length} fases`;$("rStar").textContent=`${st.stars} ★`;$("rBar").style.width=st.rDone/ROBO.length*100+"%";
  $("rGo").textContent=st.rDone?"Continuar":"Começar";
- $("aTxt").textContent=`${st.aDone} de ${ACAD.length} aulas`;$("aLv").textContent=`Nível ${Math.floor(st.xp/300)+1}`;$("aBar").style.width=st.aDone/ACAD.length*100+"%";
+ $("aTxt").textContent=`${st.aDone} de ${ACAD.length} aulas`;$("aLv").innerHTML=`+${BIPV.POR_AULA} ${BIPV.COIN} por aula`;$("aBar").style.width=st.aDone/ACAD.length*100+"%";
  $("aGo").textContent=st.aDone?"Continuar":"Começar";
  $("myCode").textContent=makeCode(st);
  $("codeBox").hidden=!!p.cloud;$("cloudBox").hidden=!p.cloud;$("foot").hidden=!NUVEM.on;
- if(p.cloud){$("cloudTurma").textContent="☁ Turma "+p.cloud.turma.nome;if(p.cloud.expired)setSync("Entre de novo para salvar",true)}}
+ if(p.cloud){$("cloudTurma").textContent="☁ Turma "+p.cloud.turma.nome;if(p.cloud.expired)setSync("Entre de novo para salvar",true)}
+ $("meSub").textContent=p.cloud?"Turma "+p.cloud.turma.nome:"Toque no Bip ou arraste para girar";
+ drawCoins(p);const l=BIPV.loja(p.id);
+ if(LOBBY.mount($("st3d"))){$("stFallback").hidden=true;LOBBY.look(l.look)}else{$("stFallback").hidden=false;$("stFallback").innerHTML=BIPV.face2d(l.look)}
+ const d=BIPV.destaque();$("lojaDest").textContent="⭐ "+d.n.toUpperCase();}
+/* Bipcoins na tela (com uma animação quando o valor sobe) */
+let lastCoins=null;
+function drawCoins(p){const v=BIPV.saldo(p.id);["coinN","coinN2"].forEach(k=>$(k).textContent=BIPV.fmt(v));
+ if(lastCoins!=null&&v>lastCoins){const c=$("coins");c.classList.remove("bump");void c.offsetWidth;c.classList.add("bump")}lastCoins=v}
+$("coinIc").innerHTML=$("coinIc2").innerHTML=BIPV.COIN;
+document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>LOBBY.gesture(b.dataset.g));
 $("bSair").onclick=async()=>{const p=curP();if(!p)return;await push(p);NUVEM.rpc("aluno_sair",{p_token:p.cloud.token}).catch(()=>{});forget(p.id);cur=null;try{localStorage.removeItem("bipsite-cur")}catch(e){}drawWho()};
 $("bSwitch").onclick=()=>{cur=null;try{localStorage.removeItem("bipsite-cur")}catch(e){}drawWho()};
 $("bCopy").onclick=()=>{const t=$("myCode").textContent;const done=()=>{$("bCopy").textContent="Copiado!";setTimeout(()=>$("bCopy").textContent="Copiar",1500)};
@@ -344,8 +474,61 @@ $("bCopy").onclick=()=>{const t=$("myCode").textContent;const done=()=>{$("bCopy
  function sel(){const r=document.createRange();r.selectNodeContents($("myCode"));const s=getSelection();s.removeAllRanges();s.addRange(r)}};
 
 /* ---- abrir e fechar os jogos ---- */
-document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{if(!cur)return;$("frame").src=b.dataset.open+".html#p-"+cur;$("play").hidden=false;document.body.style.overflow="hidden"});
-function closeGame(){$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";drawMenu();push(curP())}
+document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{if(!cur)return;LOBBY.pause(true);$("frame").src=b.dataset.open+".html#p-"+cur;$("play").hidden=false;document.body.style.overflow="hidden"});
+function closeGame(){$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";LOBBY.pause(false);drawMenu();push(curP());
+ if(lastCoins!=null)setTimeout(()=>LOBBY.gesture("comemorar"),400)}
+
+/* ============ Loja ============ */
+const EMO={"a-bola":"🔴","a-azul":"🔵","a-lampada":"💡","a-coracao":"❤️","a-estrela":"⭐","a-flor":"🌸","a-raio":"⚡","a-dupla":"📶","a-helice":"🚁","a-unicornio":"🦄","a-aureola":"😇",
+ "c-bone":"🧢","c-gorro":"❄️","c-festa":"🥳","c-gato":"🐱","c-fones":"🎧","c-ninja":"🥋","c-chef":"🍳","c-cartola":"🎩","c-mago":"🧙","c-viking":"⚔️","c-coroa":"👑","c-astronauta":"🛸",
+ "r-palhaco":"🤡","r-bigode":"〰️","r-redondos":"👓","r-pirata":"☠️","r-escuros":"🕶️","r-heroi":"🦸","r-monoculo":"🧐",
+ "n-borboleta":"🎀","n-gravata":"👔","n-cachecol":"🧣","n-perolas":"📿","n-medalha":"🥇","n-corrente":"💰",
+ "b-mochila":"🎒","b-casco":"🐢","b-capa":"🧥","b-morcego":"🦇","b-borboleta":"🦋","b-jetpack":"🚀","b-anjo":"🕊️",
+ "e-brilhos":"✨","e-coracoes":"💕","e-aura":"🌟","e-estrelas":"🌠","e-arcoiris":"🌈"};
+const PATCSS={listras:(i)=>`repeating-linear-gradient(45deg,${i.c} 0 8px,${i.c2} 8px 14px)`,bolinhas:i=>`radial-gradient(${i.c2} 25%,transparent 27%) 0 0/12px 12px,${i.c}`,
+ xadrez:i=>`conic-gradient(${i.c2} 25%,${i.c} 0 50%,${i.c2} 0 75%,${i.c} 0) 0 0/16px 16px`,camuflagem:()=>`radial-gradient(circle at 30% 30%,#3a4a2a 20%,transparent 22%),radial-gradient(circle at 70% 60%,#a68a5b 18%,transparent 20%),#6b8e4e`,
+ zebra:()=>`repeating-linear-gradient(100deg,#f5f5f5 0 6px,#1d1d1d 6px 10px)`,circuito:i=>`linear-gradient(90deg,transparent 45%,${i.c2} 45% 55%,transparent 55%),linear-gradient(transparent 45%,${i.c2} 45% 55%,transparent 55%),${i.c}`,
+ lava:()=>`radial-gradient(circle at 40% 40%,#ffd24a,#ff6a1a 30%,#2a1410 70%)`,galaxia:()=>`radial-gradient(circle at 50% 50%,#5b3cc4,#1a1446 60%,#0b0a24)`,diamante:()=>`linear-gradient(135deg,#ffffff,#bfefff 40%,#7fd8ff 60%,#ffffff)`};
+let shopCat="pintura",shopSel=null,shopAsk=false;
+function shopState(){const p=curP();return {p,l:BIPV.loja(p.id),saldo:BIPV.saldo(p.id)}}
+function owns(l,id){return BIPV.gratis(id)||l.owned.includes(id)}
+function thumb(it,l){if(it.cat=="pintura"){const bg=it.rainbow?"conic-gradient(#ff4d6d,#ffd24a,#5ef07a,#4ad8ff,#b98cff,#ff4d6d)":it.pat&&PATCSS[it.pat]?PATCSS[it.pat](it):it.metal?`linear-gradient(135deg,#fff,${it.c} 45%,${it.c})`:it.c;return `<span class="sw" style="background:${bg}"></span>`}
+ if(it.cat=="tela"){const c=it.grad?`linear-gradient(${it.grad.join(",")})`:it.c;return `<span class="sw tela" style="--ec:${it.c}"><span style="display:flex"><i style="background:${c}"></i><i style="background:${c}"></i></span></span>`}
+ if(it.cat=="olhos")return `<img alt="" src="${BIPV.eyePreview(it.id,l.look.tela)}">`;
+ return EMO[it.id]||"✦"}
+function openShop(){if(!curP())return;$("scrMenu").hidden=true;$("scrLoja").hidden=false;shopAsk=false;shopSel=null;window.scrollTo(0,0);
+ if(LOBBY.mount($("shop3d")))LOBBY.look(shopState().l.look);drawShop()}
+function closeShop(){$("scrLoja").hidden=true;drawMenu()}
+$("bLoja").onclick=openShop;$("bLojaVoltar").onclick=closeShop;
+function drawShop(){const {p,l,saldo}=shopState();drawCoins(p);
+ $("tabs").innerHTML=BIPV.CATS.map(([k,n])=>`<button role="tab" aria-selected="${k==shopCat}" data-cat="${k}">${n}</button>`).join("");
+ const list=BIPV.ITEMS.filter(i=>i.cat==shopCat).sort((a,b)=>a.p-b.p);
+ $("items").innerHTML=list.map(it=>{const r=BIPV.RAR[it.r],own=owns(l,it.id),on=l.look[it.cat]==it.id;
+  const pr=on?`<span class="pr own">✓ Usando</span>`:own?`<span class="pr own">Seu</span>`:`<span class="pr${saldo<it.p?" lack":""}">${BIPV.COIN}${BIPV.fmt(it.p)}</span>`;
+  return `<button class="item" data-id="${it.id}" data-r="${it.r}" style="--rc:${r.c}" aria-pressed="${shopSel==it.id}" title="${it.n} (${r.n})"><span class="rd"></span><span class="th">${thumb(it,l)}</span><span class="n">${it.n}</span>${pr}</button>`}).join("");
+ drawSel()}
+$("tabs").onclick=e=>{const b=e.target.closest("[data-cat]");if(!b)return;shopCat=b.dataset.cat;shopSel=null;shopAsk=false;LOBBY.look(shopState().l.look);drawShop()};
+$("items").onclick=e=>{const b=e.target.closest("[data-id]");if(!b)return;shopSel=b.dataset.id;shopAsk=false;const {l}=shopState(),it=BIPV.BYID[shopSel];
+ const prev=Object.assign({},l.look,{[it.cat]:it.id});const hat=BIPV.BYID[prev.cabeca];if(it.cat=="antena"&&hat&&hat.hide)prev.cabeca=null;LOBBY.look(prev);LOBBY.gesture(["acenar","girar","forca","dancar"][Math.floor(Math.random()*4)]);
+ document.querySelectorAll(".item").forEach(x=>x.setAttribute("aria-pressed",x==b));drawSel()};
+function drawSel(){const {l,saldo}=shopState(),el=$("sel");
+ if(!shopSel){el.innerHTML=`<div class="nm"><b>Escolha um item</b><span style="opacity:.8;font-size:.9rem">Ele aparece no seu Bip antes de você comprar.</span></div>`;return}
+ const it=BIPV.BYID[shopSel],r=BIPV.RAR[it.r],own=owns(l,it.id),on=l.look[it.cat]==it.id,opt=!["pintura","olhos","tela","antena"].includes(it.cat);
+ let act="",msg="";
+ if(own){act=on?(opt?`<button class="btn" id="sTirar">Tirar</button>`:`<button class="btn" disabled>✓ Usando</button>`):`<button class="btn wear" id="sUsar">Usar</button>`}
+ else if(shopAsk){act=`<button class="btn buy" id="sOk">Confirmar compra</button><button class="btn" id="sNo" style="color:var(--ink)">Cancelar</button>`;msg=`Vai gastar ${BIPV.fmt(it.p)} Bipcoins. Sobram ${BIPV.fmt(saldo-it.p)}.`}
+ else if(saldo>=it.p){act=`<button class="btn buy" id="sBuy">Comprar ${BIPV.COIN}${BIPV.fmt(it.p)}</button>`}
+ else{act=`<button class="btn buy" disabled>${BIPV.COIN}${BIPV.fmt(it.p)}</button>`;msg=`Faltam ${BIPV.fmt(it.p-saldo)} Bipcoins. Passe de fase no Robô Programador (até 25 por fase) ou conclua aulas na Academia (${BIPV.POR_AULA} por aula).`}
+ el.innerHTML=`<div class="nm"><b>${it.n}</b><span class="rar" style="--rc:${r.c}">${r.n}</span></div>${act}<p class="msg">${msg}</p>`;
+ const q=id=>document.getElementById(id);
+ if(q("sBuy"))q("sBuy").onclick=()=>{shopAsk=true;drawSel()};
+ if(q("sNo"))q("sNo").onclick=()=>{shopAsk=false;drawSel()};
+ if(q("sOk"))q("sOk").onclick=()=>buy(it);
+ if(q("sUsar"))q("sUsar").onclick=()=>wear(it.cat,it.id);
+ if(q("sTirar"))q("sTirar").onclick=()=>wear(it.cat,null)}
+function buy(it){const {p,l,saldo}=shopState();if(saldo<it.p||owns(l,it.id))return;l.owned.push(it.id);l.look[it.cat]=it.id;BIPV.salvarLoja(p.id,l);shopAsk=false;
+ LOBBY.look(l.look);LOBBY.gesture("comemorar");drawShop();$("sel").querySelector(".msg").textContent=`Comprado! ${it.n} já está no seu Bip.`;push(p)}
+function wear(cat,id){const {p,l}=shopState();l.look[cat]=id;BIPV.salvarLoja(p.id,l);LOBBY.look(l.look);LOBBY.gesture("acenar");drawShop();push(p)}
 window.addEventListener("message",e=>{if(e.data&&e.data.bip=="menu")closeGame()});
 
 /* ---- ilustrações dos cartões ---- */
