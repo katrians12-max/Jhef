@@ -27,6 +27,8 @@ async def main():
         await pg.reload();await pg.wait_for_timeout(1500)
         exp=100+40*25+12*50
         check(f'moedas = {exp} depois de 40 fases e 12 aulas',await pg.inner_text('#coinN')==f'{exp:,}'.replace(',','.'),await pg.inner_text('#coinN'))
+        check('botão principal continua o Robô na fase 41','fase 41' in await pg.inner_text('#playSub') and 'CONTINUAR' in await pg.inner_text('#bPlay'),await pg.inner_text('#bPlay'))
+        check('saguão ocupa a tela toda (sem rolagem lateral)',await pg.evaluate("document.body.classList.contains('full')&&document.documentElement.scrollWidth<=innerWidth"))
         await pg.click('[data-g="dancar"]');await pg.wait_for_timeout(900);await pg.screenshot(path=OUT+'l-danca.png')
         await pg.click('#bLoja');await pg.wait_for_timeout(1200);await pg.screenshot(path=OUT+'l-loja.png')
         n=await pg.evaluate("document.querySelectorAll('.item').length");check('loja lista pinturas',n>15,n)
