@@ -64,7 +64,7 @@ async def main():
         await A.reload();await A.wait_for_timeout(1200)
         check('computador 1 recebe o que foi feito no celular',await A.inner_text('#rTxt')=='8 de 91 fases',await A.inner_text('#rTxt'))
         print('PROFESSOR acompanha')
-        await P.click('#bReload');await P.wait_for_timeout(800)
+        await P.click('#bReload');await P.wait_for_timeout(800);await P.click('[data-tab="alunos"]')
         row=await P.inner_text('#rows');check('professor vê Ana7 com 8 fases e 2 aulas','Ana7' in row and '8 fases' in row and '2 aulas' in row,row)
         await P.screenshot(path=OUT+'t-prof-turma.png',full_page=True)
         await P.click('[data-pin]');await P.fill('[data-pinf] input','5678');await P.click('[data-pinf] button.main');await P.wait_for_timeout(600)

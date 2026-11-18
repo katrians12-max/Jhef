@@ -58,7 +58,8 @@ wr(fn,s)
 subprocess.run(['python3',src+'/build.py',tmp+'/robo.html'],check=True)
 wr(OUT+'/robo.html',HEAD+ICONS+RESET+rd(tmp+'/robo.html')+'</html>\n')
 lv=rd(os.path.join(F,'robo','30-levels.js'))
-ROBO=json.loads(subprocess.run(['node','-e',lv.replace('const WORLDS=','globalThis.WORLDS=').replace('const LEVELS=','globalThis.LEVELS=')+';console.log(JSON.stringify(LEVELS.map(l=>[l.t,l.w])))'],capture_output=True,text=True,check=True).stdout)
+ROBO=json.loads(subprocess.run(['node','-e',lv.replace('const WORLDS=','globalThis.WORLDS=').replace('const LEVELS=','globalThis.LEVELS=')+';console.log(JSON.stringify([LEVELS.map(l=>[l.t,l.w]),WORLDS.map(w=>w.n)]))'],capture_output=True,text=True,check=True).stdout)
+ROBO,ROBOW=ROBO
 shutil.rmtree(tmp)
 
 # ---------- Academia do Bip: progresso por aluno e botão de menu ----------
@@ -69,17 +70,18 @@ s=patch(s,'const KEY="academia-bip-3d-v1";',PID_JS+'\nconst KEY="academia-bip-3d
 s=patch(s,'<main id="home">\n','<main id="home">\n <div style="margin-bottom:12px"><button class="btn sm" id="toMenu" onclick="goMenu()">← Menu do Bip</button></div>\n',fn)
 s=patch(s,'<title>Academia do Bip</title>',ICONS+RESET+'<title>Academia do Bip</title>',fn)
 wr(OUT+'/academia.html',s)
-ACAD=[]
+ACAD=[];ACADT=[];ACADW=[]
 # aulas de cada mundo, na ordem dos mundos (W1, W2, ...): conta os blocos "/* n */{t:" dentro de cada const Wn=[...]
 for m in re.finditer(r'^const W(\d+)=\[(.*?)^\];',s,re.M|re.S):
-    w=int(m.group(1))-1;n=len(re.findall(r'^/\* ?\d+ ?\*/\{t:',m.group(2),re.M));ACAD+= [f"{w}-{i}" for i in range(n)]
+    w=int(m.group(1))-1;ts=re.findall(r'^/\* ?\d+ ?\*/\{t:"([^"]*)"',m.group(2),re.M);ACAD+= [f"{w}-{i}" for i in range(len(ts))];ACADT+=ts
+ACADW=re.findall(r'^ \{t:"([^"]*)",d:"[^"]*",c:"#[0-9a-fA-F]{6}",L:W\d+\}',s,re.M)
 
 # ---------- Área do professor + conexão com o banco ----------
 CFG=json.load(open(os.path.join(F,'config.json'),encoding='utf8'))
 NUV='<script>window.BIP_CFG='+json.dumps({"url":CFG.get('supabase_url','').rstrip('/'),"key":CFG.get('supabase_key','')})+';</script>\n<script>'+rd(os.path.join(F,'menu','nuvem.js'))+'</script>\n'
 def page(src,out,extra_head=''):
     m=rd(os.path.join(F,'menu',src))
-    m=m.replace('/*ROBO*/[]',json.dumps(ROBO,ensure_ascii=False)).replace('/*ACAD*/[]',json.dumps(ACAD)).replace('/*ROBO_N*/0',str(len(ROBO)))
+    m=m.replace('/*ROBO*/[]',json.dumps(ROBO,ensure_ascii=False)).replace('/*ACAD*/[]',json.dumps(ACAD)).replace('/*ROBO_N*/0',str(len(ROBO))).replace('/*ROBOW*/[]',json.dumps(ROBOW,ensure_ascii=False)).replace('/*ACADT*/[]',json.dumps(ACADT,ensure_ascii=False)).replace('/*ACADW*/[]',json.dumps(ACADW,ensure_ascii=False))
     m=patch(m,'<!--LOGO-->','<span class="sr-only">Mundo do Bip</span>'+logo if 'sr-only' in m else logo,src)
     m=m.replace('<script>/*BIPV*/</script>','<script>'+BIPVJS+'</script>').replace('<script>/*LOBBY*/</script>','<script>'+rd(os.path.join(F,'menu','lobby.js'))+'</script>')
     m=m.replace('<script>\n',NUV+'<script>\n',1)
@@ -95,5 +97,6 @@ for f in ['index.html','professor.html','robo.html','academia.html']:
     for js in re.findall(r'<script>(.*?)</script>',h,re.S):
         p=os.path.join(tempfile.gettempdir(),'chk.js');wr(p,js)
         r=subprocess.run(['node','--check',p],capture_output=True,text=True);assert r.returncode==0,(f,r.stderr[:400])
+assert len(ACADT)==len(ACAD) and len(ACADW)>=2 and len(ROBOW)>=5,(len(ACADT),ACADW,ROBOW)
 print(f"dist/ pronto · {len(ROBO)} fases do robô · {len(ACAD)} aulas da academia")
 for f in ['index.html','professor.html','robo.html','academia.html']:print(f"  {f}: {os.path.getsize(OUT+'/'+f)//1024} KB")

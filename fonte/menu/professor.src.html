@@ -62,13 +62,13 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .stat b{display:block;font-family:var(--display);font-size:1.7rem;line-height:1.1;font-variant-numeric:tabular-nums}
 .stat span{color:var(--muted);font-size:.85rem}
 .tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
-table{border-collapse:collapse;width:100%;min-width:680px;font-variant-numeric:tabular-nums}
+table{border-collapse:collapse;width:100%;min-width:900px;font-variant-numeric:tabular-nums}
 th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
 th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft)}
 tr:last-child td{border-bottom:none}
 .av{width:30px;height:30px;border-radius:9px;display:inline-grid;place-items:center;font-family:var(--display);font-weight:800;color:#172536;border:2px solid rgba(0,0,0,.15);margin-right:8px;vertical-align:middle}
 .mini{display:flex;align-items:center;gap:8px}
-.mini .bar{width:90px;height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+.mini .bar{width:64px;flex:none;height:8px;border-radius:9px;background:var(--line);overflow:hidden}
 .mini .bar i{display:block;height:100%}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--line)}
 .dot.on{background:var(--good)}
@@ -80,7 +80,85 @@ tr:last-child td{border-bottom:none}
 .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--bad) 10%,var(--panel));border:1px solid var(--bad)}
 .confirm input{width:130px;font-family:var(--mono);letter-spacing:.12em;border:2px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--soft)}
 .notice{padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--soft)}
-@media (max-width:760px){.auth{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.top .who{margin-left:0}}
+/* abas da turma */
+.tabbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.tabbar [role=tab]{border:none;background:transparent;border-radius:11px;padding:8px 14px;font-weight:700;color:var(--muted)}
+.tabbar [role=tab]:hover{background:var(--soft);color:var(--ink)}
+.tabbar [role=tab][aria-selected=true]{background:var(--ink);color:var(--panel)}
+.tabbar .sp{flex:1}
+.cnt{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:var(--warn);color:#fff;font-size:.78rem;margin-left:4px}
+.cnt:empty{display:none}
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:12px;background:var(--soft);border:1px solid var(--line);flex-wrap:wrap}
+.seg button{border:none;background:transparent;border-radius:9px;padding:6px 12px;font-weight:700;font-size:.9rem;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.coin{width:1.1em;height:1.1em;vertical-align:-.18em;flex:none}
+.bipav{display:inline-block;width:34px;flex:none;vertical-align:middle;margin-right:8px;line-height:0}
+/* pódio */
+.podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:12px;margin:18px 0 6px;max-width:640px;margin-inline:auto}
+.pod{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-width:0}
+.pod .bipav{width:clamp(64px,12vw,92px);margin:0}
+.pod.p1 .bipav{width:clamp(80px,15vw,116px)}
+.pod b{font-family:var(--display);font-size:1.15rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod .val{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.pod .step{width:100%;border-radius:14px 14px 4px 4px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:2rem;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+.pod.p1 .step{height:110px;background:linear-gradient(180deg,#ffd24a,#e9a500)}
+.pod.p2 .step{height:80px;background:linear-gradient(180deg,#c9d3df,#8f9db0)}
+.pod.p3 .step{height:60px;background:linear-gradient(180deg,#f0a36b,#c46a2c)}
+.rlist{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rlist li{display:grid;grid-template-columns:50px minmax(0,1.3fr) minmax(0,2fr) auto;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:14px;background:var(--soft)}
+.rlist .pos{font-family:var(--display);font-weight:800;font-size:1.25rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.rlist .nm{display:flex;align-items:center;min-width:0;font-weight:700}
+.rlist .nm span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rlist .rb{height:10px;border-radius:9px;background:var(--line);overflow:hidden}
+.rlist .rb i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--run),#ffb03a)}
+.rlist .v{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.note{margin:12px 0 0;color:var(--muted);font-size:.88rem}
+/* tabela ordenável */
+th button{all:unset;cursor:pointer;display:inline-flex;gap:4px;align-items:center}
+th button:focus-visible{outline:3px solid var(--run);outline-offset:2px;border-radius:4px}
+th button[data-dir]::after{content:attr(data-dir);font-size:.9em}
+.coinv{display:inline-flex;align-items:center;gap:5px;font-weight:700;white-space:nowrap}
+.stat b .coinv{font-size:inherit;color:inherit;gap:8px}
+.mini{white-space:nowrap}
+.sub{display:block;color:var(--muted);font-size:.8rem}
+/* por atividade */
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.act h3{font-size:1.25rem;margin-bottom:4px}
+.act h4{margin:14px 0 6px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.arow{display:grid;grid-template-columns:minmax(0,1.6fr) 76px minmax(0,1fr) 46px;align-items:center;gap:10px;padding:4px 0;font-size:.92rem}
+.arow .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arow .b{height:10px;border-radius:9px;background:var(--line);overflow:hidden}
+.arow .b i{display:block;height:100%;border-radius:9px}
+.arow .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.arow.trava{background:color-mix(in srgb,var(--warn) 14%,transparent);border-radius:8px;padding-inline:6px;margin-inline:-6px}
+.callout{padding:12px 14px;border-radius:14px;border:1px solid color-mix(in srgb,var(--warn) 55%,var(--line));background:color-mix(in srgb,var(--warn) 10%,var(--panel));margin-bottom:6px}
+/* atenção */
+.alist{display:flex;flex-direction:column;gap:8px;padding:0;margin:0;list-style:none}
+.alist li{list-style:none;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--soft)}
+.chip{font-size:.8rem;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid var(--line);background:var(--panel)}
+.chip.w{border-color:var(--warn);color:var(--warn)}
+.chip.b{border-color:var(--bad);color:var(--bad)}
+/* telão: só os 10 primeiros, letras grandes, para projetar na sala */
+.telao{position:fixed;inset:0;z-index:50;overflow:auto;color:#fff;padding:max(24px,env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) 24px max(24px,env(safe-area-inset-left,0px));
+ background:radial-gradient(ellipse 70% 50% at 50% 0%,#3a2a8a 0%,rgba(58,42,138,0) 70%),linear-gradient(180deg,#121a3a,#070a1a)}
+.telao .in{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.telao .th{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.telao h2{font-size:clamp(2rem,4.5vw,3.4rem);flex:1}
+.telao h2 small{display:block;font-family:var(--body);font-size:.4em;font-weight:700;opacity:.75;letter-spacing:.04em}
+.telao .podium{max-width:820px}
+.telao .pod b{font-size:clamp(1.3rem,2.6vw,2rem)}
+.telao .pod .val{color:#cfd8ff;font-size:clamp(1rem,1.8vw,1.35rem)}
+.telao .pod .bipav{width:clamp(80px,13vw,150px)}
+.telao .pod.p1 .bipav{width:clamp(100px,16vw,190px)}
+.telao .pod.p1 .step{height:150px}.telao .pod.p2 .step{height:110px}.telao .pod.p3 .step{height:80px}
+.telao .rlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:10px}
+.telao .rlist li{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);grid-template-columns:48px minmax(0,1fr) auto;font-size:clamp(1rem,1.7vw,1.35rem)}
+.telao .rlist .rb{display:none}
+.telao .rlist .pos{color:#cfd8ff}
+.telao .seg button{color:rgba(255,255,255,.8)}.telao .seg button[aria-pressed=true]{color:#172536}
+.telao .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff}
+@media (max-width:760px){.auth{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.top .who{margin-left:0}
+ .grid2{grid-template-columns:1fr}.rlist li{grid-template-columns:34px minmax(0,1fr) auto}.rlist .rb{display:none}.tabbar .sp{display:none}}
 </style>
 
 <div class="wrap">
@@ -144,17 +222,41 @@ tr:last-child td{border-bottom:none}
    <div class="codebig"><small>Código da turma</small><b id="tCode">———</b><button class="btn sm" id="bCopy">Copiar</button></div>
   </div>
   <div class="stats" id="stats"></div>
-  <div class="acts" style="justify-content:space-between;margin-bottom:10px"><b id="nAlunos">Alunos</b><button class="btn sm" id="bReload">↻ Atualizar</button></div>
-  <div class="tbl"><table><thead><tr><th>Aluno</th><th>Robô Programador</th><th>Academia do Bip</th><th>Último acesso</th><th>Ações</th></tr></thead><tbody id="rows"></tbody></table></div>
+  <div class="tabbar">
+   <div role="tablist" aria-label="O que ver da turma" class="acts" style="gap:4px">
+    <button role="tab" id="tb-rank" data-tab="rank" aria-selected="true" aria-controls="tabRank">🏆 Ranking</button>
+    <button role="tab" id="tb-alunos" data-tab="alunos" aria-selected="false" aria-controls="tabAlunos">👥 Alunos</button>
+    <button role="tab" id="tb-ativ" data-tab="ativ" aria-selected="false" aria-controls="tabAtiv">📊 Por atividade</button>
+    <button role="tab" id="tb-aten" data-tab="aten" aria-selected="false" aria-controls="tabAten">⚠️ Atenção<span class="cnt" id="nAten"></span></button>
+   </div>
+   <span class="sp"></span>
+   <button class="btn sm" id="bTelao">📺 Mostrar no telão</button>
+   <button class="btn sm" id="bCsv">⬇ Baixar planilha</button>
+   <button class="btn sm" id="bReload">↻ Atualizar</button>
+  </div>
+  <div role="tabpanel" id="tabRank" aria-labelledby="tb-rank">
+   <div class="acts" style="justify-content:space-between"><div class="seg" role="group" aria-label="Ordenar o ranking por" id="crit"></div><span class="hint" id="rankHint"></span></div>
+   <div id="rankBox"></div>
+   <p class="note" id="rankNote"></p>
+  </div>
+  <div role="tabpanel" id="tabAlunos" aria-labelledby="tb-alunos" hidden>
+   <div class="acts" style="justify-content:space-between;margin-bottom:10px"><b id="nAlunos">Alunos</b><span class="hint">Toque no título de uma coluna para ordenar.</span></div>
+   <div class="tbl"><table><thead><tr id="thead"></tr></thead><tbody id="rows"></tbody></table></div>
+  </div>
+  <div role="tabpanel" id="tabAtiv" aria-labelledby="tb-ativ" hidden></div>
+  <div role="tabpanel" id="tabAten" aria-labelledby="tb-aten" hidden></div>
   <p class="err" id="errRows"></p>
   <div class="danger-zone" id="dz"></div>
  </section>
 </div>
+<div class="telao" id="telao" hidden role="dialog" aria-modal="true" aria-labelledby="telTitle"></div>
 
+<script>/*BIPV*/</script>
 <script>
 /* ============ Área do professor ============ */
 const $=id=>document.getElementById(id);
-const ROBO_N=/*ROBO_N*/0,ACAD=/*ACAD*/[];
+const ROBO_N=/*ROBO_N*/0,ACAD=/*ACAD*/[],ROBO=/*ROBO*/[],ROBOW=/*ROBOW*/[],ACADT=/*ACADT*/[],ACADW=/*ACADW*/[];
+const COIN=BIPV.COIN,nf=n=>Number(n).toLocaleString("pt-BR");
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const SITE=location.href.replace(/[^/]*([?#].*)?$/,"");
@@ -218,23 +320,113 @@ $("bBack").onclick=()=>go("turmas");
 $("bReload").onclick=()=>busy($("bReload"),loadAlunos);
 $("bCopy").onclick=()=>{const t=$("tCode").textContent;try{navigator.clipboard.writeText(t).then(()=>{$("bCopy").textContent="Copiado!";setTimeout(()=>$("bCopy").textContent="Copiar",1500)})}catch(e){}};
 async function loadAlunos(){$("errRows").textContent="";try{alunos=await rpc("professor_alunos",{p_turma:turma.id});drawAlunos()}catch(x){$("errRows").textContent=erroBip(x)}}
-function stat(a){const r=(a.progresso&&a.progresso.robo)||{},ac=(a.progresso&&a.progresso.academia)||{};
- const fases=Object.keys(r.stars||{}).length+Object.keys(r.skip||{}).length,est=Object.values(r.stars||{}).reduce((s,v)=>s+(+v||0),0);
- const aulas=(ac.done||[]).filter(x=>ACAD.includes(x)).length;return {fases,est,aulas}}
-function drawAlunos(){const n=alunos.length,S=alunos.map(stat),sem=7*864e5;
- $("nAlunos").textContent=`${n} aluno${n==1?"":"s"}`;
- const ativos=alunos.filter(a=>a.ultimo_acesso&&Date.now()-new Date(a.ultimo_acesso)<sem).length,avg=k=>n?Math.round(S.reduce((s,x)=>s+x[k],0)/n):0;
- $("stats").innerHTML=[[n,"alunos na turma"],[ativos,"jogaram nos últimos 7 dias"],[avg("fases"),`fases em média (de ${ROBO_N})`],[avg("aulas"),`aulas em média (de ${ACAD.length})`]].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
- $("rows").innerHTML=n?alunos.map((a,i)=>{const s=S[i],on=a.ultimo_acesso&&Date.now()-new Date(a.ultimo_acesso)<sem;
+/* ---- números de cada aluno (tudo calculado do progresso que o banco já guarda) ---- */
+function stat(a){const pg=a.progresso||{},r=pg.robo||{},ac=pg.academia||{},lj=pg.loja||{},st=r.stars||{};
+ const feitas=new Set([...Object.keys(st).filter(k=>+st[k]>0),...Object.keys(r.skip||{})]);
+ const est=Object.values(st).reduce((s,v)=>s+Math.min(3,+v||0),0),done=new Set((ac.done||[]).filter(x=>ACAD.includes(x)));
+ const owned=Array.isArray(lj.owned)?lj.owned:[],ganhos=BIPV.ganhos(r,ac),gastos=BIPV.gasto(owned);
+ const dias=a.ultimo_acesso?(Date.now()-new Date(a.ultimo_acesso))/864e5:Infinity;
+ return {a,feitas,done,fases:feitas.size,est,aulas:done.size,ativ:feitas.size+done.size,ganhos,gastos,saldo:ganhos-gastos,itens:owned.filter(id=>!BIPV.gratis(id)).length,look:lj.look||{},dias}}
+const av=S=>`<span class="bipav" aria-hidden="true">${BIPV.face2d(S.look)}</span>`;
+const pl=(n,um,varios)=>`${nf(n)} ${n==1?um:varios}`;
+let SS=[],tab=ls.get("bipsite-prof-tab")||"rank",crit=ls.get("bipsite-prof-crit")||"ativ",sortK=["apelido",1];
+
+/* ---- ranking ---- */
+const CRIT={
+ ativ:{n:"Atividades",v:S=>S.ativ,tie:S=>S.est,fmt:S=>pl(S.ativ,"atividade","atividades"),note:"Atividades = fases do Robô Programador + aulas da Academia concluídas. Empate: quem tem mais estrelas."},
+ coins:{n:"Bipcoins ganhos",v:S=>S.ganhos-BIPV.BONUS,tie:S=>S.ativ,fmt:S=>`${nf(S.ganhos)} ${COIN}`,note:"Conta tudo o que o aluno já ganhou, e não o saldo: gastar na loja não faz ninguém cair no ranking."},
+ est:{n:"Estrelas",v:S=>S.est,tie:S=>S.fases,fmt:S=>`${nf(S.est)} ★`,note:"Estrelas do Robô Programador: até 3 por fase."},
+ aulas:{n:"Aulas",v:S=>S.aulas,tie:S=>S.ganhos,fmt:S=>pl(S.aulas,"aula","aulas"),note:"Aulas concluídas na Academia do Bip."}};
+function ranking(c){const R=SS.slice().sort((x,y)=>c.v(y)-c.v(x)||c.tie(y)-c.tie(x)||x.a.apelido.localeCompare(y.a.apelido,"pt-BR"));
+ R.forEach((S,i)=>{const P=R[i-1];S.pos=P&&c.v(S)==c.v(P)&&c.tie(S)==c.tie(P)?P.pos:i+1});return R}
+function rankHTML(c,max){const R=ranking(c),top=R.filter(S=>c.v(S)>0),zero=R.filter(S=>c.v(S)<=0);
+ if(!top.length)return '<p class="empty">Ninguém pontuou ainda. Assim que os alunos jogarem, o ranking aparece aqui.</p>';
+ const best=c.v(top[0])||1,lim=max||top.length;
+ const pod=[top[1],top[0],top[2]].map((S,i)=>S?`<div class="pod p${[2,1,3][i]}">${av(S)}<b>${esc(S.a.apelido)}</b><span class="val">${c.fmt(S)}</span><div class="step">${S.pos}º</div></div>`:"<div></div>").join("");
+ const rest=top.slice(3,lim).map(S=>`<li><span class="pos">${S.pos}º</span><span class="nm">${av(S)}<span>${esc(S.a.apelido)}</span></span><span class="rb"><i style="width:${c.v(S)/best*100}%"></i></span><span class="v">${c.fmt(S)}</span></li>`).join("");
+ return `<div class="podium">${pod}</div>${rest?`<ol class="rlist">${rest}</ol>`:""}`+(!max&&zero.length?`<p class="note">Ainda sem pontos aqui: ${zero.map(S=>esc(S.a.apelido)).join(", ")}.</p>`:"")}
+function segHTML(){return Object.entries(CRIT).map(([k,c])=>`<button data-crit="${k}" aria-pressed="${k==crit}">${c.n}</button>`).join("")}
+function drawRank(){const c=CRIT[crit];$("crit").innerHTML=segHTML();$("rankBox").innerHTML=rankHTML(c);$("rankNote").textContent=c.note;
+ $("rankHint").textContent=SS.length?"No telão aparecem só os 10 primeiros.":""}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-crit]");if(!b)return;crit=b.dataset.crit;ls.set("bipsite-prof-crit",crit);drawRank();if(!$("telao").hidden)drawTelao()});
+
+/* ---- telão (para projetar na sala) ---- */
+function drawTelao(){const c=CRIT[crit];$("telao").innerHTML=`<div class="in"><div class="th"><h2 id="telTitle">🏆 Ranking da turma<small>${esc(turma.nome)} · ${esc(c.n)}</small></h2>
+ <div class="seg" role="group" aria-label="Ordenar o ranking por" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)">${segHTML()}</div><button class="btn" id="telX">✕ Fechar</button></div>${rankHTML(c,10)}</div>`;
+ $("telX").onclick=closeTelao}
+function openTelao(){drawTelao();$("telao").hidden=false;document.body.style.overflow="hidden";const t=$("telao");try{t.requestFullscreen&&t.requestFullscreen().catch(()=>{})}catch(e){}$("telX").focus()}
+function closeTelao(){$("telao").hidden=true;document.body.style.overflow="";try{document.fullscreenElement&&document.exitFullscreen()}catch(e){}$("bTelao").focus()}
+document.addEventListener("keydown",e=>{if(e.key=="Escape"&&!$("telao").hidden)closeTelao()});
+document.addEventListener("fullscreenchange",()=>{if(!document.fullscreenElement&&!$("telao").hidden)closeTelao()});
+$("bTelao").onclick=openTelao;
+
+/* ---- planilha (abre no Excel e no Google Planilhas) ---- */
+$("bCsv").onclick=()=>{const R=ranking(CRIT.ativ),q=v=>{v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+ const L=[["Posição","Apelido","Fases do Robô","Estrelas","Aulas da Academia","Atividades","Bipcoins ganhos","Bipcoins gastos","Saldo de Bipcoins","Itens comprados","Último acesso"],
+  ...R.map(S=>[S.pos,S.a.apelido,S.fases,S.est,S.aulas,S.ativ,S.ganhos,S.gastos,S.saldo,S.itens,S.a.ultimo_acesso?new Date(S.a.ultimo_acesso).toLocaleString("pt-BR"):"nunca"])].map(r=>r.map(q).join(";"));
+ const u=URL.createObjectURL(new Blob(["﻿"+L.join("\r\n")],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");
+ a.href=u;a.download=`mundo-do-bip_${turma.nome.replace(/[^\p{L}\p{N}]+/gu,"-")}_${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000)};
+
+/* ---- abas ---- */
+function showTab(t){tab=t;ls.set("bipsite-prof-tab",t);document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab==t));
+ [["rank","tabRank"],["alunos","tabAlunos"],["ativ","tabAtiv"],["aten","tabAten"]].forEach(([k,id])=>$(id).hidden=k!=t)}
+document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+/* ---- tabela de alunos (ordenável) ---- */
+const COLS=[["apelido","Aluno"],["fases","Robô Programador"],["aulas","Academia do Bip"],["saldo","Bipcoins"],["itens","Loja"],["dias","Último acesso"],[null,"Ações"]];
+$("thead").onclick=e=>{const b=e.target.closest("[data-sort]");if(!b)return;const k=b.dataset.sort;sortK=[k,sortK[0]==k?-sortK[1]:(k=="apelido"||k=="dias"?1:-1)];drawTable()};
+function drawTable(){const [k,d]=sortK,n=SS.length;
+ $("thead").innerHTML=COLS.map(([c,l])=>c?`<th aria-sort="${c==k?(d>0?"ascending":"descending"):"none"}"><button data-sort="${c}"${c==k?` data-dir="${d>0?"▲":"▼"}"`:""}>${l}</button></th>`:`<th>${l}</th>`).join("");
+ const L=SS.slice().sort((x,y)=>(k=="apelido"?x.a.apelido.localeCompare(y.a.apelido,"pt-BR"):(x[k]==y[k]?0:x[k]<y[k]?-1:1))*d||x.a.apelido.localeCompare(y.a.apelido,"pt-BR"));
+ $("rows").innerHTML=n?L.map(S=>{const a=S.a,on=S.dias<7;
   const acts=pinOpen==a.id?`<form class="pinbox" data-pinf="${a.id}"><input inputmode="numeric" maxlength="4" placeholder="0000" aria-label="Novo PIN de ${esc(a.apelido)}" required><button class="btn sm main">Salvar</button><button class="btn sm ghost" type="button" data-cancel>✕</button></form>`
    :delOpen==a.id?`<span class="confirm" style="padding:4px 8px">Remover e apagar o progresso? <button class="btn sm danger" data-delok="${a.id}">Remover</button><button class="btn sm ghost" data-cancel>Cancelar</button></span>`
    :`<span class="rowact"><button class="btn sm" data-pin="${a.id}">Novo PIN</button><button class="btn sm danger" data-del="${a.id}">Remover</button></span>`;
-  return `<tr><td><span class="av" style="background:${esc(a.cor)}">${esc(a.apelido[0].toUpperCase())}</span><b>${esc(a.apelido)}</b></td>
-   <td><div class="mini"><span class="bar"><i style="width:${s.fases/ROBO_N*100}%;background:var(--run)"></i></span>${s.fases} fases · ${s.est} ★</div></td>
-   <td><div class="mini"><span class="bar"><i style="width:${ACAD.length?s.aulas/ACAD.length*100:0}%;background:var(--turn)"></i></span>${s.aulas} aulas</div></td>
+  return `<tr><td><span class="mini">${av(S)}<b>${esc(a.apelido)}</b></span></td>
+   <td><div class="mini"><span class="bar"><i style="width:${S.fases/ROBO_N*100}%;background:var(--run)"></i></span>${S.fases} fases · ${S.est} ★</div></td>
+   <td><div class="mini"><span class="bar"><i style="width:${ACAD.length?S.aulas/ACAD.length*100:0}%;background:var(--turn)"></i></span>${S.aulas} aulas</div></td>
+   <td><span class="coinv">${COIN}${nf(S.saldo)}</span><span class="sub">ganhou ${nf(S.ganhos)} · gastou ${nf(S.gastos)}</span></td>
+   <td>${pl(S.itens,"item","itens")}</td>
    <td><span class="dot${on?" on":""}"></span>${ago(a.ultimo_acesso)}</td><td>${acts}</td></tr>`}).join("")
-  :`<tr><td colspan="5" class="empty">Nenhum aluno ainda. Passe o código <b>${fmtCode(turma.codigo)}</b> para a turma.</td></tr>`;
- drawDZ()}
+  :`<tr><td colspan="7" class="empty">Nenhum aluno ainda. Passe o código <b>${fmtCode(turma.codigo)}</b> para a turma.</td></tr>`}
+
+/* ---- por atividade: até onde cada aluno chegou e onde a turma está agora ---- */
+function drawAtiv(){const n=SS.length;if(!n){$("tabAtiv").innerHTML='<p class="empty">Os gráficos aparecem quando os alunos começarem a jogar.</p>';return}
+ const ROW=(t,feito,aqui,cor,trava)=>`<div class="arow${trava?" trava":""}"><span class="t" title="${esc(t)}">${esc(t)}</span><span>${aqui?`<span class="chip" title="${aqui} aluno${aqui==1?"":"s"} nesta etapa agora">👣 ${aqui}</span>`:""}</span><span class="b"><i style="width:${feito/n*100}%;background:${cor}"></i></span><span class="n">${feito}/${n}</span></div>`;
+ /* Academia: quantos concluíram cada aula + em qual aula cada aluno está (a primeira que falta) */
+ const aqA={};SS.forEach(S=>{const nx=ACAD.find(id=>!S.done.has(id));if(nx&&S.ativ>0)aqA[nx]=(aqA[nx]||0)+1});
+ const topA=Object.entries(aqA).sort((x,y)=>y[1]-x[1])[0];
+ let ac="",w=-1;ACAD.forEach((id,i)=>{const wi=+id.split("-")[0];if(wi!=w){w=wi;ac+=`<h4>Mundo ${wi+1} · ${esc(ACADW[wi]||"")}</h4>`}
+  ac+=ROW(`${+id.split("-")[1]+1}. ${ACADT[i]||id}`,SS.filter(S=>S.done.has(id)).length,aqA[id]||0,"var(--turn)",topA&&topA[0]==id&&topA[1]>=2)});
+ /* Robô: por mundo, quantos terminaram o mundo inteiro + onde cada aluno está */
+ const byW=ROBOW.map(()=>[]);ROBO.forEach(([t,wi])=>byW[wi]&&byW[wi].push(t));
+ const aqR={};SS.forEach(S=>{const wi=byW.findIndex(L=>L.some(t=>!S.feitas.has(t)));if(wi>=0&&S.ativ>0)aqR[wi]=(aqR[wi]||0)+1});
+ const topR=Object.entries(aqR).sort((x,y)=>y[1]-x[1])[0];
+ const rb=byW.map((L,wi)=>ROW(`${wi+1}. ${ROBOW[wi]} (${L.length} fases)`,SS.filter(S=>L.every(t=>S.feitas.has(t))).length,aqR[wi]||0,"var(--run)",topR&&+topR[0]==wi&&topR[1]>=2)).join("");
+ const call=[topA&&topA[1]>=2?`Na <b>Academia</b>, ${topA[1]} alunos estão agora na aula <b>${esc(ACADT[ACAD.indexOf(topA[0])])}</b>.`:"",
+  topR&&topR[1]>=2?`No <b>Robô</b>, ${topR[1]} alunos estão no mundo <b>${esc(ROBOW[+topR[0]])}</b>.`:""].filter(Boolean);
+ $("tabAtiv").innerHTML=(call.length?`<div class="callout">📍 ${call.join(" ")} Pode ser um bom assunto para retomar em sala.</div>`:"")+
+  `<div class="grid2"><section class="act"><h3>Academia do Bip</h3><p class="hint">Quantos alunos concluíram cada aula. 👣 = quantos estão nessa aula agora.</p>${ac}</section>
+  <section class="act"><h3>Robô Programador</h3><p class="hint">Quantos alunos terminaram cada mundo inteiro. 👣 = quantos estão nesse mundo agora.</p>${rb}</section></div>`}
+
+/* ---- precisam de atenção ---- */
+function drawAten(){const v=SS.map(S=>S.ativ).sort((x,y)=>x-y),med=v.length?v[Math.floor((v.length-1)/2)]:0;
+ const L=SS.map(S=>{const why=[];let g=0;
+  if(S.ativ==0){why.push(`<span class="chip b">Ainda não fez nenhuma atividade</span>`);g=3}
+  if(S.dias==Infinity){why.push(`<span class="chip b">Nunca entrou na turma</span>`);g=Math.max(g,3)}
+  else if(S.dias>=7){why.push(`<span class="chip w">Sem entrar há ${Math.round(S.dias)} dias</span>`);g=Math.max(g,2)}
+  if(S.ativ>0&&med>=4&&S.ativ<med/2){why.push(`<span class="chip w">${pl(S.ativ,"atividade","atividades")}: bem abaixo da turma (mediana: ${med})</span>`);g=Math.max(g,1)}
+  return {S,why,g}}).filter(x=>x.g).sort((x,y)=>y.g-x.g||x.S.ativ-y.S.ativ);
+ $("nAten").textContent=L.length||"";
+ $("tabAten").innerHTML=L.length?`<p class="hint" style="margin-bottom:10px">Alunos que talvez precisem de um empurrãozinho. Isso não é nota: é só um aviso para você conversar com eles.</p><ul class="alist">${L.map(({S,why})=>`<li><span class="mini">${av(S)}<b>${esc(S.a.apelido)}</b></span>${why.join("")}</li>`).join("")}</ul>`
+  :'<p class="empty">Ninguém precisa de atenção agora. 🎉</p>'}
+
+function drawAlunos(){SS=alunos.map(stat);const n=SS.length,ativos=SS.filter(S=>S.dias<7).length,tot=k=>SS.reduce((s,S)=>s+S[k],0);
+ $("nAlunos").textContent=pl(n,"aluno","alunos");
+ $("stats").innerHTML=[[nf(n),`aluno${n==1?"":"s"} · ${ativos} jogaram nos últimos 7 dias`],[nf(tot("ativ")),"atividades concluídas pela turma"],
+  [n?nf(Math.round(tot("ativ")/n)):0,`atividades por aluno, em média (${n?Math.round(tot("fases")/n):0} fases e ${n?Math.round(tot("aulas")/n):0} aulas)`],
+  [`<span class="coinv">${COIN}${nf(tot("ganhos"))}</span>`,"Bipcoins ganhos pela turma"]].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+ drawRank();drawTable();drawAtiv();drawAten();showTab(tab);drawDZ()}
 function drawDZ(){const t=turma;$("dz").innerHTML=dzOpen?`<span class="confirm">Para apagar a turma e o progresso de todos os alunos, digite o código <b>${fmtCode(t.codigo)}</b>: <input id="dzIn" aria-label="Código da turma"><button class="btn sm danger" id="dzOk">Apagar turma</button><button class="btn sm ghost" id="dzNo">Cancelar</button></span>`
  :`<button class="btn sm" id="dzPause">${t.ativa?"Pausar turma (ninguém entra)":"Reabrir turma"}</button><button class="btn sm danger" id="dzDel">Apagar turma…</button><span class="hint">${t.ativa?"":"Turma pausada: os alunos não conseguem entrar."}</span>`;
  if(dzOpen){$("dzNo").onclick=()=>{dzOpen=null;drawDZ()};$("dzOk").onclick=()=>{if($("dzIn").value.toUpperCase().replace(/[^0-9A-Z]/g,"")!=t.codigo)return $("errRows").textContent="O código digitado não confere.";
