@@ -24,7 +24,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
 .hud>*{pointer-events:auto}
 .htop{display:flex;align-items:flex-start;gap:10px}
 .lives{display:flex;align-items:center;gap:6px;padding:8px 12px;font-size:1.35rem;line-height:1}
-.lives span{transition:transform .3s,opacity .3s,filter .3s}
+.lives span{transition:transform .3s,opacity .3s,filter .3s;display:block}
 .lives span.off{opacity:.25;filter:grayscale(1);transform:scale(.8)}
 .ib{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:1.2rem;color:#fff;background:var(--glass);border:1px solid var(--line)}
 .sp{flex:1}
@@ -85,6 +85,14 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 .cd{position:fixed;inset:0;z-index:4;display:grid;place-items:center;pointer-events:none;font-family:var(--display);font-weight:800;font-size:clamp(5rem,18vw,9rem);color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.5)}
 .cd span{animation:cd .9s ease forwards}
 @keyframes cd{0%{transform:scale(1.8);opacity:0}30%{transform:scale(1);opacity:1}100%{transform:scale(.7);opacity:0}}
+.hrt{width:26px;height:23px;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.chip .hrt{width:18px;height:16px;display:inline-block;vertical-align:-3px;margin-right:2px}
+.inf{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:8px;background:linear-gradient(180deg,#7cf0ff,#3aa8d8);color:#062a3a;font-family:var(--display);font-size:1.1rem;line-height:1;margin-right:4px}
+.chip[aria-pressed=true] .inf{box-shadow:0 0 0 2px #172536 inset}
+.tg{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 4px;border-radius:8px;margin-right:6px;font-style:normal;font-family:var(--display);font-weight:800;font-size:1rem;line-height:1;color:#0a0e28;background:var(--tc);box-shadow:0 2px 0 rgba(0,0,0,.35),0 0 12px color-mix(in srgb,var(--tc) 55%,transparent)}
+.trf{width:20px;height:20px;display:inline-block;vertical-align:-4px;margin-right:4px}
+.md{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;font-family:var(--display);font-weight:800;font-size:.9rem;color:#3a2600;background:#8a7bff;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.md.m1{background:radial-gradient(circle at 35% 30%,#fff3b0,#ffd24a 45%,#d99a00)}.md.m2{background:radial-gradient(circle at 35% 30%,#fff,#cfd8e3 45%,#8f9db0)}.md.m3{background:radial-gradient(circle at 35% 30%,#ffd9b8,#f0a36b 45%,#b45f22)}.md.m4,.md.m5{color:#fff}
 .trec{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .trec li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 10px;border-radius:10px;background:rgba(255,255,255,.06);font-weight:700;font-variant-numeric:tabular-nums}
 .trec li.eu{background:rgba(242,194,48,.18);outline:1px solid rgba(242,194,48,.6)}
@@ -120,10 +128,10 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
   <div><h1>Bip Runner</h1><p>A conta aparece no alto. Troque de faixa e passe pelo portal com a resposta certa. Quanto mais acertos seguidos, mais rápido e mais pontos!</p></div>
   <div><div class="lbl">Trilha</div><div class="chips" id="trilhas" role="group" aria-label="Escolha a trilha"></div><p class="more">+ 5 trilhas chegando: operações, inteiros, frações, porcentagem e potência.</p></div>
   <div><div class="lbl">Modo</div><div class="chips" role="group" aria-label="Modo de jogo">
-   <button class="chip" data-modo="normal" aria-pressed="true">❤️ Normal <small>3 vidas, acelera</small></button>
-   <button class="chip" data-modo="treino" aria-pressed="false">🧘 Treino <small>sem perder vida</small></button></div></div>
+   <button class="chip" data-modo="normal" aria-pressed="true"><svg class="hrt" viewBox="0 0 32 28" aria-hidden="true"><path d="M16 27C6 19 1 14 1 8.5 1 4.4 4.2 1 8.3 1c3 0 5.6 1.7 7.7 4.4C18.1 2.7 20.7 1 23.7 1 27.8 1 31 4.4 31 8.5 31 14 26 19 16 27z" fill="#ff4f6d" stroke="#8a1630" stroke-width="2"/><path d="M7 6.5c1.4-1.6 3.6-1.8 5-.6" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".85"/></svg> Normal <small>3 vidas, acelera</small></button>
+   <button class="chip" data-modo="treino" aria-pressed="false"><b class="inf">∞</b> Treino <small>sem perder vida</small></button></div></div>
   <div class="rec"><div><b id="rBest">0</b><span>seu recorde</span></div><div><b id="rCoins">0/60</b><span>Bipcoins hoje</span></div></div>
-  <div id="turmaRec" hidden><div class="lbl">🏆 Recordes da turma</div><ol class="trec" id="trec"></ol></div>
+  <div id="turmaRec" hidden><div class="lbl"><svg class="trf" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 3h14v8a7 7 0 0 1-14 0z" fill="#ffd24a" stroke="#a87000" stroke-width="2"/><path d="M9 6H4v2a5 5 0 0 0 5 5M23 6h5v2a5 5 0 0 1-5 5" fill="none" stroke="#a87000" stroke-width="2"/><path d="M14 18h4v5h-4z" fill="#e9a500"/><rect x="9" y="23" width="14" height="5" rx="1.5" fill="#5a3a00"/><path d="M12.5 6v5" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg> Recordes da turma</div><ol class="trec" id="trec"></ol></div>
   <div class="row"><button class="btn go" id="bGo">▶ Correr</button><a class="back" href="./" id="bBack">← Voltar ao Mundo do Bip</a></div>
  </div>
 </section>
@@ -135,7 +143,7 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 
 <section class="scr" id="sEnd" hidden>
  <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="eT">
-  <div><div class="lbl" id="eSub">Fim da corrida</div><h2 id="eT" class="big">0</h2><span class="newrec" id="eNew" hidden>🏆 Novo recorde!</span></div>
+  <div><div class="lbl" id="eSub">Fim da corrida</div><h2 id="eT" class="big">0</h2><span class="newrec" id="eNew" hidden><svg class="trf" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 3h14v8a7 7 0 0 1-14 0z" fill="#ffd24a" stroke="#a87000" stroke-width="2"/><path d="M9 6H4v2a5 5 0 0 0 5 5M23 6h5v2a5 5 0 0 1-5 5" fill="none" stroke="#a87000" stroke-width="2"/><path d="M14 18h4v5h-4z" fill="#e9a500"/><rect x="9" y="23" width="14" height="5" rx="1.5" fill="#5a3a00"/><path d="M12.5 6v5" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg> Novo recorde!</span></div>
   <div class="rec"><div><b id="eOk">0</b><span>acertos</span></div><div><b id="eCombo">0</b><span>maior sequência</span></div><div><b id="eLv">1</b><span>nível</span></div></div>
   <div class="coinline" id="eCoin"></div>
   <div id="eRev"><div class="lbl">Para revisar</div><div class="facts" id="eFacts"></div></div>
@@ -170,7 +178,9 @@ function voltar(e){if(INFRAME){e&&e.preventDefault();window.parent.postMessage({
 $("bBack").onclick=voltar;$("bBack2").onclick=voltar;
 
 /* ---------- trilhas (no protótipo, só a tabuada) ---------- */
-const TRILHAS=[{id:"tabuada",n:"✖️ Tabuada",ok:1},{id:"operacoes",n:"➕ 4 operações"},{id:"inteiros",n:"± Inteiros"},{id:"fracoes",n:"½ Frações"},{id:"porcent",n:"% Decimais e porcentagem"},{id:"potencia",n:"x² Potência e raiz"}];
+const TG=(t,c)=>`<i class="tg" style="--tc:${c}">${t}</i>`;
+const TRILHAS=[{id:"tabuada",n:TG("×","#5ef0e0")+"Tabuada",ok:1},{id:"operacoes",n:TG("+","#ffd24a")+"4 operações"},{id:"inteiros",n:TG("±","#ff4fd8")+"Inteiros"},{id:"fracoes",n:TG("½","#8a7bff")+"Frações"},{id:"porcent",n:TG("%","#7cff6b")+"Decimais e porcentagem"},{id:"potencia",n:TG("x²","#ff8a3c")+"Potência e raiz"}];
+const HEART=`<svg class="hrt" viewBox="0 0 32 28" aria-hidden="true"><path d="M16 27C6 19 1 14 1 8.5 1 4.4 4.2 1 8.3 1c3 0 5.6 1.7 7.7 4.4C18.1 2.7 20.7 1 23.7 1 27.8 1 31 4.4 31 8.5 31 14 26 19 16 27z" fill="#ff4f6d" stroke="#8a1630" stroke-width="2"/><path d="M7 6.5c1.4-1.6 3.6-1.8 5-.6" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".85"/></svg>`;
 let trilha="tabuada",modo="normal";
 $("trilhas").innerHTML=TRILHAS.map(t=>`<button class="chip" data-tr="${t.id}" aria-pressed="${t.id==trilha}"${t.ok?"":" disabled"}>${t.n}${t.ok?"":" <small>em breve</small>"}</button>`).join("");
 document.querySelectorAll("[data-tr]").forEach(b=>b.onclick=()=>{trilha=b.dataset.tr;document.querySelectorAll("[data-tr]").forEach(x=>x.setAttribute("aria-pressed",x==b));drawRec()});
@@ -181,7 +191,7 @@ let recPend=false;
 async function turmaRec(){if(recPend||typeof NUVEM=="undefined"||!NUVEM.on||!PID)return;let p=null;try{p=(JSON.parse(localStorage.getItem("bipsite-profiles"))||[]).find(q=>q.id==PID)}catch(e){}
  if(!p||!p.cloud||!p.cloud.token)return;recPend=true;
  try{const L=await NUVEM.rpc("aluno_recordes",{p_token:p.cloud.token,p_trilha:trilha});
-  if(Array.isArray(L)&&L.length){$("trec").innerHTML=L.map((r,i)=>`<li class="${r.eu?"eu":""}"><span>${["🥇","🥈","🥉"][i]||i+1+"º"}</span><span>${String(r.apelido).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}${r.eu?" (você)":""}</span><span>${(+r.pontos).toLocaleString("pt-BR")}</span></li>`).join("");$("turmaRec").hidden=false}}
+  if(Array.isArray(L)&&L.length){$("trec").innerHTML=L.map((r,i)=>`<li class="${r.eu?"eu":""}"><span class="md m${i+1}">${i+1}</span><span>${String(r.apelido).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}${r.eu?" (você)":""}</span><span>${(+r.pontos).toLocaleString("pt-BR")}</span></li>`).join("");$("turmaRec").hidden=false}}
  catch(e){}finally{recPend=false}}
 drawRec();
 
@@ -288,12 +298,12 @@ function nextQ(){const L=LV(modo=="treino"?0:S.lv),q=pergunta(modo=="treino"?Mat
  gates.push(makeGate(q,z));$("qt").textContent=q.txt+" = ?";$("qlab").textContent=modo=="treino"?"Tabuada · treino":"Tabuada · nível "+(S.lv+1);
  const qq=$("q");qq.style.visibility="visible";qq.classList.remove("pop");void qq.offsetWidth;qq.classList.add("pop")}
 function toast(html,cls,long){const t=$("toast");t.className="toast";void t.offsetWidth;t.innerHTML=html;t.className="toast show "+cls+(long?" long":"")}
-function drawLives(){$("lives").innerHTML=S.lives==Infinity?'<span title="Modo treino">🧘</span><span style="font-size:.8rem;font-weight:700">treino</span>':[0,1,2].map(i=>`<span class="${i<S.lives?"":"off"}">❤️</span>`).join("");$("lives").setAttribute("aria-label",S.lives==Infinity?"Modo treino":`${S.lives} vidas`)}
+function drawLives(){$("lives").innerHTML=S.lives==Infinity?'<b class="inf" title="Modo treino">∞</b><span style="font-size:.85rem;font-weight:700">treino</span>':[0,1,2].map(i=>`<span class="${i<S.lives?"":"off"}">${HEART}</span>`).join("");$("lives").setAttribute("aria-label",S.lives==Infinity?"Modo treino":`${S.lives} vidas`)}
 function judge(g){g.done=true;const lane=Bip.lane,ok=lane==g.q.ok,cx=(g.q.ok-1)*LANE;
  if(ok){S.ok++;S.combo++;S.best=Math.max(S.best,S.combo);const mult=Math.min(5,1+Math.floor(S.combo/5)),pts=10*mult+(S.lv*2);S.score+=pts;
   SFX.ok(S.combo);burst(cx,g.G.position.z,GCOL[g.q.ok]);toast(`+${pts}${S.combo>=3?` <small style="font-size:.55em">sequência ${S.combo}!</small>`:""}`,"ok");
   BIPV.setMood(P,S.combo%5==0?"festa":"feliz");
-  if(modo!="treino"&&S.ok%5==0){S.lv++;setTimeout(()=>{SFX.lv();toast(`Nível ${S.lv+1}! ⚡`,"lv")},450)}}
+  if(modo!="treino"&&S.ok%5==0){S.lv++;setTimeout(()=>{SFX.lv();toast(`Nível ${S.lv+1}!<small style="display:block;font-size:.5em;color:#fff">mais rápido</small>`,"lv")},450)}}
  else{S.bad++;S.combo=0;S.erros.push(`${g.q.txt} = <b>${g.q.c}</b>`);
   {const e=REC.err[g.q.txt]||(REC.err[g.q.txt]={n:0,r:{}}),resp=String(g.q.opts[lane]);e.n++;e.r[resp]=(e.r[resp]||0)+1}if(S.lives!=Infinity)S.lives--;drawLives();SFX.no();shake=.45;
   const f=$("flash");f.classList.add("on");setTimeout(()=>f.classList.remove("on"),60);BIPV.setMood(P,"ops");stumble=.6;

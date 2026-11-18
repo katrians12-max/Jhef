@@ -145,6 +145,9 @@ body.full .brand{display:none}
 .gestos button{border:none;background:transparent;color:#fff;border-radius:11px;padding:8px 12px 8px 8px;min-height:44px;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:8px;text-align:left}
 .gestos button:hover{background:rgba(255,255,255,.14)}
 .gestos button span{font-size:1.3rem;width:28px;text-align:center}
+.gestos .gi{display:grid;place-items:center;width:38px!important;height:38px;margin:-4px 0}
+.gestos .gi img{width:50px;height:50px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+.shopcard .ic img{width:62px;height:62px;object-fit:contain;display:block;margin:-8px -6px -8px -8px;filter:drop-shadow(0 4px 6px rgba(80,10,40,.45))}
 /* coluna da direita: loja, os dois jogos e o botão principal */
 .side{display:flex;flex-direction:column;gap:12px;min-width:0}
 .saguao .side{position:absolute;z-index:3;top:calc(var(--edge) + 72px);right:var(--edge);bottom:var(--edge);width:var(--sidew)}
@@ -197,6 +200,10 @@ body.full .foot{padding:0 16px 30px}
 .item[aria-pressed="true"]{outline:3px solid var(--run);outline-offset:1px}
 .item .th{width:64px;height:48px;display:grid;place-items:center;font-size:2rem;line-height:1}
 .item .th img{width:64px;height:40px;border-radius:8px}
+.item .th{width:72px;height:70px}
+.item .i3{display:grid;place-items:center;width:72px;height:70px}
+.item .i3.on img{width:70px;height:70px;border-radius:0;object-fit:contain;filter:drop-shadow(0 3px 4px rgba(20,20,60,.25))}
+.item:hover .i3.on img{transform:scale(1.08) rotate(-3deg);transition:transform .2s}
 .item .sw{width:44px;height:44px;border-radius:50%;border:3px solid rgba(0,0,0,.15)}
 .item .sw.tela{border-radius:12px;width:56px;height:36px;background:#172536!important;display:grid;place-items:center}
 .item .sw.tela i{width:12px;height:18px;border-radius:6px;box-shadow:0 0 8px var(--ec);background:var(--ec);margin:0 4px}
@@ -307,11 +314,11 @@ body.full .foot{padding:0 16px 30px}
       <div class="coins glass" id="coins" title="Seus Bipcoins"><span id="coinIc"></span><span><b id="coinN">0</b><br><small>Bipcoins</small></span></div>
      </div>
      <div class="gestos glass" role="group" aria-label="Gestos do Bip"><span class="gh">Gestos</span>
-      <button data-g="acenar"><span>👋</span><b>Acenar</b></button><button data-g="dancar"><span>💃</span><b>Dançar</b></button><button data-g="comemorar"><span>🎉</span><b>Festa</b></button>
-      <button data-g="forca"><span>💪</span><b>Força</b></button><button data-g="pensar"><span>🤔</span><b>Pensar</b></button><button data-g="girar"><span>🔄</span><b>Girar</b></button></div>
+      <button data-g="acenar"><span class="gi" data-pose="acenar">👋</span><b>Acenar</b></button><button data-g="dancar"><span class="gi" data-pose="dancar">💃</span><b>Dançar</b></button><button data-g="comemorar"><span class="gi" data-pose="comemorar">🎉</span><b>Festa</b></button>
+      <button data-g="forca"><span class="gi" data-pose="forca">💪</span><b>Força</b></button><button data-g="pensar"><span class="gi" data-pose="pensar">🤔</span><b>Pensar</b></button><button data-g="girar"><span class="gi" data-pose="girar">🔄</span><b>Girar</b></button></div>
     </div>
     <div class="side">
-     <button class="shopcard" id="bLoja"><span class="ic">🛒</span><span><h3>Loja do Bip</h3><p id="lojaSub">Personalize seu robô com Bipcoins</p></span><span class="dest" id="lojaDest">DESTAQUE</span></button>
+     <button class="shopcard" id="bLoja"><span class="ic" id="lojaIc">🛒</span><span><h3>Loja do Bip</h3><p id="lojaSub">Personalize seu robô com Bipcoins</p></span><span class="dest" id="lojaDest">DESTAQUE</span></button>
      <article class="game">
        <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice"><g id="roboArt"></g></svg></div>
        <div class="bd"><span class="eyebrow">Lógica de programação</span><h3>Robô Programador</h3><p>Monte programas com peças de encaixar e leve o Bip até a bandeira.</p>
@@ -553,7 +560,10 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  drawPlay(p,st);
  drawCoins(p);const l=BIPV.loja(p.id);
  if(LOBBY.mount($("st3d"))){$("stFallback").hidden=true;LOBBY.look(l.look)}else{$("stFallback").hidden=false;$("stFallback").innerHTML=BIPV.face2d(l.look)}
- const d=BIPV.destaque();$("lojaDest").textContent="⭐ "+d.n.toUpperCase();}
+ const d=BIPV.destaque();$("lojaDest").textContent="★ "+d.n.toUpperCase();
+ /* ícones 3D: o Bip do aluno com o item em destaque, e o Bip fazendo cada gesto */
+ BIPV.ICON.item(d.id,l.look,u=>{$("lojaIc").innerHTML=`<img src="${u}" alt="">`});
+ document.querySelectorAll("[data-pose]").forEach(el=>BIPV.ICON.pose(el.dataset.pose,l.look,u=>{el.innerHTML=`<img src="${u}" alt="">`}));}
 /* Botão principal: continua o último jogo aberto (ou começa pelo Robô) */
 function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.id)}catch(e){}return g=="academia"||g=="runner"?g:"robo"}
 const diaHoje=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
@@ -593,7 +603,9 @@ const PATCSS={listras:(i)=>`repeating-linear-gradient(45deg,${i.c} 0 8px,${i.c2}
 let shopCat="pintura",shopSel=null,shopAsk=false;
 function shopState(){const p=curP();return {p,l:BIPV.loja(p.id),saldo:BIPV.saldo(p.id)}}
 function owns(l,id){return BIPV.gratis(id)||l.owned.includes(id)}
-function thumb(it,l){if(it.cat=="pintura"){const bg=it.rainbow?"conic-gradient(#ff4d6d,#ffd24a,#5ef07a,#4ad8ff,#b98cff,#ff4d6d)":it.pat&&PATCSS[it.pat]?PATCSS[it.pat](it):it.metal?`linear-gradient(135deg,#fff,${it.c} 45%,${it.c})`:it.c;return `<span class="sw" style="background:${bg}"></span>`}
+function thumb(it,l){if(it.cat!="olhos"&&it.cat!="tela")return `<span class="i3" data-icon="${it.id}">${thumb0(it,l)}</span>`;return thumb0(it,l)}
+function fillIcons(look){document.querySelectorAll("#items [data-icon]").forEach(el=>BIPV.ICON.item(el.dataset.icon,look,u=>{el.innerHTML=`<img src="${u}" alt="">`;el.classList.add("on")}))}
+function thumb0(it,l){if(it.cat=="pintura"){const bg=it.rainbow?"conic-gradient(#ff4d6d,#ffd24a,#5ef07a,#4ad8ff,#b98cff,#ff4d6d)":it.pat&&PATCSS[it.pat]?PATCSS[it.pat](it):it.metal?`linear-gradient(135deg,#fff,${it.c} 45%,${it.c})`:it.c;return `<span class="sw" style="background:${bg}"></span>`}
  if(it.cat=="tela"){const c=it.grad?`linear-gradient(${it.grad.join(",")})`:it.c;return `<span class="sw tela" style="--ec:${it.c}"><span style="display:flex"><i style="background:${c}"></i><i style="background:${c}"></i></span></span>`}
  if(it.cat=="olhos")return `<img alt="" src="${BIPV.eyePreview(it.id,l.look.tela)}">`;
  return EMO[it.id]||"✦"}
@@ -607,7 +619,7 @@ function drawShop(){const {p,l,saldo}=shopState();drawCoins(p);
  $("items").innerHTML=list.map(it=>{const r=BIPV.RAR[it.r],own=owns(l,it.id),on=l.look[it.cat]==it.id;
   const pr=on?`<span class="pr own">✓ Usando</span>`:own?`<span class="pr own">Seu</span>`:`<span class="pr${saldo<it.p?" lack":""}">${BIPV.COIN}${BIPV.fmt(it.p)}</span>`;
   return `<button class="item" data-id="${it.id}" data-r="${it.r}" style="--rc:${r.c}" aria-pressed="${shopSel==it.id}" title="${it.n} (${r.n})"><span class="rd"></span><span class="th">${thumb(it,l)}</span><span class="n">${it.n}</span>${pr}</button>`}).join("");
- drawSel()}
+ fillIcons(l.look);drawSel()}
 $("tabs").onclick=e=>{const b=e.target.closest("[data-cat]");if(!b)return;shopCat=b.dataset.cat;shopSel=null;shopAsk=false;LOBBY.look(shopState().l.look);drawShop()};
 $("items").onclick=e=>{const b=e.target.closest("[data-id]");if(!b)return;shopSel=b.dataset.id;shopAsk=false;const {l}=shopState(),it=BIPV.BYID[shopSel];
  const prev=Object.assign({},l.look,{[it.cat]:it.id});const hat=BIPV.BYID[prev.cabeca];if(it.cat=="antena"&&hat&&hat.hide)prev.cabeca=null;LOBBY.look(prev);LOBBY.gesture(["acenar","girar","forca","dancar"][Math.floor(Math.random()*4)]);

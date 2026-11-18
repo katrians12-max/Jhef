@@ -265,6 +265,7 @@ function dress(P,look){look=Object.assign({},DEFAULT,look||{});P.look=look;
  const acc=new THREE.Group();P.acc=acc;P.body.add(acc);P.anims=[];
  let hideAnt=false,hideStem=false;
  for(const cat of ["antena","cabeca","rosto","pescoco","costas","efeito"]){const id=look[cat];if(!id)continue;const g=buildAcc(id,P);if(!g)continue;
+  g.userData.cat=cat;
   if(cat=="efeito"){g.position.y=0;P.inner.add(g);acc.userData.fx=(acc.userData.fx||[]);acc.userData.fx.push(g)}else acc.add(g);
   if(g.userData.anim)P.anims.push(g.userData.anim);if(cat=="cabeca"&&g.userData.hide)hideAnt=true;if(g.userData.hideStem)hideStem=true}
  /* efeitos ficam no "inner" (fora do corpo); guarda para remover depois */
@@ -281,8 +282,75 @@ function face2d(look,m="feliz"){look=Object.assign({},DEFAULT,look||{});const p=
   (happy?`<path d="M62 92q12-17 24 0M114 92q12-17 24 0" stroke="${e}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M80 108q20 17 40 0" stroke="${e}" stroke-width="6" fill="none" stroke-linecap="round"/>`
   :`<rect x="66" y="70" width="18" height="28" rx="9" fill="${e}"/><rect x="116" y="70" width="18" height="28" rx="9" fill="${e}"/><path d="M86 112q14 9 28 0" stroke="${e}" stroke-width="5" fill="none" stroke-linecap="round"/>`)+`</svg>`}
 
+/* ---------- Ícones com a cara do jogo: o próprio Bip, fotografado em 3D ----------
+   Um desenho 3D pequeno e escondido monta o Bip com a pintura do aluno, coloca o item
+   (ou faz a pose do gesto), enquadra a parte certa e tira uma "foto" (imagem PNG).
+   As fotos ficam guardadas na memória; uma por quadro, para não travar a tela. */
+const ICON=(()=>{const SZ=160;let R=null,scene,cam,P,arc,props,ok=null;const cache={},fila=[];let rodando=false;
+ function init(){if(ok!==null)return ok;ok=false;if(!window.THREE)return false;
+  try{R=new THREE.WebGLRenderer({canvas:document.createElement("canvas"),antialias:true,alpha:true,preserveDrawingBuffer:true})}catch(e){return false}
+  R.setPixelRatio(1);R.setSize(SZ,SZ,false);R.setClearColor(0,0);
+  scene=new THREE.Scene();scene.add(new THREE.HemisphereLight(0xe4ebff,0x3a2a5a,.95));
+  const k=new THREE.DirectionalLight(0xfff1dc,1.05);k.position.set(2.5,4,5);scene.add(k);
+  const a=new THREE.PointLight(0xff4fd8,1.1,9);a.position.set(-2.6,2.6,-1.6);scene.add(a);
+  const b=new THREE.PointLight(0x3ce8ff,1.1,9);b.position.set(2.6,2.4,-1.6);scene.add(b);
+  cam=new THREE.PerspectiveCamera(26,1,.05,60);
+  P=buildBody();P.g.children.filter(o=>o.isMesh&&o.geometry.type=="CircleGeometry").forEach(o=>o.visible=false);P.glow.visible=false;scene.add(P.g);
+  /* arco de movimento para o ícone de "girar" */
+  arc=new THREE.Mesh(new THREE.TorusGeometry(1.05,.045,8,48,Math.PI*1.45),new THREE.MeshBasicMaterial({color:0x5ef0e0}));arc.rotation.set(Math.PI/2,0,.6);arc.position.y=.9;arc.visible=false;scene.add(arc);
+  props=new THREE.Group();scene.add(props);
+  return ok=true}
+ /* enfeites que mostram o gesto (notas, confete, "?", raios) */
+ function txt(ch,col,sz){const [c,g]=canvas(128,128);g.font='800 96px "Baloo 2",system-ui,sans-serif';g.textAlign="center";g.textBaseline="middle";g.shadowColor=col;g.shadowBlur=18;g.fillStyle="#fff";g.fillText(ch,64,70);g.shadowBlur=0;g.fillStyle=col;g.fillText(ch,64,70);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));sp.scale.set(sz,sz,1);return sp}
+ function add(o,x,y,z){o.position.set(x,y,z);props.add(o);return o}
+ function limpa(){while(props.children.length){const o=props.children.pop();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}if(o.geometry)o.geometry.dispose()}}
+ function pose(){P.arms[0].rotation.set(0,0,.12);P.arms[1].rotation.set(0,0,-.12);P.legs[0].rotation.x=P.legs[1].rotation.x=0;
+  P.body.rotation.set(0,0,0);P.body.position.y=0;P.inner.rotation.set(0,0,0);P.inner.position.y=0;P.g.rotation.set(0,0,0);arc.visible=false;if(props)limpa()}
+ const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+ function foto(objs,dir,zoom){const box=new THREE.Box3();P.g.updateMatrixWorld(true);objs.forEach(o=>o&&box.expandByObject(o));
+  const c=box.getCenter(V()),r=box.getSize(V()).length()/2,d=r/Math.sin(cam.fov*Math.PI/360)*(zoom||1);
+  cam.position.copy(c).add(dir.clone().normalize().multiplyScalar(d));cam.lookAt(c);cam.near=d/20;cam.far=d*4;cam.updateProjectionMatrix();
+  R.render(scene,cam);return R.domElement.toDataURL("image/png")}
+ const parte=cat=>P.acc&&P.acc.children.find(o=>o.userData.cat==cat);
+ /* foto de um item da loja, no Bip do aluno */
+ function fazItem(id,look){const it=BYID[id];if(!it)return null;
+  const lk={pintura:look.pintura,olhos:look.olhos,tela:look.tela,antena:"a-bola",cabeca:null,rosto:null,pescoco:null,costas:null,efeito:null};lk[it.cat]=id;
+  pose();dress(P,lk);setMood(P,"feliz");tick(P,1.3,.016);const c=it.cat,h=P.head,a=parte(c);
+  if(c=="pintura"){P.g.rotation.y=-.3;return foto([P.body],V(.2,.18,1),.74)}
+  if(c=="efeito"){P.g.rotation.y=-.2;tick(P,2.1,.016);/* no ícone o fundo é claro: brilhos "somados à luz" sumiriam, então viram brilhos normais e maiores */
+   (P.fxNodes||[]).forEach(n=>n.traverse(o=>{if((o.isSprite&&o.scale.x<1)||o.isPoints)o.scale.multiplyScalar(1.9);if(o.isSprite&&o.scale.x>=1)o.material.opacity=.35;if(o.material&&o.material.blending==THREE.AdditiveBlending){o.material.blending=THREE.NormalBlending;o.material.opacity=Math.min(1,(o.material.opacity||1)*1.3)}}));
+   return foto([P.body,P.legs[0],P.legs[1]],V(.15,.15,1),.86)}
+  if(c=="antena")return foto([a,h],V(.35,.32,1),.78);
+  if(c=="cabeca")return foto([a,h],V(.42,.28,1),.8);
+  if(c=="rosto")return foto([h,a],V(.28,.08,1),.74);
+  if(c=="pescoco")return foto([a,h],V(.3,.12,1),.8);
+  if(c=="costas"){P.g.rotation.y=Math.PI*.9;return foto([a,P.body],V(.12,.3,1),.78)}
+  return foto([P.body],V(.3,.2,1),.85)}
+ /* foto de um gesto: o Bip parado no meio do movimento */
+ function fazPose(n,look){pose();dress(P,Object.assign({},look,{efeito:null}));let m="feliz";const A=P.arms;
+  const cor=["#ff4fd8","#5ef0e0","#ffd24a","#7cff6b","#ff8a3c"];
+  if(n=="acenar"){A[1].rotation.set(.25,0,2.6);P.body.rotation.z=-.06;
+   [0,1].forEach(i=>{const t=new THREE.Mesh(new THREE.TorusGeometry(.32+i*.16,.035,6,24,Math.PI*.6),new THREE.MeshBasicMaterial({color:0x5ef0e0}));t.rotation.z=-.2;add(t,.62,1.85,.1)})}
+  else if(n=="dancar"){A[0].rotation.set(0,0,-2.1);A[1].rotation.set(0,0,.5);P.body.rotation.z=.2;P.legs[0].rotation.x=.45;P.legs[1].rotation.x=-.35;P.inner.rotation.y=.35;m="festa";
+   add(txt("♪","#ff4fd8",.75),.85,1.75,.2);add(txt("♫","#5ef0e0",.6),-.85,1.95,.2)}
+  else if(n=="comemorar"){A[0].rotation.set(0,0,-2.65);A[1].rotation.set(0,0,2.65);P.inner.position.y=.2;m="festa";
+   for(let i=0;i<16;i++){const b=new THREE.Mesh(new THREE.BoxGeometry(.11,.05,.02),new THREE.MeshBasicMaterial({color:cor[i%5]}));b.rotation.set(Math.random()*3,Math.random()*3,Math.random()*3);add(b,(Math.random()-.5)*1.9,1.6+Math.random()*1.1,.3+(Math.random()-.5)*.4)}}
+  else if(n=="forca"){A[0].rotation.set(0,0,-1.55);A[1].rotation.set(0,0,1.55);P.inner.position.y=-.04;P.legs[0].rotation.z=-.15;P.legs[1].rotation.z=.15;
+   add(txt("⚡","#ffd24a",.62),-.95,1.75,.2);add(txt("⚡","#ffd24a",.62),.95,1.75,.2)}
+  else if(n=="pensar"){A[1].rotation.set(-1.95,0,.55);P.body.rotation.z=.16;P.inner.rotation.y=-.3;m="pensa";add(txt("?","#5ef0e0",.8),.75,2.05,.1)}
+  else if(n=="girar"){P.inner.rotation.y=1.0;P.inner.position.y=.15;arc.visible=true}
+  setMood(P,m);tick(P,1.3,.016);const img=foto([P.body].concat(arc.visible?[arc]:[],props.children),V(.12,.1,1),.62);
+  arc.visible=false;P.legs[0].rotation.z=P.legs[1].rotation.z=0;limpa();return img}
+ const chave=(k,l)=>k+"|"+l.pintura+"|"+l.olhos+"|"+l.tela+"|"+(l.antena||"");
+ function pedir(k,look,faz,cb){look=Object.assign({},DEFAULT,look||{});const key=chave(k,look);if(cache[key]){cb(cache[key]);return true}
+  if(!init())return false;fila.push({key,faz:()=>faz(look),cb});if(!rodando){rodando=true;setTimeout(()=>requestAnimationFrame(proximo),250)}return true}
+ function proximo(){const t0=performance.now();while(fila.length&&performance.now()-t0<12){const j=fila.shift();if(!cache[j.key]){try{cache[j.key]=j.faz()}catch(e){cache[j.key]=null}}if(cache[j.key])j.cb(cache[j.key])}
+  if(fila.length)requestAnimationFrame(proximo);else rodando=false}
+ return {item:(id,look,cb)=>pedir("i:"+id,look,l=>fazItem(id,l),cb),pose:(n,look,cb)=>pedir("p:"+n,look,l=>fazPose(n,l),cb),ok:()=>init()}})();
+
 return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,runKey,ganhosRunner,ganhos,loja,salvarLoja,gasto,saldo,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
- faceTex,eyePreview,buildBody,dress,tick,setMood,glowTex,face2d,patTex}})();
+ faceTex,eyePreview,buildBody,dress,tick,setMood,glowTex,face2d,patTex,ICON}})();
 </script>
 <style>
 /* Academia do Bip — trilha de matemática do Fundamental 2 com o robô Bip em 3D */
