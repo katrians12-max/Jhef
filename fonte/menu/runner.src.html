@@ -1,4 +1,4 @@
-<title>Bip Runner · Mundo do Bip</title>
+<title>Bip Runner</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
@@ -85,6 +85,13 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 .cd{position:fixed;inset:0;z-index:4;display:grid;place-items:center;pointer-events:none;font-family:var(--display);font-weight:800;font-size:clamp(5rem,18vw,9rem);color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.5)}
 .cd span{animation:cd .9s ease forwards}
 @keyframes cd{0%{transform:scale(1.8);opacity:0}30%{transform:scale(1);opacity:1}100%{transform:scale(.7);opacity:0}}
+.trec{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.trec li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 10px;border-radius:10px;background:rgba(255,255,255,.06);font-weight:700;font-variant-numeric:tabular-nums}
+.trec li.eu{background:rgba(242,194,48,.18);outline:1px solid rgba(242,194,48,.6)}
+.trec li span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.coinline{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;background:rgba(242,194,48,.12);border:1px solid rgba(242,194,48,.45);font-weight:700}
+.coinline:empty{display:none}
+.coinline svg{width:26px;height:26px;flex:none}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:760px){.chip:disabled{display:none}.more{display:block}.scr{background:linear-gradient(0deg,rgba(7,10,26,.92) 0,rgba(7,10,26,.75) 55%,rgba(7,10,26,.15) 100%);align-items:end}.card{justify-self:center;margin:0;padding:18px}
  .score{min-width:0}.score b{font-size:1.5rem}.q{top:auto;bottom:auto;position:relative;left:auto;transform:none;margin:8px auto 0;width:fit-content}.q.pop{animation:none}.keys{display:none}}
@@ -109,14 +116,15 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 
 <section class="scr" id="sStart">
  <div class="card glass">
-  <div class="brandrow"><!--LOGO--><span class="proto">PROTÓTIPO</span></div>
+  <div class="brandrow"><!--LOGO--></div>
   <div><h1>Bip Runner</h1><p>A conta aparece no alto. Troque de faixa e passe pelo portal com a resposta certa. Quanto mais acertos seguidos, mais rápido e mais pontos!</p></div>
   <div><div class="lbl">Trilha</div><div class="chips" id="trilhas" role="group" aria-label="Escolha a trilha"></div><p class="more">+ 5 trilhas chegando: operações, inteiros, frações, porcentagem e potência.</p></div>
   <div><div class="lbl">Modo</div><div class="chips" role="group" aria-label="Modo de jogo">
    <button class="chip" data-modo="normal" aria-pressed="true">❤️ Normal <small>3 vidas, acelera</small></button>
    <button class="chip" data-modo="treino" aria-pressed="false">🧘 Treino <small>sem perder vida</small></button></div></div>
-  <div class="rec"><div><b id="rBest">0</b><span>seu recorde</span></div><div><b id="rRuns">0</b><span>corridas</span></div></div>
-  <div class="row"><button class="btn go" id="bGo">▶ Correr</button><a class="back" href="./">← Voltar ao Mundo do Bip</a></div>
+  <div class="rec"><div><b id="rBest">0</b><span>seu recorde</span></div><div><b id="rCoins">0/60</b><span>Bipcoins hoje</span></div></div>
+  <div id="turmaRec" hidden><div class="lbl">🏆 Recordes da turma</div><ol class="trec" id="trec"></ol></div>
+  <div class="row"><button class="btn go" id="bGo">▶ Correr</button><a class="back" href="./" id="bBack">← Voltar ao Mundo do Bip</a></div>
  </div>
 </section>
 
@@ -129,8 +137,9 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
  <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="eT">
   <div><div class="lbl" id="eSub">Fim da corrida</div><h2 id="eT" class="big">0</h2><span class="newrec" id="eNew" hidden>🏆 Novo recorde!</span></div>
   <div class="rec"><div><b id="eOk">0</b><span>acertos</span></div><div><b id="eCombo">0</b><span>maior sequência</span></div><div><b id="eLv">1</b><span>nível</span></div></div>
+  <div class="coinline" id="eCoin"></div>
   <div id="eRev"><div class="lbl">Para revisar</div><div class="facts" id="eFacts"></div></div>
-  <div class="row"><button class="btn go" id="bAgain">↻ Correr de novo</button><button class="btn" id="bMenu">Trocar trilha</button></div>
+  <div class="row"><button class="btn go" id="bAgain">↻ Correr de novo</button><button class="btn" id="bMenu">Trocar trilha</button><a class="back" href="./" id="bBack2">← Mundo do Bip</a></div>
  </div>
 </section>
 
@@ -144,10 +153,21 @@ const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()
 const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
 /* ---------- quem está jogando (mesmo perfil do Mundo do Bip) ---------- */
-let PID=null;try{PID=localStorage.getItem("bipsite-cur")}catch(e){}
+/* o menu abre o jogo como runner.html#p-<perfil>; aberto direto, usa o último perfil */
+let PID=(location.hash.match(/^#p-([\w-]+)/)||[])[1]||null;if(!PID)try{PID=localStorage.getItem("bipsite-cur")}catch(e){}
 const LOOK=PID?BIPV.loja(PID).look:Object.assign({},BIPV.DEFAULT);
-const RKEY="bipsite-runner:"+(PID||"anon");
-const REC=Object.assign({best:{},runs:0},ls.get(RKEY)||{});
+const RKEY=BIPV.runKey(PID||"anon");
+const REC=Object.assign({v:1,best:{},runs:0,coins:{},err:{},tot:{}},ls.get(RKEY)||{});
+const dia=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const hojeCoins=()=>Math.min(BIPV.RUN_DIA,Math.floor(REC.coins[dia()]||0));
+function salvar(){REC.t=Date.now();
+ /* guarda só os 80 erros mais frequentes, para o arquivo continuar pequeno */
+ const ks=Object.keys(REC.err);if(ks.length>80){ks.sort((a,b)=>(REC.err[b].n||0)-(REC.err[a].n||0)).slice(80).forEach(k=>delete REC.err[k])}
+ ls.set(RKEY,REC)}
+/* voltar ao menu: dentro do Mundo do Bip, avisa o menu; aberto sozinho, vai para a página inicial */
+const INFRAME=window.parent!==window;
+function voltar(e){if(INFRAME){e&&e.preventDefault();window.parent.postMessage({bip:"menu"},"*")}}
+$("bBack").onclick=voltar;$("bBack2").onclick=voltar;
 
 /* ---------- trilhas (no protótipo, só a tabuada) ---------- */
 const TRILHAS=[{id:"tabuada",n:"✖️ Tabuada",ok:1},{id:"operacoes",n:"➕ 4 operações"},{id:"inteiros",n:"± Inteiros"},{id:"fracoes",n:"½ Frações"},{id:"porcent",n:"% Decimais e porcentagem"},{id:"potencia",n:"x² Potência e raiz"}];
@@ -155,7 +175,14 @@ let trilha="tabuada",modo="normal";
 $("trilhas").innerHTML=TRILHAS.map(t=>`<button class="chip" data-tr="${t.id}" aria-pressed="${t.id==trilha}"${t.ok?"":" disabled"}>${t.n}${t.ok?"":" <small>em breve</small>"}</button>`).join("");
 document.querySelectorAll("[data-tr]").forEach(b=>b.onclick=()=>{trilha=b.dataset.tr;document.querySelectorAll("[data-tr]").forEach(x=>x.setAttribute("aria-pressed",x==b));drawRec()});
 document.querySelectorAll("[data-modo]").forEach(b=>b.onclick=()=>{modo=b.dataset.modo;document.querySelectorAll("[data-modo]").forEach(x=>x.setAttribute("aria-pressed",x==b))});
-function drawRec(){$("rBest").textContent=(REC.best[trilha]||0).toLocaleString("pt-BR");$("rRuns").textContent=REC.runs}
+function drawRec(){$("rBest").textContent=(REC.best[trilha]||0).toLocaleString("pt-BR");$("rCoins").textContent=`${hojeCoins()}/${BIPV.RUN_DIA}`;turmaRec()}
+/* recordes da turma (só para quem entrou com o código da turma) */
+let recPend=false;
+async function turmaRec(){if(recPend||typeof NUVEM=="undefined"||!NUVEM.on||!PID)return;let p=null;try{p=(JSON.parse(localStorage.getItem("bipsite-profiles"))||[]).find(q=>q.id==PID)}catch(e){}
+ if(!p||!p.cloud||!p.cloud.token)return;recPend=true;
+ try{const L=await NUVEM.rpc("aluno_recordes",{p_token:p.cloud.token,p_trilha:trilha});
+  if(Array.isArray(L)&&L.length){$("trec").innerHTML=L.map((r,i)=>`<li class="${r.eu?"eu":""}"><span>${["🥇","🥈","🥉"][i]||i+1+"º"}</span><span>${String(r.apelido).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}${r.eu?" (você)":""}</span><span>${(+r.pontos).toLocaleString("pt-BR")}</span></li>`).join("");$("turmaRec").hidden=false}}
+ catch(e){}finally{recPend=false}}
 drawRec();
 
 /* ---------- contas da tabuada, com portais errados que são erros comuns ---------- */
@@ -267,7 +294,8 @@ function judge(g){g.done=true;const lane=Bip.lane,ok=lane==g.q.ok,cx=(g.q.ok-1)*
   SFX.ok(S.combo);burst(cx,g.G.position.z,GCOL[g.q.ok]);toast(`+${pts}${S.combo>=3?` <small style="font-size:.55em">sequência ${S.combo}!</small>`:""}`,"ok");
   BIPV.setMood(P,S.combo%5==0?"festa":"feliz");
   if(modo!="treino"&&S.ok%5==0){S.lv++;setTimeout(()=>{SFX.lv();toast(`Nível ${S.lv+1}! ⚡`,"lv")},450)}}
- else{S.bad++;S.combo=0;S.erros.push(`${g.q.txt} = <b>${g.q.c}</b>`);if(S.lives!=Infinity)S.lives--;drawLives();SFX.no();shake=.45;
+ else{S.bad++;S.combo=0;S.erros.push(`${g.q.txt} = <b>${g.q.c}</b>`);
+  {const e=REC.err[g.q.txt]||(REC.err[g.q.txt]={n:0,r:{}}),resp=String(g.q.opts[lane]);e.n++;e.r[resp]=(e.r[resp]||0)+1}if(S.lives!=Infinity)S.lives--;drawLives();SFX.no();shake=.45;
   const f=$("flash");f.classList.add("on");setTimeout(()=>f.classList.remove("on"),60);BIPV.setMood(P,"ops");stumble=.6;
   toast(`${g.q.txt} = ${g.q.c}<small>Era o portal do ${g.q.c}</small>`,"no",true)}
  g.parts.forEach((p,i)=>{if(i!=g.q.ok){p.fm.opacity=.25;p.lab.material.opacity=.3}else{p.fill.material.opacity=.5}});
@@ -275,7 +303,13 @@ function judge(g){g.done=true;const lane=Bip.lane,ok=lane==g.q.ok,cx=(g.q.ok-1)*
  if(S.lives<=0||(modo=="treino"&&S.ok+S.bad>=20)){state="over";setTimeout(end,1100);return}
  setTimeout(()=>{if(state=="run")nextQ()},ok?120:900)}
 function end(){state="end";$("hud").hidden=true;turn=1;Bip.lane=1;
- const novo=modo!="treino"&&S.score>(REC.best[trilha]||0);if(modo!="treino"){REC.runs++;if(novo)REC.best[trilha]=S.score;ls.set(RKEY,REC)}
+ const novo=modo!="treino"&&S.score>(REC.best[trilha]||0);if(modo!="treino"){REC.runs++;if(novo)REC.best[trilha]=S.score}
+ const tt=REC.tot[trilha]||(REC.tot[trilha]={ok:0,bad:0});tt.ok+=S.ok;tt.bad+=S.bad;
+ /* Bipcoins: 1 a cada 8 pontos (no treino, 1 a cada 2 acertos), até 60 por dia */
+ const ganhou=modo=="treino"?Math.floor(S.ok/2):Math.floor(S.score/8),antes=hojeCoins(),add=Math.max(0,Math.min(ganhou,BIPV.RUN_DIA-antes));
+ if(add)REC.coins[dia()]=antes+add;salvar();
+ $("eCoin").innerHTML=add?`${BIPV.COIN}<span>+${add} Bipcoins para gastar na Loja do Bip! <small style="opacity:.8">(hoje: ${antes+add}/${BIPV.RUN_DIA})</small></span>`
+  :antes>=BIPV.RUN_DIA?`${BIPV.COIN}<span>Você já ganhou os ${BIPV.RUN_DIA} Bipcoins de hoje no Runner. Amanhã tem mais! Continue treinando para bater o recorde.</span>`:"";
  $("eSub").textContent=modo=="treino"?"Fim do treino":"Fim da corrida · pontos";$("eT").textContent=S.score.toLocaleString("pt-BR");$("eNew").hidden=!novo;
  $("eOk").textContent=S.ok;$("eCombo").textContent=S.best;$("eLv").textContent=S.lv+1;
  const uniq=[...new Set(S.erros)];$("eRev").hidden=!uniq.length;$("eFacts").innerHTML=uniq.map(e=>`<span>${e}</span>`).join("");

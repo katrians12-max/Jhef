@@ -34,7 +34,12 @@ async def main():
             if 'o-coracao' in itens:loja['look']['olhos']='o-coracao'
             ua='null' if dias is None else f"now()-interval '{dias} days'"
             aid=db(f"insert into alunos(turma_id,apelido,pin_hash,ultimo_acesso) values('{tid}','{ap}','x',{ua}) returning id").split('\n')[0]
-            for jogo,d in [('robo',robo),('academia',acad),('loja',loja)]:
+            run=None
+            if nf>=8:
+                ee={'7 × 8':{'n':2,'r':{'54':1,'63':1}},'6 × 9':{'n':1,'r':{'56':1}}} if ap in ('Theo','Bia','Enzo','Malu') else {'8 × 7':{'n':1,'r':{'54':1}}}
+                run={'v':1,'best':{'tabuada':nf*11+na},'runs':nf//4,'coins':{'2026-11-17':60,'2026-11-18':25},'err':ee,'tot':{'tabuada':{'ok':nf*3,'bad':4}},'t':1}
+            for jogo,d in [('robo',robo),('academia',acad),('loja',loja),('runner',run)]:
+                if d is None:continue
                 if jogo=='loja' and not itens:continue
                 db(f"insert into progresso(aluno_id,jogo,dados) values('{aid}','{jogo}','{json.dumps(d)}'::jsonb)")
         await P.click('#bReload');await P.wait_for_timeout(800)
@@ -43,13 +48,18 @@ async def main():
         check('quem não jogou aparece como "sem pontos"','Ainda sem pontos aqui: Lucas, Rafa' in await P.inner_text('#tabRank'),await P.inner_text('#tabRank'))
         await P.screenshot(path=OUT+'p-ranking.png',full_page=True)
         await P.click('[data-crit="coins"]');t=await P.inner_text('#rankBox');check('ranking por Bipcoins ganhos','Ana7' in t)
+        await P.click('[data-crit="run"]');t=await P.inner_text('#rankBox')
+        check('ranking do Bip Runner (Ana7 tem o maior recorde)','Ana7' in t and '454 pontos' in t,t[:200])
         await P.click('[data-crit="est"]');await P.click('[data-crit="ativ"]')
         await P.click('[data-tab="alunos"]');rows=await P.inner_text('#rows')
         check('tabela mostra saldo e itens','gastou' in rows and '2 itens' in rows,rows[:300])
+        check('tabela mostra recorde do Runner e quem ainda não correu','454 pts' in rows and 'ainda não correu' in rows,rows[:300])
+        check('Bipcoins do Runner entram no ganho (Ana7: 1.570 + 85)','ganhou 1.655' in rows,rows[:400])
         await P.click('[data-sort="saldo"]');first=(await P.inner_text('#rows tr:first-child'));check('ordena por Bipcoins (maior primeiro)','Davi' in first or 'Ana7' in first or 'Lia' in first,first)
         await P.screenshot(path=OUT+'p-alunos.png',full_page=True)
         await P.click('[data-tab="ativ"]');t=await P.inner_text('#tabAtiv')
         check('por atividade mostra aulas e mundos do Robô','O ponto' in t and 'Primeiros passos' in t and '👣' in t,t[:200])
+        check('Runner: conta que a turma mais erra e a resposta mais marcada','7 × 8 = 56' in t and '4 alunos' in t and 'mais marcado: 54' in t,t[-600:])
         await P.screenshot(path=OUT+'p-ativ.png',full_page=True)
         await P.click('[data-tab="aten"]');t=await P.inner_text('#tabAten');n=await P.inner_text('#nAten')
         check('atenção lista Rafa, Lucas, Pedro e Caio','Rafa' in t and 'Lucas' in t and 'Pedro' in t and 'Caio' in t and 'Nunca entrou' in t and n.strip()!='',t[:300])
@@ -58,6 +68,14 @@ async def main():
         async with P.expect_download() as d:await P.click('#bCsv')
         f=await (await d.value).path();txt=open(f,encoding='utf-8-sig').read()
         check('planilha baixada com 14 alunos e colunas',txt.count('\n')==14 and txt.startswith('Posição;Apelido') and 'Ana7' in txt.split('\n')[1],txt[:200])
+        check('planilha tem colunas do Runner','Recorde no Bip Runner' in txt.split('\n')[0])
+        tok=db(f"insert into sessoes(aluno_id) select id from alunos where apelido='Lia' and turma_id='{tid}' returning token").split('\n')[0]
+        rec=await P.evaluate(f"fetch('/rest/v1/rpc/aluno_recordes',{{method:'POST',headers:{{apikey:'chave-teste','Content-Type':'application/json'}},body:JSON.stringify({{p_token:'{tok}',p_trilha:'tabuada'}})}}).then(r=>r.json())")
+        check('aluno vê os 5 recordes da turma, com ele marcado',isinstance(rec,list) and len(rec)==5 and rec[0]['apelido']=='Ana7' and any(r['eu'] and r['apelido']=='Lia' for r in rec) and set(rec[0].keys())=={'apelido','pontos','eu'},rec)
+        sv=await P.evaluate(f"fetch('/rest/v1/rpc/aluno_salvar',{{method:'POST',headers:{{apikey:'chave-teste','Content-Type':'application/json'}},body:JSON.stringify({{p_token:'{tok}',p_jogo:'runner',p_dados:{{v:1,best:{{tabuada:999}}}}}})}}).then(r=>r.json())")
+        check('banco aceita salvar o jogo runner',sv.get('ok') is True,sv)
+        stx=await P.evaluate(f"fetch('/rest/v1/rpc/aluno_recordes',{{method:'POST',headers:{{apikey:'chave-teste','Content-Type':'application/json'}},body:JSON.stringify({{p_token:'{tok}',p_trilha:\"x'; drop table alunos;--\"}})}}).then(r=>r.status)")
+        check('trilha estranha é recusada',stx>=400,stx)
         await P.click('#bTelao');await P.wait_for_timeout(400);tl=await P.inner_text('#telao')
         check('telão mostra só os 10 primeiros','Ana7' in tl and '10º' in tl and '11º' not in tl and 'Pedro' not in tl,tl[-300:])
         await P.screenshot(path=OUT+'p-telao.png')

@@ -50,7 +50,7 @@ create index if not exists sessoes_aluno on public.sessoes (aluno_id);
 
 create table if not exists public.progresso (
   aluno_id       uuid not null references public.alunos(id) on delete cascade,
-  jogo           text not null check (jogo in ('robo','academia','loja')),
+  jogo           text not null check (jogo in ('robo','academia','loja','runner')),
   dados          jsonb not null default '{}'::jsonb,
   atualizado_em  timestamptz not null default now(),
   primary key (aluno_id, jogo)
@@ -144,7 +144,7 @@ returns jsonb language plpgsql security definer set search_path = public as $$
 declare a_id uuid := _aluno_da_sessao(p_token);
 begin
   if a_id is null then raise exception 'sessao_expirada' using errcode = 'P0001'; end if;
-  if p_jogo not in ('robo','academia','loja') then raise exception 'jogo_invalido' using errcode = 'P0001'; end if;
+  if p_jogo not in ('robo','academia','loja','runner') then raise exception 'jogo_invalido' using errcode = 'P0001'; end if;
   if jsonb_typeof(p_dados) <> 'object' or octet_length(p_dados::text) > 100000 then raise exception 'dados_invalidos' using errcode = 'P0001'; end if;
   insert into progresso (aluno_id, jogo, dados, atualizado_em) values (a_id, p_jogo, p_dados, now())
     on conflict (aluno_id, jogo) do update set dados = excluded.dados, atualizado_em = now();

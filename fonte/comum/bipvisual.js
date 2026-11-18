@@ -7,13 +7,16 @@ const BIPV=(()=>{
 const BONUS=100,POR_AULA=50,POR_FASE=10,POR_ESTRELA=5;
 const ls=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 /* quanto o aluno já ganhou: sempre calculado a partir do progresso (não dá para duplicar) */
-function ganhos(robo,acad){let c=BONUS;const st=(robo&&robo.stars)||{};for(const k in st){const s=+st[k]||0;if(s>0)c+=POR_FASE+POR_ESTRELA*Math.min(3,s)}
- c+=((acad&&acad.done)||[]).length*POR_AULA;return c}
+function ganhos(robo,acad,run){let c=BONUS;const st=(robo&&robo.stars)||{};for(const k in st){const s=+st[k]||0;if(s>0)c+=POR_FASE+POR_ESTRELA*Math.min(3,s)}
+ c+=((acad&&acad.done)||[]).length*POR_AULA;return c+ganhosRunner(run)}
+/* Bip Runner: o jogo guarda quanto rendeu em cada dia; cada dia vale no máximo RUN_DIA */
+const RUN_DIA=60,runKey=pid=>"bipsite-runner:"+pid;
+function ganhosRunner(run){let c=0;const m=(run&&run.coins)||{};for(const k in m)c+=Math.max(0,Math.min(RUN_DIA,Math.floor(+m[k]||0)));return c}
 const lojaKey=pid=>"bipsite-loja:"+pid;
 function loja(pid){const l=ls(lojaKey(pid))||{};return {owned:Array.isArray(l.owned)?l.owned:[],look:Object.assign({},DEFAULT,l.look||{}),t:l.t||0}}
 function salvarLoja(pid,l){l.t=Date.now();try{localStorage.setItem(lojaKey(pid),JSON.stringify({owned:l.owned,look:l.look,t:l.t}))}catch(e){}}
 const gasto=owned=>owned.reduce((s,id)=>s+((BYID[id]&&BYID[id].p)||0),0);
-function saldo(pid){const l=loja(pid);return ganhos(ls("robo4:"+pid),ls("academia-bip-3d-v1:"+pid))-gasto(l.owned)}
+function saldo(pid){const l=loja(pid);return ganhos(ls("robo4:"+pid),ls("academia-bip-3d-v1:"+pid),ls(runKey(pid)))-gasto(l.owned)}
 const COIN='<svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#f2b20a"/><circle cx="12" cy="12" r="8.4" fill="#ffd24a" stroke="#c98a00" stroke-width="1.4"/><path d="M9.4 6.8h3.5c1.9 0 3 .9 3 2.4 0 1-.6 1.7-1.5 2 1.2.3 1.9 1.1 1.9 2.3 0 1.7-1.3 2.7-3.3 2.7H9.4zm2 1.6v2.5h1.3c.9 0 1.4-.4 1.4-1.3 0-.8-.5-1.2-1.4-1.2zm0 4v2.8h1.6c1 0 1.5-.5 1.5-1.4s-.6-1.4-1.6-1.4z" fill="#8a5a00"/></svg>';
 const fmt=n=>Math.max(0,n).toLocaleString("pt-BR");
 
@@ -264,5 +267,5 @@ function face2d(look,m="feliz"){look=Object.assign({},DEFAULT,look||{});const p=
   (happy?`<path d="M62 92q12-17 24 0M114 92q12-17 24 0" stroke="${e}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M80 108q20 17 40 0" stroke="${e}" stroke-width="6" fill="none" stroke-linecap="round"/>`
   :`<rect x="66" y="70" width="18" height="28" rx="9" fill="${e}"/><rect x="116" y="70" width="18" height="28" rx="9" fill="${e}"/><path d="M86 112q14 9 28 0" stroke="${e}" stroke-width="5" fill="none" stroke-linecap="round"/>`)+`</svg>`}
 
-return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,ganhos,loja,salvarLoja,gasto,saldo,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
+return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,runKey,ganhosRunner,ganhos,loja,salvarLoja,gasto,saldo,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
  faceTex,eyePreview,buildBody,dress,tick,setMood,glowTex,face2d,patTex}})();
