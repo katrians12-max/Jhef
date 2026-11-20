@@ -20,7 +20,7 @@ def patch(s,a,b,fn):
 HEAD='<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
 RESET='<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>\n'
 # Marca: ícone da aba, ícones do celular e a prévia do link (WhatsApp, redes sociais)
-SITE='https://mundo-do-bip.netlify.app/'
+SITE='https://mundodobip.com.br/'
 DESC='Programe o robô Bip e aprenda matemática: lógica de programação e aulas em 3D do Fundamental 2.'
 ICONS='<meta name="theme-color" content="#f2c230">\n<link rel="icon" href="favicon.svg" type="image/svg+xml">\n<link rel="apple-touch-icon" href="apple-touch-icon.png">\n<link rel="manifest" href="manifest.webmanifest">\n'
 SHARE=f'<meta name="description" content="{DESC}">\n<meta property="og:type" content="website">\n<meta property="og:title" content="Mundo do Bip">\n<meta property="og:description" content="{DESC}">\n<meta property="og:image" content="{SITE}og.png">\n<meta property="og:url" content="{SITE}">\n<meta property="og:locale" content="pt_BR">\n<meta name="twitter:card" content="summary_large_image">\n'

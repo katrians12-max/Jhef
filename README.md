@@ -1,7 +1,7 @@
 # Mundo do Bip
 
 Plataforma de matemática e lógica de programação com o robô Bip.
-Site no ar: https://mundo-do-bip.netlify.app
+Site no ar: https://mundodobip.com.br (hospedado no Cloudflare Pages: publica a pasta dist/ a cada push na main)
 
 ## O que tem aqui
 
