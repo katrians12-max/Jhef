@@ -155,6 +155,7 @@ body.full .brand{display:none}
  background:linear-gradient(135deg,#ff8a2c 0%,#ee5f2b 45%,#c2306a 100%);box-shadow:0 5px 0 #9a2350,0 14px 30px rgba(194,48,106,.35)}
 .shopcard:active{transform:translateY(3px);box-shadow:0 2px 0 #9a2350}
 .shopcard .ic{font-size:2.4rem;line-height:1;filter:drop-shadow(0 3px 0 rgba(0,0,0,.2))}
+.shopcard .ic img.pc{width:62px;height:42px;border-radius:10px;object-fit:cover;margin:0 -4px 0 -6px}
 .shopcard h3{font-size:1.6rem;color:#fff}
 .shopcard p{margin:0;font-size:.86rem;opacity:.95}
 .shopcard .dest{position:absolute;right:-6px;top:8px;transform:rotate(8deg);background:#ffd24a;color:#5a3a00;font-weight:800;font-size:.7rem;padding:3px 12px;border-radius:8px;letter-spacing:.04em}
@@ -177,41 +178,144 @@ body.full .brand{display:none}
 body.full .foot{padding:0 16px 30px}
 .endrow{display:flex;justify-content:flex-end}
 
-/* Loja */
-.shop{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px;align-items:start}
-.shop .stage{min-height:600px;position:sticky;top:12px}
-.sel{position:absolute;left:14px;right:14px;bottom:14px;z-index:2;padding:12px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+/* ============ Loja: tela cheia, no clima do saguão (estudo: Fortnite, Brawl Stars, Free Fire) ============
+   3 níveis de destaque: vitrine grande > cartões > detalhes. A raridade é a cor do cartão inteiro. */
+.loja{position:relative;min-height:100vh;min-height:100svh;display:grid;grid-template-columns:minmax(320px,38%) minmax(0,1fr);color:#fff;
+ background:radial-gradient(ellipse 60% 45% at 75% 0%,#3a2a8a 0%,rgba(58,42,138,0) 70%),linear-gradient(180deg,#121a3a,#070a1a 70%)}
+.lj-stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#0a0d24}
+.lj-stage .st-3d{position:absolute;inset:0}
+.lj-top{position:absolute;z-index:3;top:16px;left:16px;right:16px;display:flex;gap:10px;align-items:center}
+.lj-top .coins{margin-left:auto}
+.loja .btn{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25)}
+.loja .btn.glass{background:rgba(10,14,36,.62)}
+.sel{position:absolute;left:14px;right:14px;bottom:14px;z-index:3;padding:12px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .sel .nm{flex:1;min-width:150px}
-.sel .nm b{font-family:var(--display);font-size:1.3rem;display:block;line-height:1.1}
+.sel .nm b{font-family:var(--display);font-size:1.35rem;display:block;line-height:1.1}
+.sel .hint2{opacity:.8;font-size:.9rem}
 .rar{display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 9px;border-radius:99px;color:#fff;background:var(--rc)}
 .sel .msg{flex-basis:100%;margin:0;font-size:.88rem;opacity:.9;min-height:1.2em}
-.btn.buy{background:linear-gradient(#ffd24a,#f2b20a);border-color:#c98a00;color:#4a3000;font-family:var(--display);font-size:1.1rem;box-shadow:0 4px 0 #a87000}
+.loja .btn.buy,.btn.buy{background:linear-gradient(#ffe45c,#f5b70f);border-color:#c98a00;color:#3a2600;font-family:var(--display);font-size:1.1rem;box-shadow:0 4px 0 #a87000}
 .btn.buy:disabled{opacity:.55;box-shadow:none}
-.btn.wear{background:var(--go);border-color:var(--go);color:#fff;box-shadow:0 4px 0 #0a6a63}
-.shop-list h2{font-size:1.8rem}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 14px}
-.tabs button{border:1px solid var(--line);background:var(--soft);border-radius:99px;padding:5px 12px;font-weight:700;font-size:.88rem}
-.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
-.item{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px 8px;border-radius:16px;border:2px solid var(--line);background:var(--soft);text-align:center;
- background-image:linear-gradient(180deg,color-mix(in srgb,var(--rc) 22%,transparent),transparent 60%)}
-.item[data-r="lendario"]{border-color:color-mix(in srgb,var(--rc) 70%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--rc) 40%,transparent),0 6px 18px color-mix(in srgb,var(--rc) 30%,transparent)}
-.item[data-r="epico"]{border-color:color-mix(in srgb,var(--rc) 55%,var(--line))}
-.item[aria-pressed="true"]{outline:3px solid var(--run);outline-offset:1px}
-.item .th{width:64px;height:48px;display:grid;place-items:center;font-size:2rem;line-height:1}
-.item .th img{width:64px;height:40px;border-radius:8px}
-.item .th{width:72px;height:70px}
-.item .i3{display:grid;place-items:center;width:72px;height:70px}
-.item .i3.on img{width:70px;height:70px;border-radius:0;object-fit:contain;filter:drop-shadow(0 3px 4px rgba(20,20,60,.25))}
-.item:hover .i3.on img{transform:scale(1.08) rotate(-3deg);transition:transform .2s}
-.item .sw{width:44px;height:44px;border-radius:50%;border:3px solid rgba(0,0,0,.15)}
-.item .sw.tela{border-radius:12px;width:56px;height:36px;background:#172536!important;display:grid;place-items:center}
-.item .sw.tela i{width:12px;height:18px;border-radius:6px;box-shadow:0 0 8px var(--ec);background:var(--ec);margin:0 4px}
-.item .n{font-weight:700;font-size:.85rem;line-height:1.15}
-.item .pr{font-family:var(--display);font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
-.item .pr.own{color:var(--go);font-family:var(--body);font-size:.8rem}
-.item .pr.lack{opacity:.55}
-.item .rd{position:absolute;top:6px;left:6px;width:9px;height:9px;border-radius:50%;background:var(--rc)}
+.loja .btn.wear,.btn.wear{background:#14a89c;border-color:#14a89c;color:#fff;box-shadow:0 4px 0 #0a6a63}
+.lj-main{min-width:0;padding:22px clamp(16px,2.4vw,34px) 40px;display:flex;flex-direction:column;gap:16px}
+.lj-head{display:flex;align-items:flex-end;gap:14px 24px;flex-wrap:wrap}
+.lj-head h2{font-size:clamp(2.1rem,3.6vw,3rem);background:linear-gradient(90deg,#fff 30%,#ffd24a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lj-head p{margin:2px 0 0;color:#c9d3f5;max-width:52ch}
+.col{margin-left:auto;min-width:220px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+.col .row{display:flex;justify-content:space-between;gap:10px;font-weight:700;font-size:.9rem;color:#c9d3f5}
+.col .row b{color:#fff;font-variant-numeric:tabular-nums}
+.col .bar{height:8px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:6px}
+.col .bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#5ef0e0,#ffd24a)}
+.lj-body{display:grid;grid-template-columns:92px minmax(0,1fr);gap:18px;align-items:start}
+.lj-rail{display:flex;flex-direction:column;gap:5px;position:sticky;top:12px;max-height:calc(100vh - 24px);max-height:calc(100svh - 24px);overflow-y:auto;scrollbar-width:none;border-radius:16px}
+.lj-rail::-webkit-scrollbar{display:none}
+.lj-rail button{flex:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 4px 6px;border-radius:16px;border:1px solid transparent;background:rgba(255,255,255,.05);color:#c9d3f5;font-weight:700;font-size:.72rem;line-height:1.1;text-align:center}
+.lj-rail button:hover{background:rgba(255,255,255,.1);color:#fff}
+.lj-rail button[aria-selected=true]{background:linear-gradient(180deg,rgba(255,210,74,.25),rgba(255,210,74,.06));border-color:#ffd24a;color:#fff}
+.ri{width:46px;height:42px;display:grid;place-items:center;overflow:hidden}
+.ri img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
+.ri img.pc{width:46px;height:32px;border-radius:8px;object-fit:cover}
+.ri svg{width:34px;height:34px}
+.ri .sw.tela{width:40px;height:28px;border-radius:9px;background:#172536;display:grid;place-items:center}
+.ri .sw.tela i{display:block;width:8px;height:13px;border-radius:5px;background:#5ef0e0;box-shadow:0 0 8px #5ef0e0;margin:0 3px}
+.lj-ct{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.lj-ct h3{font-size:1.7rem;flex:1}
+.loja .seg{display:inline-flex;gap:2px;padding:3px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+.loja .seg button{border:none;background:transparent;border-radius:9px;padding:6px 12px;font-weight:700;font-size:.88rem;color:#c9d3f5}
+.loja .seg button[aria-pressed=true]{background:#fff;color:#172536}
+/* cartões: a cor da raridade é o fundo inteiro; lendário com raios girando e um brilho passando */
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.item{--r1:#9fb0c6;--r2:#2c384c;position:relative;display:flex;flex-direction:column;border:none;border-radius:18px;overflow:hidden;color:#fff;text-align:left;padding:0;min-height:200px;cursor:pointer;isolation:isolate;
+ background:radial-gradient(circle at 50% 36%,var(--r1) 0%,var(--r2) 78%);box-shadow:inset 0 0 0 2px rgba(255,255,255,.14),0 6px 16px rgba(0,0,0,.35);transition:transform .15s,box-shadow .15s}
+.item[data-r=raro]{--r1:#5cb4ff;--r2:#173a8a}
+.item[data-r=epico]{--r1:#c98aff;--r2:#3a167a;box-shadow:inset 0 0 0 2px rgba(220,170,255,.35),0 0 20px rgba(192,122,255,.3),0 6px 16px rgba(0,0,0,.35)}
+.item[data-r=lendario]{--r1:#ffe07a;--r2:#9a5200;box-shadow:inset 0 0 0 2px rgba(255,236,170,.7),0 0 24px rgba(255,190,40,.4),0 6px 16px rgba(0,0,0,.35)}
+.item:hover{transform:translateY(-3px)}
+.item[aria-pressed=true]{box-shadow:inset 0 0 0 3px #fff,0 0 0 3px #ffd24a,0 12px 26px rgba(0,0,0,.45)}
+.item:focus-visible,.kit:focus-visible,.lj-rail button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.item[data-r=lendario]::before,.lj-hero::before{content:"";position:absolute;inset:-45%;z-index:-1;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.16) 0 9deg,transparent 9deg 20deg);animation:lj-gira 22s linear infinite}
+.item[data-r=lendario]::after,.lj-hero::after{content:"";position:absolute;top:0;bottom:0;width:38%;left:-60%;z-index:1;pointer-events:none;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);animation:lj-brilho 3.4s ease-in-out infinite}
+@keyframes lj-gira{to{transform:rotate(360deg)}}
+@keyframes lj-brilho{0%,62%{left:-60%}100%{left:130%}}
+.item .rr{position:absolute;top:8px;left:10px;z-index:2;font-size:.6rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.item .th{position:relative;z-index:2;flex:1;display:grid;place-items:center;padding:20px 6px 2px;font-size:2.6rem;line-height:1}
+.item .th img{width:118px;height:118px;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))}
+.item .th .i3{display:grid;place-items:center}
+.item:hover .th img{transform:scale(1.07) rotate(-3deg);transition:transform .2s}
+.item .sw{width:70px;height:70px;border-radius:50%;border:4px solid rgba(255,255,255,.7);box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.item .sw.tela{border-radius:16px;width:96px;height:62px;background:#172536!important;display:grid;place-items:center}
+.item .sw.tela i{display:block;width:18px;height:28px;border-radius:9px;box-shadow:0 0 12px var(--ec);background:var(--ec);margin:0 6px}
+.item .th>img:not(.bg){border-radius:12px}
+.item .ft,.kit .ft{position:relative;z-index:2;display:flex;flex-direction:column;gap:5px;padding:8px 10px 10px;background:linear-gradient(0deg,rgba(5,8,24,.88),rgba(5,8,24,.3))}
+.item .n,.kit .n{font-family:var(--display);font-size:1.05rem;line-height:1.1;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.price{display:inline-flex;align-items:center;gap:5px;width:fit-content;font-family:var(--display);font-weight:800;font-size:1rem;line-height:1;padding:3px 11px 3px 4px;border-radius:99px;background:rgba(0,0,0,.4);font-variant-numeric:tabular-nums}
+.price .coin{width:20px;height:20px}
+.price.lack{opacity:.6}
+.price s{opacity:.65;font-weight:700;font-size:.82em;margin:0 2px 0 4px}
+.price.big{font-size:1.5rem;padding:4px 14px 4px 5px}.price.big .coin{width:28px;height:28px}
+.loja .tag{display:inline-block;width:fit-content;font-size:.78rem;font-weight:800;padding:3px 10px;margin:0;border-radius:99px;background:rgba(255,255,255,.22);color:#fff}
+.loja .tag.on{background:#1b9a52}
+/* cenários: o cartão-postal é o próprio cartão */
+.item.cen{grid-column:span 2;min-height:176px}
+.item.cen .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.item.cen .th{display:none}
+.item.cen .ft{margin-top:auto}
+.item.cen::before{display:none}
+.row-scroll{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,270px);gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+.row-scroll .item{scroll-snap-align:start}
+.row-scroll .item.cen{grid-column:auto}
+.item.got,.kit.got{animation:lj-ganhou .9s ease}
+@keyframes lj-ganhou{0%{transform:rotateY(0)}50%{transform:rotateY(180deg) scale(1.08)}100%{transform:rotateY(360deg)}}
+/* vitrine: destaque do dia bem grande */
+.lj-hero{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(150px,34%) minmax(0,1fr);gap:10px 20px;align-items:center;border-radius:24px;overflow:hidden;padding:18px 24px;min-height:220px;
+ background:radial-gradient(circle at 22% 50%,#ffe7a0 0%,#e8a51a 38%,#6e3600 100%);box-shadow:inset 0 0 0 2px rgba(255,236,170,.7),0 14px 40px rgba(232,165,26,.3)}
+.lj-hero-art{position:relative;z-index:2;display:grid;place-items:center}
+.lj-hero-art img{width:100%;max-width:220px;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 10px 14px rgba(60,20,0,.5))}
+.lj-hero-art img.pc{aspect-ratio:16/10;border-radius:16px;object-fit:cover;max-width:260px}
+.lj-hero-tx{position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.lj-hero .kick{font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:.75rem;color:#fff6d0}
+.lj-hero h3{font-size:clamp(2rem,3.2vw,2.8rem);color:#fff;text-shadow:0 3px 0 rgba(90,40,0,.35)}
+.lj-hero-act{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 2px}
+.lj-hero small{color:#fff6d0;font-weight:700}
+.lj-sec h3{font-size:1.5rem}
+.lj-sec>p{margin:2px 0 10px;color:#c9d3f5}
+.kits{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.kit{position:relative;display:flex;flex-direction:column;border:none;border-radius:18px;overflow:hidden;padding:0;color:#fff;text-align:left;cursor:pointer;
+ background:radial-gradient(circle at 50% 30%,#ff8ac0 0%,#7a1f6a 80%);box-shadow:inset 0 0 0 2px rgba(255,180,220,.5),0 6px 16px rgba(0,0,0,.35);transition:transform .15s}
+.kit:hover{transform:translateY(-3px)}
+.kit[aria-pressed=true]{box-shadow:inset 0 0 0 3px #fff,0 0 0 3px #ffd24a}
+.kit .rr{position:absolute;top:8px;left:10px;font-size:.6rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.kit .kt{display:flex;justify-content:center;gap:2px;padding:24px 8px 6px}
+.ki{width:60px;height:64px;display:grid;place-items:center;font-size:1.8rem}
+.ki .i3,.ki .sw{display:inline-grid;place-items:center}
+.ki img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+.ki .sw{width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,.7)}
+.ki .sw.tela{width:50px;height:34px;border-radius:10px;background:#172536!important;display:grid;place-items:center}.ki .sw.tela i{display:block;width:9px;height:14px;border-radius:5px;margin:0 3px}
+.ki img.pc{width:60px;height:40px;border-radius:8px;object-fit:cover}
+.kit .n small{display:block;font-family:var(--body);font-size:.8rem;font-weight:400;opacity:.85;text-shadow:none}
+.kit .fr{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.lj-more{background:none;border:none;color:#ffd24a;font-weight:800;margin-top:10px;padding:4px 0}
+.lj-empty{color:#c9d3f5;padding:10px 0}
+#vitrine{display:flex;flex-direction:column;gap:24px}
+#vitrine:empty{display:none}
+/* confete da compra */
+.cf{position:absolute;z-index:5;top:42%;left:50%;width:9px;height:14px;border-radius:2px;pointer-events:none;animation:lj-cf 1.5s cubic-bezier(.2,.7,.4,1) forwards}
+@keyframes lj-cf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+@media (prefers-reduced-motion:reduce){.item[data-r=lendario]::before,.lj-hero::before,.item[data-r=lendario]::after,.lj-hero::after,.cf{animation:none}.item.got,.kit.got{animation:none}}
+@media (max-width:899px){
+ .loja{grid-template-columns:minmax(0,1fr)}
+ .lj-stage{position:relative;height:56vh;height:56svh;min-height:400px}
+ .lj-body{grid-template-columns:minmax(0,1fr)}
+ .lj-rail{flex-direction:row;overflow-x:auto;max-height:none;position:sticky;top:0;z-index:4;background:#0b0f2a;padding:8px 2px;margin:0 -4px;border-radius:0}
+ .lj-rail button{flex:none;width:76px}
+ .items{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .item,.kit,.lj-ct{scroll-margin-top:96px}
+ .item.cen{min-height:136px}
+ .item{min-height:180px}.item .th img{width:96px;height:96px}
+ .lj-hero{grid-template-columns:1fr;text-align:center;justify-items:center}.lj-hero-art img{max-width:150px}.lj-hero-art img.pc{max-width:220px}.lj-hero-tx{align-items:center}
+ .col{margin-left:0;width:100%}
+ .sel{left:10px;right:10px;bottom:10px;padding:9px 11px;gap:4px 10px}.sel .nm{min-width:0;flex:1 1 0}.sel .nm b{font-size:1.05rem}.sel .hint2{font-size:.82rem}.sel .msg{font-size:.8rem}.sel .btn{padding:8px 13px;font-size:.95rem}
+}
 
 /* Jogo aberto */
 #play{position:fixed;inset:0;z-index:50;background:var(--bg)}
@@ -222,9 +326,7 @@ body.full .foot{padding:0 16px 30px}
 @media (max-height:700px) and (min-width:900px){.saguao .game .art{min-height:82px}.saguao .game .eyebrow{display:none}.saguao .prog .row{font-size:.78rem}.shopcard p{display:none}}
 /* celular e tablet em pé: o Bip em cima, e os cartões numa faixa escura logo abaixo (zona do polegar) */
 @media (max-width:899px){
- .shop{grid-template-columns:1fr}
  .stage{min-height:440px}
- .shop .stage{min-height:400px;position:relative;top:0}
  .arena{height:64vh;height:64svh;min-height:430px;max-height:720px}
  .btn.play{order:-1;margin:0 0 4px}
  .arena .st-3d{--bip-x:0px}
@@ -379,18 +481,20 @@ body.full .foot{padding:0 16px 30px}
  </section>
 
  <!-- Tela 3: loja -->
- <section id="scrLoja" hidden>
-  <div class="wrap">
-   <div class="shop">
-    <div class="stage" id="shopStage">
-     <div class="st-3d" id="shop3d" data-frame="perto"></div>
-     <div class="st-top"><button class="btn glass" id="bLojaVoltar">← Voltar</button><div class="coins glass"><span id="coinIc2"></span><span><b id="coinN2">0</b><br><small>Bipcoins</small></span></div></div>
-     <div class="sel glass" id="sel" aria-live="polite"></div>
-    </div>
-    <div class="panel shop-list">
-     <h2>Loja do Bip</h2>
-     <p class="hint" style="margin:2px 0 0;color:var(--muted)">Ganhe Bipcoins passando de fase no Robô Programador e concluindo aulas na Academia. Toque num item para experimentar.</p>
-     <div class="tabs" role="tablist" id="tabs"></div>
+ <section id="scrLoja" class="loja" hidden>
+  <div class="lj-stage" id="shopStage">
+   <div class="st-3d" id="shop3d" data-frame="perto"></div>
+   <div class="lj-top"><button class="btn glass" id="bLojaVoltar">← Voltar</button><div class="coins glass"><span id="coinIc2"></span><span><b id="coinN2">0</b><br><small>Bipcoins</small></span></div></div>
+   <div class="sel glass" id="sel" aria-live="polite"></div>
+  </div>
+  <div class="lj-main" id="shopMain">
+   <header class="lj-head"><div><h2>Loja do Bip</h2><p>Ganhe Bipcoins nas atividades e deixe o Bip do seu jeito. Toque num item para experimentar antes de comprar.</p></div>
+    <div class="col"><div class="row"><span>Sua coleção</span><b id="colN">0 de 0</b></div><div class="bar"><i id="colBar"></i></div></div></header>
+   <div class="lj-body">
+    <nav class="lj-rail" role="tablist" aria-label="Seções da loja" id="tabs"></nav>
+    <div class="lj-content">
+     <div class="lj-ct"><h3 id="ljTitle">Destaques</h3><div class="seg" id="filt" role="group" aria-label="Filtrar itens"><button data-fil="todos">Todos</button><button data-fil="posso">Posso comprar</button><button data-fil="meus">Meus itens</button></div></div>
+     <div id="vitrine"></div>
      <div class="items" id="items"></div>
     </div>
    </div>
@@ -403,6 +507,7 @@ body.full .foot{padding:0 16px 30px}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>/*BIPV*/</script>
+<script>/*CENA*/</script>
 <script>/*LOBBY*/</script>
 <script>
 /* ============ Mundo do Bip: perfis, progresso e código ============ */
@@ -488,7 +593,8 @@ function mergeRunner(a,b){if(!a)return b;if(!b)return a;const mx=(x,y)=>{const o
  const tot={};for(const k of new Set([...Object.keys(a.tot||{}),...Object.keys(b.tot||{})]))tot[k]=mx((a.tot||{})[k],(b.tot||{})[k]);
  return {v:1,best:mx(a.best,b.best),runs:Math.max(a.runs||0,b.runs||0),coins:mx(a.coins,b.coins),err,tot,t:Math.max(a.t||0,b.t||0)}}
 /* loja: junta os itens comprados nos dois lugares; o visual é o mais recente */
-function mergeLoja(a,b){if(!a)return b;if(!b)return a;const n=(a.t||0)>=(b.t||0)?a:b;return {owned:[...new Set([...(a.owned||[]),...(b.owned||[])])],look:n.look||{},t:Math.max(a.t||0,b.t||0)}}
+function mergeLoja(a,b){if(!a)return b;if(!b)return a;const n=(a.t||0)>=(b.t||0)?a:b,kits={...(a.kits||{})};for(const k in b.kits||{})kits[k]=Math.max(+kits[k]||0,+b.kits[k]||0);
+ return {owned:[...new Set([...(a.owned||[]),...(b.owned||[])])],look:n.look||{},kits,t:Math.max(a.t||0,b.t||0)}}
 function mergeRobo(a,b){if(!a)return b;if(!b)return a;const r={...b,...a,v:1,all:0},st={...(b.stars||{})};
  for(const k in a.stars||{})st[k]=Math.max(st[k]||0,a.stars[k]);r.stars=st;const sk={...(b.skip||{}),...(a.skip||{})};for(const k in st)delete sk[k];r.skip=sk;
  r.seen={...(b.seen||{}),...(a.seen||{})};const n=x=>Object.keys(x.stars||{}).length+Object.keys(x.skip||{}).length;r.lvl=n(a)>=n(b)?a.lvl:b.lvl;return r}
@@ -561,8 +667,8 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  drawCoins(p);const l=BIPV.loja(p.id);
  if(LOBBY.mount($("st3d"))){$("stFallback").hidden=true;LOBBY.look(l.look)}else{$("stFallback").hidden=false;$("stFallback").innerHTML=BIPV.face2d(l.look)}
  const d=BIPV.destaque();$("lojaDest").textContent="★ "+d.n.toUpperCase();
- /* ícones 3D: o Bip do aluno com o item em destaque, e o Bip fazendo cada gesto */
- BIPV.ICON.item(d.id,l.look,u=>{$("lojaIc").innerHTML=`<img src="${u}" alt="">`});
+ /* ícones 3D: o Bip do aluno com o item em destaque, e o Bip fazendo cada gesto (cenário mostra o cartão-postal) */
+ if(d.cat=="cenario")$("lojaIc").innerHTML=`<img class="pc" src="${CENA.postal(d.id)}" alt="">`;else BIPV.ICON.item(d.id,l.look,u=>{$("lojaIc").innerHTML=`<img src="${u}" alt="">`});
  document.querySelectorAll("[data-pose]").forEach(el=>BIPV.ICON.pose(el.dataset.pose,l.look,u=>{el.innerHTML=`<img src="${u}" alt="">`}));}
 /* Botão principal: continua o último jogo aberto (ou começa pelo Robô) */
 function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.id)}catch(e){}return g=="academia"||g=="runner"?g:"robo"}
@@ -600,48 +706,114 @@ const PATCSS={listras:(i)=>`repeating-linear-gradient(45deg,${i.c} 0 8px,${i.c2}
  xadrez:i=>`conic-gradient(${i.c2} 25%,${i.c} 0 50%,${i.c2} 0 75%,${i.c} 0) 0 0/16px 16px`,camuflagem:()=>`radial-gradient(circle at 30% 30%,#3a4a2a 20%,transparent 22%),radial-gradient(circle at 70% 60%,#a68a5b 18%,transparent 20%),#6b8e4e`,
  zebra:()=>`repeating-linear-gradient(100deg,#f5f5f5 0 6px,#1d1d1d 6px 10px)`,circuito:i=>`linear-gradient(90deg,transparent 45%,${i.c2} 45% 55%,transparent 55%),linear-gradient(transparent 45%,${i.c2} 45% 55%,transparent 55%),${i.c}`,
  lava:()=>`radial-gradient(circle at 40% 40%,#ffd24a,#ff6a1a 30%,#2a1410 70%)`,galaxia:()=>`radial-gradient(circle at 50% 50%,#5b3cc4,#1a1446 60%,#0b0a24)`,diamante:()=>`linear-gradient(135deg,#ffffff,#bfefff 40%,#7fd8ff 60%,#ffffff)`};
-let shopCat="pintura",shopSel=null,shopAsk=false;
+/* Estado da loja: seção aberta, filtro, item ou conjunto escolhido e se está confirmando a compra */
+let shopCat="destaques",shopFil="todos",shopSel=null,shopAsk=false,railKey="";
+const SVG_STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.4l-6.1 3.4 1.4-6.8-5.1-4.7 6.9-.8z" fill="#ffd24a" stroke="#a86a00" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+const SVG_GIFT='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="10" width="17" height="11" rx="2" fill="#e0408f"/><rect x="2.5" y="7" width="19" height="4.2" rx="1.5" fill="#ff7ab8"/><rect x="10.6" y="7" width="2.8" height="14" fill="#ffd24a"/><path d="M12 7C10.4 3.6 6.5 3.4 6.5 5.6 6.5 7 9.6 7 12 7zm0 0c1.6-3.4 5.5-3.6 5.5-1.6C17.5 7 14.4 7 12 7z" fill="none" stroke="#ffd24a" stroke-width="1.8"/></svg>';
+const RAIL=[["destaques","Destaques","*star"],["conjuntos","Conjuntos","*gift"],["cenario","Cenários","s-praia"],["pintura","Pintura","p-ouro"],["olhos","Olhos","o-estrela"],["tela","Cor dos olhos","*tela"],
+ ["antena","Antena","a-estrela"],["cabeca","Cabeça","c-coroa"],["rosto","Rosto","r-escuros"],["pescoco","Pescoço","n-medalha"],["costas","Costas","b-anjo"],["efeito","Efeitos","e-aura"]];
 function shopState(){const p=curP();return {p,l:BIPV.loja(p.id),saldo:BIPV.saldo(p.id)}}
 function owns(l,id){return BIPV.gratis(id)||l.owned.includes(id)}
-function thumb(it,l){if(it.cat!="olhos"&&it.cat!="tela")return `<span class="i3" data-icon="${it.id}">${thumb0(it,l)}</span>`;return thumb0(it,l)}
-function fillIcons(look){document.querySelectorAll("#items [data-icon]").forEach(el=>BIPV.ICON.item(el.dataset.icon,look,u=>{el.innerHTML=`<img src="${u}" alt="">`;el.classList.add("on")}))}
+function thumb(it,l){if(it.cat=="cenario")return `<img class="pc" alt="" src="${CENA.postal(it.id)}">`;if(it.cat!="olhos"&&it.cat!="tela")return `<span class="i3" data-icon="${it.id}">${thumb0(it,l)}</span>`;return thumb0(it,l)}
+function fillIcons(look){document.querySelectorAll("#shopMain [data-icon]:not(.on)").forEach(el=>BIPV.ICON.item(el.dataset.icon,look,u=>{el.innerHTML=`<img src="${u}" alt="">`;el.classList.add("on")}))}
 function thumb0(it,l){if(it.cat=="pintura"){const bg=it.rainbow?"conic-gradient(#ff4d6d,#ffd24a,#5ef07a,#4ad8ff,#b98cff,#ff4d6d)":it.pat&&PATCSS[it.pat]?PATCSS[it.pat](it):it.metal?`linear-gradient(135deg,#fff,${it.c} 45%,${it.c})`:it.c;return `<span class="sw" style="background:${bg}"></span>`}
  if(it.cat=="tela"){const c=it.grad?`linear-gradient(${it.grad.join(",")})`:it.c;return `<span class="sw tela" style="--ec:${it.c}"><span style="display:flex"><i style="background:${c}"></i><i style="background:${c}"></i></span></span>`}
  if(it.cat=="olhos")return `<img alt="" src="${BIPV.eyePreview(it.id,l.look.tela)}">`;
  return EMO[it.id]||"✦"}
-function openShop(){if(!curP())return;document.body.classList.remove("full");$("scrMenu").hidden=true;$("scrLoja").hidden=false;shopAsk=false;shopSel=null;window.scrollTo(0,0);
- if(LOBBY.mount($("shop3d")))LOBBY.look(shopState().l.look);drawShop()}
+function railIcon(ic,l){if(ic=="*star")return SVG_STAR;if(ic=="*gift")return SVG_GIFT;if(ic=="*tela")return `<span class="sw tela"><span style="display:flex"><i></i><i></i></span></span>`;
+ const it=BIPV.BYID[ic];if(it.cat=="cenario")return `<img class="pc" alt="" src="${CENA.postal(ic)}">`;if(it.cat=="olhos")return `<img alt="" src="${BIPV.eyePreview(ic,l.look.tela)}">`;
+ return `<span data-icon="${ic}">${thumb0(it,l)}</span>`}
+/* preço ou situação do item (usando / seu) */
+function tagOf(it,l,saldo){if(l.look[it.cat]==it.id)return `<span class="tag on">✓ Usando</span>`;if(owns(l,it.id))return `<span class="tag">Seu</span>`;
+ return `<span class="price${saldo<it.p?" lack":""}">${BIPV.COIN}${BIPV.fmt(it.p)}</span>`}
+function card(it,l,saldo){const r=BIPV.RAR[it.r],cen=it.cat=="cenario";
+ return `<button class="item${cen?" cen":""}" data-id="${it.id}" data-r="${it.r}" aria-pressed="${shopSel==it.id}" title="${it.n} (${r.n})">${cen?`<img class="bg" alt="" src="${CENA.postal(it.id)}">`:""}<span class="rr">${r.n}</span>${cen?"":`<span class="th">${thumb(it,l)}</span>`}<span class="ft"><span class="n">${it.n}</span>${tagOf(it,l,saldo)}</span></button>`}
+function kitCard(k,l,saldo){const kp=BIPV.kitPreco(k,l.owned),done=!kp.falta.length;
+ const pr=done?`<span class="tag on">✓ Completo</span>`:`<span class="price${saldo<kp.preco?" lack":""}">${BIPV.COIN}<s>${BIPV.fmt(kp.cheio)}</s>${BIPV.fmt(kp.preco)}</span>`;
+ return `<button class="kit" data-kit="${k.id}" aria-pressed="${shopSel==k.id}"><span class="rr">Conjunto · 15% off</span><span class="kt">${k.itens.map(id=>`<span class="ki">${thumb(BIPV.BYID[id],l)}</span>`).join("")}</span>
+  <span class="ft"><span class="n">${k.n}<small>${k.d}</small></span><span class="fr">${pr}<small>${k.itens.length} peças</small></span></span></button>`}
+function heroHTML(l,saldo){const d=BIPV.destaque(),own=owns(l,d.id);
+ const art=d.cat=="cenario"?`<img class="pc" alt="" src="${CENA.postal(d.id)}">`:`<span class="i3" data-icon="${d.id}">${thumb0(d,l)}</span>`;
+ return `<div class="lj-hero"><div class="lj-hero-art">${art}</div><div class="lj-hero-tx"><span class="kick">★ Destaque do dia · Lendário</span><h3>${d.n}</h3>
+  <div class="lj-hero-act">${own?`<span class="tag on">✓ Já é seu</span>`:`<span class="price big${saldo<d.p?" lack":""}">${BIPV.COIN}${BIPV.fmt(d.p)}</span>`}<button class="btn buy" data-id="${d.id}">${own?"Ver no Bip":"Experimentar"}</button></div>
+  <small>Todo dia um item lendário diferente aparece aqui.</small></div></div>`}
+const EMPTY={posso:"Nada desta seção cabe nas suas Bipcoins ainda. Passe fases no Robô, faça aulas na Academia ou corra no Bip Runner para ganhar mais.",meus:"Você ainda não tem itens desta seção."};
+function vitrineHTML(l,saldo){const cen=BIPV.ITEMS.filter(i=>i.cat=="cenario"&&i.p>0);
+ const pode=BIPV.ITEMS.filter(i=>!owns(l,i.id)&&i.p<=saldo&&i.cat!="cenario").sort((a,b)=>b.p-a.p).slice(0,8);
+ return heroHTML(l,saldo)+
+  `<section class="lj-sec"><h3>Cenários</h3><p>Troque o mundo em volta do Bip. O cenário aparece no saguão.</p><div class="row-scroll">${cen.map(i=>card(i,l,saldo)).join("")}</div></section>`+
+  `<section class="lj-sec"><h3>Conjuntos</h3><p>O visual completo com 15% de desconto. Peças que você já tem saem do preço.</p><div class="kits">${BIPV.KITS.slice(0,3).map(k=>kitCard(k,l,saldo)).join("")}</div><button class="lj-more" data-cat="conjuntos">Ver todos os conjuntos →</button></section>`+
+  (pode.length?`<section class="lj-sec"><h3>Você já pode comprar</h3><div class="items">${pode.map(i=>card(i,l,saldo)).join("")}</div></section>`:"")}
+function kitsHTML(l,saldo){let ks=BIPV.KITS;
+ if(shopFil=="posso")ks=ks.filter(k=>{const kp=BIPV.kitPreco(k,l.owned);return kp.falta.length&&kp.preco<=saldo});
+ if(shopFil=="meus")ks=ks.filter(k=>!BIPV.kitPreco(k,l.owned).falta.length);
+ return ks.length?`<div class="kits">${ks.map(k=>kitCard(k,l,saldo)).join("")}</div>`:`<p class="lj-empty">${shopFil=="meus"?"Você ainda não completou nenhum conjunto.":EMPTY.posso}</p>`}
+function listaHTML(l,saldo){let list=BIPV.ITEMS.filter(i=>shopCat=="destaques"||i.cat==shopCat).sort((a,b)=>a.p-b.p);
+ if(shopFil=="posso")list=list.filter(i=>!owns(l,i.id)&&i.p<=saldo);if(shopFil=="meus")list=list.filter(i=>owns(l,i.id)&&(i.p>0||shopCat!="destaques"));
+ return list.length?list.map(i=>card(i,l,saldo)).join(""):`<p class="lj-empty" style="grid-column:1/-1">${EMPTY[shopFil]||""}</p>`}
+function drawShop(){const {p,l,saldo}=shopState();drawCoins(p);
+ const pagos=BIPV.ITEMS.filter(i=>i.p>0),tem=pagos.filter(i=>l.owned.includes(i.id)).length;
+ $("colN").textContent=`${tem} de ${pagos.length}`;$("colBar").style.width=(tem/pagos.length*100).toFixed(1)+"%";
+ const rk=JSON.stringify(l.look);if(rk!=railKey){railKey=rk;$("tabs").innerHTML=RAIL.map(([k,n,ic])=>`<button role="tab" data-cat="${k}"><span class="ri">${railIcon(ic,l)}</span>${n}</button>`).join("")}
+ $("tabs").querySelectorAll("[data-cat]").forEach(b=>b.setAttribute("aria-selected",b.dataset.cat==shopCat));
+ $("ljTitle").textContent=RAIL.find(r=>r[0]==shopCat)[1];
+ $("filt").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.fil==shopFil));
+ if(shopCat=="destaques"&&shopFil=="todos"){$("vitrine").innerHTML=vitrineHTML(l,saldo);$("items").innerHTML=""}
+ else if(shopCat=="conjuntos"){$("vitrine").innerHTML=kitsHTML(l,saldo);$("items").innerHTML=""}
+ else{$("vitrine").innerHTML="";$("items").innerHTML=listaHTML(l,saldo)}
+ fillIcons(l.look);drawSel()}
+function openShop(){if(!curP())return;$("scrMenu").hidden=true;$("scrLoja").hidden=false;document.body.classList.add("full");shopAsk=false;shopSel=null;window.scrollTo(0,0);
+ $("foot").hidden=true;if(LOBBY.mount($("shop3d"))){LOBBY.frame("perto");LOBBY.look(shopState().l.look)}drawShop()}
 function closeShop(){$("scrLoja").hidden=true;drawMenu();window.scrollTo(0,0)}
 $("bLoja").onclick=openShop;$("bLojaVoltar").onclick=closeShop;
-function drawShop(){const {p,l,saldo}=shopState();drawCoins(p);
- $("tabs").innerHTML=BIPV.CATS.map(([k,n])=>`<button role="tab" aria-selected="${k==shopCat}" data-cat="${k}">${n}</button>`).join("");
- const list=BIPV.ITEMS.filter(i=>i.cat==shopCat).sort((a,b)=>a.p-b.p);
- $("items").innerHTML=list.map(it=>{const r=BIPV.RAR[it.r],own=owns(l,it.id),on=l.look[it.cat]==it.id;
-  const pr=on?`<span class="pr own">✓ Usando</span>`:own?`<span class="pr own">Seu</span>`:`<span class="pr${saldo<it.p?" lack":""}">${BIPV.COIN}${BIPV.fmt(it.p)}</span>`;
-  return `<button class="item" data-id="${it.id}" data-r="${it.r}" style="--rc:${r.c}" aria-pressed="${shopSel==it.id}" title="${it.n} (${r.n})"><span class="rd"></span><span class="th">${thumb(it,l)}</span><span class="n">${it.n}</span>${pr}</button>`}).join("");
- fillIcons(l.look);drawSel()}
-$("tabs").onclick=e=>{const b=e.target.closest("[data-cat]");if(!b)return;shopCat=b.dataset.cat;shopSel=null;shopAsk=false;LOBBY.look(shopState().l.look);drawShop()};
-$("items").onclick=e=>{const b=e.target.closest("[data-id]");if(!b)return;shopSel=b.dataset.id;shopAsk=false;const {l}=shopState(),it=BIPV.BYID[shopSel];
- const prev=Object.assign({},l.look,{[it.cat]:it.id});const hat=BIPV.BYID[prev.cabeca];if(it.cat=="antena"&&hat&&hat.hide)prev.cabeca=null;LOBBY.look(prev);LOBBY.gesture(["acenar","girar","forca","dancar"][Math.floor(Math.random()*4)]);
- document.querySelectorAll(".item").forEach(x=>x.setAttribute("aria-pressed",x==b));drawSel()};
-function drawSel(){const {l,saldo}=shopState(),el=$("sel");
- if(!shopSel){el.innerHTML=`<div class="nm"><b>Escolha um item</b><span style="opacity:.8;font-size:.9rem">Ele aparece no seu Bip antes de você comprar.</span></div>`;return}
- const it=BIPV.BYID[shopSel],r=BIPV.RAR[it.r],own=owns(l,it.id),on=l.look[it.cat]==it.id,opt=!["pintura","olhos","tela","antena"].includes(it.cat);
- let act="",msg="";
- if(own){act=on?(opt?`<button class="btn" id="sTirar">Tirar</button>`:`<button class="btn" disabled>✓ Usando</button>`):`<button class="btn wear" id="sUsar">Usar</button>`}
- else if(shopAsk){act=`<button class="btn buy" id="sOk">Confirmar compra</button><button class="btn" id="sNo" style="color:var(--ink)">Cancelar</button>`;msg=`Vai gastar ${BIPV.fmt(it.p)} Bipcoins. Sobram ${BIPV.fmt(saldo-it.p)}.`}
- else if(saldo>=it.p){act=`<button class="btn buy" id="sBuy">Comprar ${BIPV.COIN}${BIPV.fmt(it.p)}</button>`}
- else{act=`<button class="btn buy" disabled>${BIPV.COIN}${BIPV.fmt(it.p)}</button>`;msg=`Faltam ${BIPV.fmt(it.p-saldo)} Bipcoins. Passe de fase no Robô Programador (até 25 por fase) ou conclua aulas na Academia (${BIPV.POR_AULA} por aula).`}
- el.innerHTML=`<div class="nm"><b>${it.n}</b><span class="rar" style="--rc:${r.c}">${r.n}</span></div>${act}<p class="msg">${msg}</p>`;
- const q=id=>document.getElementById(id);
+/* um único "ouvinte" para a coluna da loja: filtros, seções, itens e conjuntos */
+$("shopMain").onclick=e=>{const t=e.target;
+ const f=t.closest("[data-fil]");if(f){shopFil=f.dataset.fil;drawShop();return}
+ const c=t.closest("[data-cat]");if(c){shopCat=c.dataset.cat;shopSel=null;shopAsk=false;preview(true);drawShop();if(c.classList.contains("lj-more"))$("shopMain").scrollIntoView({block:"start"});return}
+ const b=t.closest("[data-kit],[data-id]");if(!b)return;shopSel=b.dataset.kit||b.dataset.id;shopAsk=false;preview();
+ document.querySelectorAll("#shopMain [aria-pressed]").forEach(x=>{if(x.dataset.id||x.dataset.kit)x.setAttribute("aria-pressed",(x.dataset.kit||x.dataset.id)==shopSel)});drawSel();
+ if(matchMedia("(max-width:899px)").matches)$("shopStage").scrollIntoView({behavior:"smooth",block:"start"})};
+/* experimenta no Bip: um item, um conjunto inteiro ou um cenário (câmera abre para mostrar o mundo) */
+function preview(quiet){const {l}=shopState(),prev=Object.assign({},l.look);let cena=false;
+ if(shopSel&&BIPV.KIT[shopSel])BIPV.KIT[shopSel].itens.forEach(id=>{prev[BIPV.BYID[id].cat]=id});
+ else if(shopSel){const it=BIPV.BYID[shopSel];prev[it.cat]=it.id;cena=it.cat=="cenario";const hat=BIPV.BYID[prev.cabeca];if(it.cat=="antena"&&hat&&hat.hide)prev.cabeca=null}
+ LOBBY.frame(cena?"cena":"perto");LOBBY.look(prev);if(!quiet)LOBBY.gesture(cena?"acenar":["acenar","girar","forca","dancar"][Math.floor(Math.random()*4)])}
+function drawSel(){const {l,saldo}=shopState(),el=$("sel"),q=id=>document.getElementById(id),F=BIPV.fmt,C=BIPV.COIN;
+ const ganhar=`Passe fases no Robô Programador (até 25 por fase), conclua aulas na Academia (${BIPV.POR_AULA} por aula) ou corra no Bip Runner.`;
+ if(!shopSel){el.innerHTML=`<div class="nm"><b>Escolha um item</b><span class="hint2">Ele aparece no seu Bip antes de você comprar.</span></div>`;return}
+ const k=BIPV.KIT[shopSel];let act="",msg="",head;
+ if(k){const kp=BIPV.kitPreco(k,l.owned);head=`<b>Conjunto ${k.n}</b><span class="rar" style="--rc:#d0428f">${k.itens.length} peças · 15% off</span>`;
+  if(!kp.falta.length)act=`<button class="btn wear" id="sUsar">Usar o conjunto</button>`;
+  else if(shopAsk){act=`<button class="btn buy" id="sOk">Confirmar compra</button><button class="btn" id="sNo">Cancelar</button>`;msg=`Vai gastar ${F(kp.preco)} Bipcoins e economizar ${F(kp.desc)}. Sobram ${F(saldo-kp.preco)}.`}
+  else if(saldo>=kp.preco){act=`<button class="btn buy" id="sBuy">Comprar ${C}${F(kp.preco)}</button>`;msg=`Separado sairia ${F(kp.cheio)}. Você economiza ${F(kp.desc)}.`}
+  else{act=`<button class="btn buy" disabled>${C}${F(kp.preco)}</button>`;msg=`Faltam ${F(kp.preco-saldo)} Bipcoins. ${ganhar}`}}
+ else{const it=BIPV.BYID[shopSel],r=BIPV.RAR[it.r],own=owns(l,it.id),on=l.look[it.cat]==it.id,opt=!["pintura","olhos","tela","antena","cenario"].includes(it.cat);
+  head=`<b>${it.n}</b><span class="rar" style="--rc:${r.c}">${r.n}</span>`;
+  if(own)act=on?(opt?`<button class="btn" id="sTirar">Tirar</button>`:`<button class="btn" disabled>✓ Usando</button>`):`<button class="btn wear" id="sUsar">Usar</button>`;
+  else if(shopAsk){act=`<button class="btn buy" id="sOk">Confirmar compra</button><button class="btn" id="sNo">Cancelar</button>`;msg=`Vai gastar ${F(it.p)} Bipcoins. Sobram ${F(saldo-it.p)}.`}
+  else if(saldo>=it.p)act=`<button class="btn buy" id="sBuy">Comprar ${C}${F(it.p)}</button>`;
+  else{act=`<button class="btn buy" disabled>${C}${F(it.p)}</button>`;msg=`Faltam ${F(it.p-saldo)} Bipcoins. ${ganhar}`}
+  if(it.cat=="cenario"&&!msg)msg=own?"O cenário fica em volta do Bip no saguão.":"Experimente: veja o mundo em volta do Bip antes de comprar."}
+ el.innerHTML=`<div class="nm">${head}</div>${act}<p class="msg">${msg}</p>`;
  if(q("sBuy"))q("sBuy").onclick=()=>{shopAsk=true;drawSel()};
  if(q("sNo"))q("sNo").onclick=()=>{shopAsk=false;drawSel()};
- if(q("sOk"))q("sOk").onclick=()=>buy(it);
- if(q("sUsar"))q("sUsar").onclick=()=>wear(it.cat,it.id);
- if(q("sTirar"))q("sTirar").onclick=()=>wear(it.cat,null)}
+ if(q("sOk"))q("sOk").onclick=()=>k?buyKit(k):buy(BIPV.BYID[shopSel]);
+ if(q("sUsar"))q("sUsar").onclick=()=>k?wearKit(k):wear(BIPV.BYID[shopSel].cat,shopSel);
+ if(q("sTirar"))q("sTirar").onclick=()=>wear(BIPV.BYID[shopSel].cat,null)}
 function buy(it){const {p,l,saldo}=shopState();if(saldo<it.p||owns(l,it.id))return;l.owned.push(it.id);l.look[it.cat]=it.id;BIPV.salvarLoja(p.id,l);shopAsk=false;
- LOBBY.look(l.look);LOBBY.gesture("comemorar");drawShop();$("sel").querySelector(".msg").textContent=`Comprado! ${it.n} já está no seu Bip.`;push(p)}
+ festa(it.id,`Comprado! ${it.n} já está no seu Bip.`);push(p)}
+function buyKit(k){const {p,l,saldo}=shopState(),kp=BIPV.kitPreco(k,l.owned);if(!kp.falta.length||saldo<kp.preco)return;
+ kp.falta.forEach(id=>l.owned.push(id));l.kits=l.kits||{};l.kits[k.id]=kp.desc;k.itens.forEach(id=>{l.look[BIPV.BYID[id].cat]=id});BIPV.salvarLoja(p.id,l);shopAsk=false;
+ festa(k.id,`Conjunto ${k.n} completo! Você economizou ${BIPV.fmt(kp.desc)} Bipcoins.`);push(p)}
 function wear(cat,id){const {p,l}=shopState();l.look[cat]=id;BIPV.salvarLoja(p.id,l);LOBBY.look(l.look);LOBBY.gesture("acenar");drawShop();push(p)}
+function wearKit(k){const {p,l}=shopState();k.itens.forEach(id=>{l.look[BIPV.BYID[id].cat]=id});BIPV.salvarLoja(p.id,l);LOBBY.look(l.look);LOBBY.gesture("acenar");drawShop();push(p)}
+/* compra com festa: o Bip comemora, cai confete e o cartão dá uma volta */
+function festa(id,txt){const {l}=shopState();LOBBY.look(l.look);LOBBY.gesture("comemorar");drawShop();$("sel").querySelector(".msg").textContent=txt;
+ const c=document.querySelector(`#shopMain [data-id="${id}"],#shopMain [data-kit="${id}"]`);if(c)c.classList.add("got");
+ if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;const st=$("shopStage"),cols=["#ffd24a","#5ef0e0","#ff6aa8","#9b7bff","#ffffff","#5ef07a"];
+ for(let i=0;i<48;i++){const s=document.createElement("span"),a=Math.random()*Math.PI*2,d=110+Math.random()*240;s.className="cf";
+  s.style.cssText=`background:${cols[i%cols.length]};--dx:${(Math.cos(a)*d).toFixed(0)}px;--dy:${(Math.sin(a)*d-60).toFixed(0)}px;--r:${(Math.random()*720-360).toFixed(0)}deg;animation-delay:${(Math.random()*.15).toFixed(2)}s`;
+  st.appendChild(s);setTimeout(()=>s.remove(),1900)}}
 window.addEventListener("message",e=>{if(e.data&&e.data.bip=="menu")closeGame()});
 
 /* ---- ilustrações dos cartões ---- */

@@ -324,7 +324,7 @@ async function loadAlunos(){$("errRows").textContent="";try{alunos=await rpc("pr
 function stat(a){const pg=a.progresso||{},r=pg.robo||{},ac=pg.academia||{},lj=pg.loja||{},ru=pg.runner||{},st=r.stars||{};
  const feitas=new Set([...Object.keys(st).filter(k=>+st[k]>0),...Object.keys(r.skip||{})]);
  const est=Object.values(st).reduce((s,v)=>s+Math.min(3,+v||0),0),done=new Set((ac.done||[]).filter(x=>ACAD.includes(x)));
- const owned=Array.isArray(lj.owned)?lj.owned:[],ganhos=BIPV.ganhos(r,ac,ru),gastos=BIPV.gasto(owned);
+ const owned=Array.isArray(lj.owned)?lj.owned:[],ganhos=BIPV.ganhos(r,ac,ru),gastos=BIPV.gasto(owned,lj.kits);
  const dias=a.ultimo_acesso?(Date.now()-new Date(a.ultimo_acesso))/864e5:Infinity;
  return {a,feitas,done,fases:feitas.size,est,aulas:done.size,ativ:feitas.size+done.size,ganhos,gastos,saldo:ganhos-gastos,itens:owned.filter(id=>!BIPV.gratis(id)).length,look:lj.look||{},dias,
   run:+((ru.best||{}).tabuada)||0,runs:+ru.runs||0,rerr:ru.err||{},rtot:(ru.tot||{}).tabuada||{ok:0,bad:0}}}

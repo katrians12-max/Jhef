@@ -12,7 +12,7 @@ async def ctx(b,w=1366,h=860,mobile=False):
         if 'three.min.js' in u:await r.fulfill(body=THREE,content_type='application/javascript')
         elif u.startswith(B):await r.continue_()
         else:await r.abort()
-    await c.route('**/*',rt);pg=await c.new_page();errs=[];pg.on('pageerror',lambda e:errs.append(str(e)));pg.on('console',lambda m:m.type=='error' and 'Failed to load' not in m.text and errs.append(m.text));return c,pg,errs
+    await c.route('**/*',rt);pg=await c.new_page();pg.set_default_timeout(8000);errs=[];pg.on('pageerror',lambda e:errs.append(str(e)));pg.on('console',lambda m:m.type=='error' and 'Failed to load' not in m.text and errs.append(m.text));return c,pg,errs
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(args=['--ignore-gpu-blocklist','--use-gl=angle','--use-angle=swiftshader'])
@@ -22,23 +22,45 @@ async def main():
         check('começa com 100 Bipcoins',await pg.inner_text('#coinN')=='100',await pg.inner_text('#coinN'))
         await pg.screenshot(path=OUT+'l-saguao.png')
         pid=await pg.evaluate("cur")
-        await pg.evaluate("""(()=>{const st={};ROBO.slice(0,40).forEach(([t])=>st[t]=3);localStorage.setItem('robo4:'+cur,JSON.stringify({v:1,stars:st,skip:{},seen:{}}));
-          localStorage.setItem('academia-bip-3d-v1:'+cur,JSON.stringify({done:ACAD.slice(0,12)}))})()""")
+        await pg.evaluate("""(()=>{const st={};ROBO.slice(0,60).forEach(([t])=>st[t]=3);localStorage.setItem('robo4:'+cur,JSON.stringify({v:1,stars:st,skip:{},seen:{}}));
+          localStorage.setItem('academia-bip-3d-v1:'+cur,JSON.stringify({done:ACAD.slice(0,20)}))})()""")
         await pg.reload();await pg.wait_for_timeout(1500)
-        exp=100+40*25+12*50
-        check(f'moedas = {exp} depois de 40 fases e 12 aulas',await pg.inner_text('#coinN')==f'{exp:,}'.replace(',','.'),await pg.inner_text('#coinN'))
-        check('botão principal continua o Robô na fase 41','fase 41' in await pg.inner_text('#playSub') and 'CONTINUAR' in await pg.inner_text('#bPlay'),await pg.inner_text('#bPlay'))
+        exp=100+60*25+20*50
+        check(f'moedas = {exp} depois de 60 fases e 20 aulas',await pg.inner_text('#coinN')==f'{exp:,}'.replace(',','.'),await pg.inner_text('#coinN'))
+        check('botão principal continua o Robô na fase 61','fase 61' in await pg.inner_text('#playSub') and 'CONTINUAR' in await pg.inner_text('#bPlay'),await pg.inner_text('#bPlay'))
         check('saguão ocupa a tela toda (sem rolagem lateral)',await pg.evaluate("document.body.classList.contains('full')&&document.documentElement.scrollWidth<=innerWidth"))
         await pg.click('[data-g="dancar"]');await pg.wait_for_timeout(900);await pg.screenshot(path=OUT+'l-danca.png')
         await pg.click('#bLoja');await pg.wait_for_timeout(1200);await pg.screenshot(path=OUT+'l-loja.png')
+        check('loja abre na vitrine com destaque do dia',await pg.is_visible('.lj-hero') and await pg.evaluate("document.querySelectorAll('#vitrine .item.cen').length")==9)
+        check('coleção começa em 0',(await pg.inner_text('#colN')).startswith('0 de'),await pg.inner_text('#colN'))
+        await pg.click('[data-cat="pintura"]');await pg.wait_for_timeout(300)
         n=await pg.evaluate("document.querySelectorAll('.item').length");check('loja lista pinturas',n>15,n)
+        await pg.click('[data-fil="posso"]');n2=await pg.evaluate("[...document.querySelectorAll('.item')].every(e=>BIPV.BYID[e.dataset.id].p<=BIPV.saldo(cur))")
+        check('filtro "Posso comprar" só mostra o que cabe',n2);await pg.click('[data-fil="todos"]')
+        # cenário: experimenta (a câmera abre) e compra a praia
+        await pg.click('[data-cat="cenario"]');await pg.click('[data-id="s-lua"]');await pg.wait_for_timeout(900)
+        check('experimentar cenário troca o mundo',await pg.evaluate("LOBBY.cena()")=='s-lua' and await pg.get_attribute('#shop3d','data-frame')=='cena')
+        await pg.screenshot(path=OUT+'l-cena-lua.png')
+        await pg.click('[data-id="s-praia"]');await pg.click('#sBuy');await pg.click('#sOk');await pg.wait_for_timeout(700)
+        exp-=300;check('comprou o cenário da praia',await pg.inner_text('#coinN2')==f'{exp:,}'.replace(',','.') and await pg.evaluate("BIPV.loja(cur).look.cenario")=='s-praia',await pg.inner_text('#coinN2'))
+        check('coleção conta a compra',(await pg.inner_text('#colN')).startswith('1 de'),await pg.inner_text('#colN'))
+        await pg.screenshot(path=OUT+'l-cena-praia.png')
+        # conjunto com desconto
+        await pg.click('[data-cat="conjuntos"]');await pg.click('[data-kit="k-heroi"]');await pg.wait_for_timeout(500)
+        kp=await pg.evaluate("BIPV.kitPreco(BIPV.KIT['k-heroi'],BIPV.loja(cur).owned)")
+        await pg.click('#sBuy');await pg.click('#sOk');await pg.wait_for_timeout(700);exp-=kp['preco']
+        check(f'conjunto Herói comprado com desconto ({kp["preco"]} em vez de {kp["cheio"]})',await pg.inner_text('#coinN2')==f'{exp:,}'.replace(',','.') and kp['desc']>0,await pg.inner_text('#coinN2'))
+        check('conjunto veste todas as peças',await pg.evaluate("BIPV.KIT['k-heroi'].itens.every(id=>Object.values(BIPV.loja(cur).look).includes(id))"))
+        check('saldo do conjunto confere com BIPV.saldo',await pg.evaluate("BIPV.saldo(cur)")==exp)
+        await pg.screenshot(path=OUT+'l-kit.png')
+        await pg.click('[data-fil="meus"]');check('filtro "Meus itens" mostra o conjunto completo',await pg.evaluate("document.querySelectorAll('[data-kit]').length")==1);await pg.click('[data-fil="todos"]')
         # lendário caro demais
         await pg.click('[data-cat="pintura"]');await pg.click('[data-id="p-diamante"]');await pg.wait_for_timeout(500)
         check('item caro avisa quanto falta','Faltam' in await pg.inner_text('#sel'),await pg.inner_text('#sel'))
         await pg.screenshot(path=OUT+'l-astronauta.png')
         # compra a coroa (1200) e confere saldo
         await pg.click('[data-cat="cabeca"]');await pg.click('[data-id="c-coroa"]');await pg.click('#sBuy');await pg.click('#sOk');await pg.wait_for_timeout(600)
-        check('comprou a coroa',await pg.inner_text('#coinN2')==f'{exp-1200:,}'.replace(',','.'),await pg.inner_text('#coinN2'))
+        exp-=1200;check('comprou a coroa',await pg.inner_text('#coinN2')==f'{exp:,}'.replace(',','.'),await pg.inner_text('#coinN2'))
         for cat,item in [('pintura','p-galaxia'),('olhos','o-coracao'),('costas','b-anjo'),('efeito','e-aura'),('rosto','r-escuros'),('pescoco','n-cachecol'),('antena','a-helice')]:
             await pg.click(f'[data-cat="{cat}"]');await pg.click(f'[data-id="{item}"]');await pg.wait_for_timeout(700);await pg.screenshot(path=OUT+f'l-{item}.png')
         # compra mais itens baratos e usa

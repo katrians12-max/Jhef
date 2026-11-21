@@ -83,7 +83,7 @@ def page(src,out,extra_head=''):
     m=rd(os.path.join(F,'menu',src))
     m=m.replace('/*ROBO*/[]',json.dumps(ROBO,ensure_ascii=False)).replace('/*ACAD*/[]',json.dumps(ACAD)).replace('/*ROBO_N*/0',str(len(ROBO))).replace('/*ROBOW*/[]',json.dumps(ROBOW,ensure_ascii=False)).replace('/*ACADT*/[]',json.dumps(ACADT,ensure_ascii=False)).replace('/*ACADW*/[]',json.dumps(ACADW,ensure_ascii=False))
     m=patch(m,'<!--LOGO-->','<span class="sr-only">Mundo do Bip</span>'+logo if 'sr-only' in m else logo,src)
-    m=m.replace('<script>/*BIPV*/</script>','<script>'+BIPVJS+'</script>').replace('<script>/*LOBBY*/</script>','<script>'+rd(os.path.join(F,'menu','lobby.js'))+'</script>')
+    m=m.replace('<script>/*BIPV*/</script>','<script>'+BIPVJS+'</script>').replace('<script>/*LOBBY*/</script>','<script>'+rd(os.path.join(F,'menu','lobby.js'))+'</script>').replace('<script>/*CENA*/</script>','<script>'+rd(os.path.join(F,'menu','cenarios.js'))+'</script>')
     m=m.replace('<script>\n',NUV+'<script>\n',1)
     cut=m.index('</style>\n')+len('</style>\n')
     wr(OUT+'/'+out,HEAD+ICONS+extra_head+'<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n'+m[:cut]+'</head>\n<body>\n'+m[cut:]+'\n</body>\n</html>\n')
