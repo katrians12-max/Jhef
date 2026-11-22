@@ -55,7 +55,7 @@ async def main():
         await M.wait_for_timeout(500);t=await M.inner_text('#errTurma');check('PIN errado avisa tentativas','PIN errado' in t and '4 tentativas' in t,t)
         await M.screenshot(path=OUT+'t-cel-pin-errado.png')
         await M.fill('#tPin','1234');await M.click('#bTurmaOk');await M.wait_for_selector('#scrMenu:not([hidden])',timeout=12000)
-        check('no celular aparece o mesmo progresso',await M.inner_text('#rTxt')=='5 de 91 fases' and await M.inner_text('#aTxt')=='2 de 22 aulas',(await M.inner_text('#rTxt'),await M.inner_text('#aTxt')))
+        check('no celular aparece o mesmo progresso',await M.inner_text('#rTxt')=='5 de 91 fases' and await M.inner_text('#aTxt')==f'2 de {await M.evaluate("ACAD.length")} aulas',(await M.inner_text('#rTxt'),await M.inner_text('#aTxt')))
         await M.screenshot(path=OUT+'t-cel-menu.png',full_page=True)
         # joga mais no celular e volta para o computador 1
         await M.click('#rGo');await M.wait_for_timeout(3500);f=M.frames[1]

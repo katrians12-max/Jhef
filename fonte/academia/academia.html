@@ -84,6 +84,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1}
 #cv,#cv canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 #ov{position:absolute;left:50%;top:14px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:calc(100% - 28px);max-width:760px}
 #ov>*{pointer-events:auto}
+#ov .badge.lado{align-self:flex-start}
 #act{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;width:calc(100% - 24px);max-width:820px}
 #act:empty,#ov:empty{display:none}
 .hintcam{position:absolute;right:12px;top:10px;font-size:.75rem;color:var(--muted);background:color-mix(in srgb,var(--panel) 80%,transparent);padding:3px 9px;border-radius:99px;pointer-events:none}
@@ -129,6 +130,29 @@ input[type=range]{width:min(420px,70vw);accent-color:var(--run)}
 .badge .medal{width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe58a,var(--star) 60%,#b97c00);display:grid;place-items:center;font-size:1.8rem;color:#6b4400;font-family:var(--display);font-weight:800;box-shadow:0 5px 0 #a06c00}
 .badge .xp{color:var(--loop);font-weight:700}
 .load{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted)}
+/* frações empilhadas (3 sobre 4) */
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.02;margin:0 .1em;font-family:var(--display);font-weight:800}
+.fr i{font-style:normal;padding:0 .16em}
+.fr i:first-child{border-bottom:.12em solid currentColor;padding-bottom:.04em}
+.opt .fr{font-size:1.05em}
+/* contra o chute: espera depois do erro */
+.cool{margin-top:8px;font-weight:700;color:var(--bad);font-size:.9rem}
+.cool .cb{height:6px;border-radius:9px;background:var(--soft);overflow:hidden;margin:4px auto 0;max-width:240px}
+.cool .cb i{display:block;height:100%;width:100%;background:var(--bad);animation:esvazia linear forwards}
+@keyframes esvazia{to{width:0}}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:6px 0 8px}
+.chip{min-width:42px;height:38px;padding:0 8px;border-radius:12px;border:2px solid var(--line);background:var(--panel);font-family:var(--display);font-weight:800}
+.chip.on{background:var(--paint);border-color:var(--paint);color:#fff}
+.btn.chk{background:var(--go);border-color:var(--go);color:#fff}
+.btn:disabled,.chip:disabled{opacity:.5;cursor:not-allowed}
+.stars{color:var(--star);letter-spacing:2px;font-size:1.3rem;line-height:1}
+.stars .off{color:var(--line)}
+.les .stars{font-size:.85rem;letter-spacing:1px;margin-left:4px}
+.flash{font-weight:800;color:var(--loop);letter-spacing:.04em}
+.cristal{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--paint);font-size:.88rem;margin-top:4px}
+.cristal i{display:inline-block;width:12px;height:12px;transform:rotate(45deg);background:var(--paint);border-radius:2px}
+.soonl{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
+.soonl small{display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-size:.72rem}
 
 @media (max-width:760px){
  #lesson{padding:8px 10px 10px;gap:8px}
@@ -204,7 +228,7 @@ FACES.festa=FACES.feliz;FACES.aponta=FACES.normal;
 /* =====================================================================
    MOTOR 3D
    ===================================================================== */
-let R,scene,cam,root,fx,floorMat,bigGrid,smallGrid,bip,ok3d=false;
+let R,scene,cam,root,fx,floorMat,bigGrid,smallGrid,bip,hemiL,sunL,ok3d=false;
 const camS={th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0},camGoal={...camS};
 const P3=(x,y,h=0)=>new THREE.Vector3(x,h,-y);
 const mat=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.55,metalness:.05,...o});
@@ -217,9 +241,9 @@ function init3d(){if(ok3d)return true;if(!window.THREE){$("load").textContent="N
  R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(2,devicePixelRatio));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
  $("cv").appendChild(R.domElement);
  scene=new THREE.Scene();cam=new THREE.PerspectiveCamera(42,1,.1,300);
- scene.add(new THREE.HemisphereLight(0xffffff,0x8b9bb0,.85));
+ hemiL=new THREE.HemisphereLight(0xffffff,0x8b9bb0,.85);scene.add(hemiL);
  const rim=new THREE.DirectionalLight(0xa8c8ff,.45);rim.position.set(-8,9,-12);scene.add(rim);
- const sun=new THREE.DirectionalLight(0xfff4e0,.8);sun.position.set(6,14,8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-10,right:10,top:10,bottom:-10});scene.add(sun);
+ const sun=sunL=new THREE.DirectionalLight(0xfff4e0,.8);sun.position.set(6,14,8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-10,right:10,top:10,bottom:-10});scene.add(sun);
  floorMat=mat(0xf6f8fb,{roughness:.9});const fl=new THREE.Mesh(new THREE.PlaneGeometry(400,400),floorMat);fl.rotation.x=-Math.PI/2;fl.receiveShadow=true;scene.add(fl);
  bigGrid=new THREE.GridHelper(120,120,0xd5dde8,0xe2e8f0);bigGrid.position.y=.002;scene.add(bigGrid);
  smallGrid=new THREE.GridHelper(12,12,0x9fb0c6,0xb9c6d6);smallGrid.position.y=.004;scene.add(smallGrid);
@@ -232,24 +256,26 @@ function init3d(){if(ok3d)return true;if(!window.THREE){$("load").textContent="N
  let last=performance.now();const loop=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;
   for(const k in camGoal)camS[k]+=(camGoal[k]-camS[k])*Math.min(1,dt*4);
   const {th,ph,r,tx,tz}=camS;cam.position.set(tx+r*Math.sin(ph)*Math.cos(th),r*Math.cos(ph),tz+r*Math.sin(ph)*Math.sin(th));cam.lookAt(tx,0,tz);
-  bip.tick(dt,now/1000);root.children.forEach(o=>o.userData.tick&&o.userData.tick(now/1000));
+  bip.tick(dt,now/1000);root.children.forEach(o=>o.userData.tick&&o.userData.tick(now/1000));if(decor&&decor.userData.tick)decor.userData.tick(now/1000);
   for(let i=fx.children.length-1;i>=0;i--){const o=fx.children[i];if(o.userData.step&&o.userData.step(dt)===false){fx.remove(o);o.geometry&&o.geometry.dispose();o.material&&o.material.dispose()}}
   R.render(scene,cam);requestAnimationFrame(loop)};
  requestAnimationFrame(loop);ok3d=true;$("load").remove();return true}
-function theme3d(){const d=dark(),bg=d?0x0e1520:0xe8edf4;scene.background=new THREE.Color(bg);scene.fog=new THREE.Fog(bg,18,40);
- floorMat.color.setHex(d?0x162131:0xf6f8fb);
+function theme3d(){const d=dark(),W3=curWorld==2,bg=W3?(d?0x0c1a2e:0xbfe3f5):d?0x0e1520:0xe8edf4;scene.background=new THREE.Color(bg);scene.fog=new THREE.Fog(bg,W3?22:18,W3?58:40);
+ floorMat.color.setHex(W3?(d?0x1d3a24:0x8fcf6a):d?0x162131:0xf6f8fb);bigGrid.visible=smallGrid.visible=!W3;hemiL.intensity=W3?.6:.85;sunL.intensity=W3?.72:.8;
  [bigGrid,smallGrid].forEach((g,i)=>{const c=d?(i?0x3a4b63:0x223047):(i?0x9fb0c6:0xdbe2ec);[].concat(g.material).forEach(m=>{m.vertexColors=false;m.color.setHex(c);m.needsUpdate=true})})}
 function size(){const s=$("stage"),w=s.clientWidth,h=s.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<1?Math.min(68,42/Math.pow(w/h,.8)):42;cam.updateProjectionMatrix();  /* celular em pé: ângulo de visão mais aberto */
 }
 function camTo(o){Object.assign(camGoal,o);const w=$("stage").clientWidth;if(w<600&&o.r)camGoal.r=o.r*1.12}
 
 /* Câmera: arrastar gira; toque sem arrastar = escolher ponto no chão */
-let onPick=null;
+let onPick=null,onHit=null;
+function hitMesh(e){const r=R.domElement.getBoundingClientRect(),v=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
+ const rc=new THREE.Raycaster();rc.setFromCamera(v,cam);const h=rc.intersectObjects(root.children,true).find(x=>x.object.type!="Sprite");return h?h.object:null}
 function setupPointer(){const el=R.domElement;let down=null,drag=false;
  el.addEventListener("pointerdown",e=>{down={x:e.clientX,y:e.clientY,th:camGoal.th,ph:camGoal.ph};drag=false;el.setPointerCapture(e.pointerId)});
  el.addEventListener("pointermove",e=>{if(!down)return;const dx=e.clientX-down.x,dy=e.clientY-down.y;if(Math.hypot(dx,dy)>6)drag=true;
   if(drag){camGoal.th=down.th+dx*.008;camGoal.ph=Math.max(.3,Math.min(1.35,down.ph-dy*.006))}});
- el.addEventListener("pointerup",e=>{if(!down)return;const wasDrag=drag;down=null;if(!wasDrag&&onPick){const p=floorAt(e);if(p)onPick(p)}});
+ el.addEventListener("pointerup",e=>{if(!down)return;const wasDrag=drag;down=null;if(!wasDrag&&onHit){const m=hitMesh(e);if(m){onHit(m);return}}if(!wasDrag&&onPick){const p=floorAt(e);if(p)onPick(p)}});
  el.addEventListener("wheel",e=>{e.preventDefault();camGoal.r=Math.max(8,Math.min(34,camGoal.r*(1+Math.sign(e.deltaY)*.08)))},{passive:false})}
 function floorAt(e){const r=R.domElement.getBoundingClientRect(),v=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
  const rc=new THREE.Raycaster();rc.setFromCamera(v,cam);const hit=new THREE.Vector3();if(!rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),hit))return null;
@@ -709,10 +735,323 @@ const W2=[
  {m:"festa",end:1,t:"Você completou o <b>Mundo 2</b>: os números naturais! Próxima parada: as frações.",set(){B().place(0,0,-90)},badge:["x²","Mestre dos naturais","Mundo 2 completo!"]}]}
 ];
 
+/* =====================================================================
+   MUNDO 3 · FRAÇÕES — O Cristal do Inteiro
+   Cenário: a Vila da Partilha (Ilha 1): praça, casas, árvores, padaria, mar e o farol com o cristal.
+   Peças novas: bolo e barra cortados em partes, lanternas, moradores robôs e a fração empilhada.
+   ===================================================================== */
+let curWorld=-1,decor=null,cristal=null;
+function disposeTree(o){o.traverse(n=>{n.geometry&&n.geometry.dispose();if(n.material)[].concat(n.material).forEach(m=>{m.map&&m.map.dispose();m.dispose()})})}
+function setWorld(w){if(w!==curWorld){curWorld=w;if(decor){scene.remove(decor);disposeTree(decor);decor=null;cristal=null}if(w==2){decor=vila();scene.add(decor)}theme3d()}
+ if(w==2)acendeCristal(crystalCount(new Set(save.done)))}
+/* o farol mostra quantos dos 21 pedaços já voltaram */
+function acendeCristal(k){if(!cristal)return;cristal.shards.forEach((m,i)=>{const on=i<k;m.material.color.setHex(on?0xff5fa2:0xc9d2de);m.material.emissive.setHex(on?0xff2f86:0);m.material.emissiveIntensity=on?.9:0;m.material.opacity=on?1:.55});
+ cristal.gem.material.emissiveIntensity=.15+.85*k/21;cristal.glow.material.opacity=.15+.6*k/21}
+function vila(){const G=new THREE.Group(),M=(c,o)=>mat(c,o),near=[];
+ const flatM=(geo,c,y,o)=>{const m=new THREE.Mesh(geo,M(c,{roughness:.95,...o}));m.rotation.x=-Math.PI/2;m.position.y=y;m.receiveShadow=true;G.add(m);return m};
+ flatM(new THREE.CircleGeometry(7.7,72),0xd9c9a3,.004);flatM(new THREE.RingGeometry(7.7,8.2,72),0xb0966a,.006);
+ flatM(new THREE.RingGeometry(24,28,72),0xf1dfae,.008);const mar=flatM(new THREE.RingGeometry(28,160,72),0x3aa6d8,.01,{roughness:.25,metalness:.15});
+ /* caminho de pedras da praça até o farol */
+ for(let i=0;i<6;i++){const t=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.05,14),M(0xd8c9a8,{roughness:.95}));t.position.copy(P3(.5+i*.3,8.8+i*.75,.025));G.add(t)}
+ const toCenter=(x,y)=>Math.atan2(-x,y);
+ const casa=(x,y,cw,cr,s=1)=>{const g=new THREE.Group(),w=M(cw,{roughness:.8});
+  const b=new THREE.Mesh(new THREE.BoxGeometry(2*s,1.6*s,1.8*s),w);b.position.y=.8*s;b.castShadow=true;g.add(b);
+  const t=new THREE.Mesh(new THREE.ConeGeometry(1.62*s,1.1*s,4),M(cr,{roughness:.7}));t.position.y=2.15*s;t.rotation.y=Math.PI/4;t.castShadow=true;g.add(t);
+  const d=new THREE.Mesh(new THREE.BoxGeometry(.46*s,.82*s,.06),M(0x6b4a33));d.position.set(0,.41*s,.91*s);g.add(d);
+  [-.6,.6].forEach(px=>{const j=new THREE.Mesh(new THREE.PlaneGeometry(.38*s,.38*s),new THREE.MeshStandardMaterial({color:0xfff1b8,emissive:0xffd76a,emissiveIntensity:.45}));j.position.set(px*s,1.02*s,.915*s);g.add(j)});
+  g.position.copy(P3(x,y));g.rotation.y=toCenter(x,y);G.add(g);near.push(g);return g};
+ const arvore=(x,y,s=1)=>{const g=new THREE.Group();const tr=new THREE.Mesh(new THREE.CylinderGeometry(.12*s,.18*s,1*s,8),M(0x7a5536));tr.position.y=.5*s;g.add(tr);
+  [[0,1.45,.75],[.3,1.15,.5],[-.32,1.2,.5]].forEach(([dx,dy,r])=>{const f=new THREE.Mesh(new THREE.IcosahedronGeometry(r*s,1),M(0x3f9a4a,{roughness:.9,flatShading:true}));f.position.set(dx*s,dy*s,0);f.castShadow=true;g.add(f)});
+  g.position.copy(P3(x,y));G.add(g);near.push(g);return g};
+ const pol=(a,r)=>[Math.cos(a*D2R)*r,Math.sin(a*D2R)*r];
+ [[18,11.2,0xf3e3c3,0xd23f45],[42,11.6,0xcfe7f7,0x2f6fd6],[118,11.8,0xfde2c8,0xd58200],[142,11.3,0xe3f2d8,0x1b9a52],[166,11,0xf5d5e3,0xd93a7f],[-14,12,0xe9e2f8,0x6b4fd8],[194,12,0xf3e3c3,0x0e8f86]]
+  .forEach(([a,r,c1,c2])=>{const [x,y]=pol(a,r);casa(x,y,c1,c2,a%2?1.05:.95)});
+ [[30,14],[56,15.5],[100,15],[130,14.5],[155,15.5],[6,15],[178,14.6],[-30,15.5],[210,15],[230,17],[310,17],[260,18],[285,18]].forEach(([a,r],i)=>{const [x,y]=pol(a,r);arvore(x,y,.9+((i*37)%5)/10)});
+ /* flores baixas na frente, para não tapar a praça */
+ [[-7.6,-5.2],[-6.4,-6.6],[6.8,-5.8],[7.8,-4.4],[-3.2,-8.6],[3.6,-8.4]].forEach(([x,y],i)=>{const c=[0xffd24a,0xff6aa8,0xffffff,0x9b7bff][i%4];
+  for(let k=0;k<5;k++){const f=new THREE.Mesh(new THREE.SphereGeometry(.12,8,6),M(c));f.position.copy(P3(x+Math.cos(k*1.3)*.35,y+Math.sin(k*1.3)*.35,.2));G.add(f)}});
+ /* padaria da Dona Fornalha */
+ const pad=new THREE.Group();const balc=new THREE.Mesh(new THREE.BoxGeometry(2.6,.9,.9),M(0xa86b3c,{roughness:.8}));balc.position.y=.45;balc.castShadow=true;pad.add(balc);
+ const cv=document.createElement("canvas");cv.width=256;cv.height=64;const cg=cv.getContext("2d");for(let i=0;i<8;i++){cg.fillStyle=i%2?"#ffffff":"#e0457b";cg.fillRect(i*32,0,32,64)}
+ const tol=new THREE.Mesh(new THREE.BoxGeometry(2.9,.12,1.4),new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(cv)}));tol.position.set(0,2,.15);tol.rotation.x=.18;pad.add(tol);
+ [-1.3,1.3].forEach(px=>{const po=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,2,8),M(0x6b4a33));po.position.set(px,1,-.3);pad.add(po)});
+ for(let i=0;i<3;i++){const pa=new THREE.Mesh(new THREE.SphereGeometry(.28,14,10),M(0xd99a52));pa.scale.set(1.6,.7,.9);pa.position.set(-.8+i*.8,1.02,0);pad.add(pa)}
+ const sg=document.createElement("canvas");sg.width=256;sg.height=72;const sx=sg.getContext("2d");sx.fillStyle="#fff7e8";sx.beginPath();sx.roundRect(2,2,252,68,16);sx.fill();sx.fillStyle="#a8452f";sx.font='800 44px "Baloo 2",system-ui,sans-serif';sx.textAlign="center";sx.textBaseline="middle";sx.fillText("PADARIA",128,40);
+ const placa=new THREE.Mesh(new THREE.PlaneGeometry(1.6,.45),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(sg),transparent:true}));placa.position.set(0,2.45,.5);pad.add(placa);
+ pad.position.copy(P3(-5.2,9.4));pad.rotation.y=toCenter(-5.2,9.4);G.add(pad);near.push(pad);
+ /* farol com o Cristal do Inteiro e os 21 pedaços em volta */
+ const far=new THREE.Group();const tw=new THREE.Mesh(new THREE.CylinderGeometry(.55,.85,4.2,24),M(0xffffff,{roughness:.6}));tw.position.y=2.1;tw.castShadow=true;far.add(tw);
+ [.9,2.2,3.4].forEach(h=>{const r=new THREE.Mesh(new THREE.CylinderGeometry(.85-.3*h/4.2+.015,.85-.3*(h-.35)/4.2+.015,.35,24),M(0xd23f45));r.position.y=h;far.add(r)});
+ const vid=new THREE.Mesh(new THREE.CylinderGeometry(.62,.62,.75,20,1,true),new THREE.MeshStandardMaterial({color:0xbfe8ff,transparent:true,opacity:.3,side:2}));vid.position.y=4.55;far.add(vid);
+ const teto=new THREE.Mesh(new THREE.ConeGeometry(.78,.6,20),M(0xd23f45));teto.position.y=5.22;far.add(teto);
+ const gem=new THREE.Mesh(new THREE.OctahedronGeometry(.34),new THREE.MeshStandardMaterial({color:0xff7ab8,emissive:0xff2f86,emissiveIntensity:.2,roughness:.15,metalness:.1}));gem.position.y=4.55;gem.scale.y=1.4;far.add(gem);
+ const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xff5fa2,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.2}));glow.scale.set(3.2,3.2,1);glow.position.y=4.55;far.add(glow);
+ const ring=new THREE.Group();ring.position.y=4.55;far.add(ring);const shards=[];
+ for(let i=0;i<21;i++){const a=i/21*Math.PI*2,m=new THREE.Mesh(new THREE.OctahedronGeometry(.1),new THREE.MeshStandardMaterial({color:0xc9d2de,transparent:true,opacity:.55,roughness:.2}));m.position.set(Math.cos(a)*1.05,Math.sin(a*3)*.06,Math.sin(a)*1.05);m.scale.y=1.5;ring.add(m);shards.push(m)}
+ far.position.copy(P3(2.6,12.6));G.add(far);near.push(far);cristal={gem,glow,shards};
+ /* esconde o que ficar colado na câmera quando o aluno gira a vista; mar ondulando e cristal girando */
+ G.userData.tick=t=>{const cx=cam.position.x,cz=cam.position.z;near.forEach(o=>{o.visible=Math.hypot(o.position.x-cx,o.position.z-cz)>3.2});ring.rotation.y=t*.35;gem.rotation.y=-t*.8;mar.material.color.setHSL(.55,.62,.53+Math.sin(t*.8)*.015)};
+ return G}
+
+/* ---------- Peças de fração (entram em "root") ---------- */
+const FR=(n,d)=>`<span class="fr"><i>${n}</i><i>${d}</i></span>`;
+const FLASH=`<span class="flash">⚡ REVISÃO RELÂMPAGO</span> · `;
+const TICO=0x2f6fd6,TECA=0xd93a7f,FORNA=0xd58200,PREF=0x1b9a52;
+const olha=(x,y,tx=0,ty=0)=>Math.atan2(ty-y,tx-x)/D2R;
+const cam3=(o={})=>camTo({th:Math.PI/2-.35,ph:.98,r:13.5,tx:0,tz:0,...o});
+/* fração empilhada (3 em cima de 4) como placa no ar */
+function fracTag(n,d,x,y,h=1,o={}){const c=document.createElement("canvas"),g=c.getContext("2d"),fs=64,W=Math.max(String(n).length,String(d).length)*38+62,H=fs*2+36;c.width=W;c.height=H;
+ g.fillStyle=o.bg||"rgba(255,255,255,.95)";g.beginPath();g.roundRect(2,2,W-4,H-4,24);g.fill();g.fillStyle=o.color||"#172536";g.font=`800 ${fs}px "Baloo 2",system-ui,sans-serif`;g.textAlign="center";g.textBaseline="middle";
+ g.fillText(String(n),W/2,H/2-fs/2+2);g.fillRect(20,H/2-3,W-40,6);g.fillText(String(d),W/2,H/2+fs/2+6);
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));const sc=o.size||1.1;sp.scale.set(sc*W/H,sc,1);sp.position.copy(P3(x,y,h));sp.renderOrder=11;return add(sp)}
+/* bolo (ou pizza) cortado em fatias; ang = tamanhos diferentes (para mostrar o corte injusto) */
+function bolo(x,y,n,o={}){const r=o.r||1.5,h=o.h||.55,P=[],fr=o.ang||Array(n).fill(1/n),gap=n>1?(o.gap??.07):0;let a0=Math.PI/2;
+ const C=o.pizza?[0xe9a443,0xd23f45,0xf7d06a]:[FC.massa,0xd98aa8,0xf7c948];
+ fr.forEach((f,i)=>{const a1=a0,a2=a0+f*Math.PI*2;a0=a2;const sh=new THREE.Shape();sh.moveTo(0,0);sh.absarc(0,0,r,a1,a2,false);sh.lineTo(0,0);const seg=Math.max(3,Math.ceil(56*f));
+  const m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:h,bevelEnabled:false,curveSegments:seg}),mat(C[0],{roughness:.75}));m.rotation.x=-Math.PI/2;
+  const cap=new THREE.Mesh(new THREE.ShapeGeometry(sh,seg),new THREE.MeshStandardMaterial({color:C[2],roughness:.5}));cap.position.z=h+.012;m.add(cap);
+  const mid=(a1+a2)/2,off=gap+(o.explode||0);m.position.copy(P3(x+Math.cos(mid)*off,y+Math.sin(mid)*off,0));m.castShadow=true;add(m);
+  if(o.pizza&&n==1)for(let k=0;k<6;k++){const q=new THREE.Mesh(new THREE.CylinderGeometry(r*.13,r*.13,.02,14),mat(0xb8322f));q.rotation.x=Math.PI/2;const aa=k*1.05+.3,rr=k?r*.58:0;q.position.set(Math.cos(aa)*rr,Math.sin(aa)*rr,h+.03);m.add(q)}
+  const p={m,i,mid,set(on){cap.material.color.setHex(on?(o.pizza?0xd23f45:0xe0457b):C[2]);m.material.color.setHex(on?C[1]:C[0]);p.on=on}};P.push(p)});
+ (o.on||[...Array(o.pint||0).keys()]).forEach(i=>P[i]&&P[i].set(true));return P}
+const FC={massa:0xd99a5b};
+/* barra cortada em partes (cristal, pão ou chocolate); w = larguras diferentes (corte injusto) */
+function barra(x,y,n,o={}){const L=o.L||6,d=o.d||.9,h=o.h||.42,gap=n>1?(o.gap??.08):0,ws=o.w||Array(n).fill(1/n),P=[],K=o.kind||"cris";
+ const C={cris:[0xdfe7f1,0xff5fa2],pao:[0xa9682f,0xffd24a],choc:[0x7a4a2a,0xe0457b]}[K];let cx=x-L/2;
+ ws.forEach((f,i)=>{const w=f*L,m=new THREE.Mesh(new THREE.BoxGeometry(Math.max(.05,w-gap),h,d),mat(C[0],K=="cris"?{roughness:.25,transparent:true,opacity:.93}:{roughness:.75}));
+  m.position.copy(P3(cx+w/2,y,h/2+(o.lift||0)));cx+=w;m.castShadow=true;add(m);
+  const p={m,i,set(on){m.material.color.setHex(on?C[1]:C[0]);m.material.emissive.setHex(on?C[1]:0);m.material.emissiveIntensity=on?(K=="cris"?.55:.35):0;p.on=on}};P.push(p)});
+ (o.on||[...Array(o.pint||0).keys()]).forEach(i=>P[i]&&P[i].set(true));return P}
+/* lanternas da praça (um grupo de objetos como inteiro) */
+function lanterna(x,y,on){const g=new THREE.Group(),post=new THREE.Mesh(new THREE.CylinderGeometry(.05,.07,1.1,10),mat(0x3b4250));post.position.y=.55;g.add(post);
+ const lamp=new THREE.Mesh(new THREE.SphereGeometry(.28,18,14),mat(0x8d98a8,{roughness:.4}));lamp.position.y=1.26;g.add(lamp);
+ const cap=new THREE.Mesh(new THREE.ConeGeometry(.27,.22,12),mat(0x3b4250));cap.position.y=1.52;g.add(cap);
+ const hl=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xffd24a,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:0}));hl.scale.set(1.8,1.8,1);hl.position.y=1.26;g.add(hl);
+ g.position.copy(P3(x,y));add(g);const p={m:g,set(v){lamp.material.color.setHex(v?0xffd24a:0x8d98a8);lamp.material.emissive.setHex(v?0xffb300:0);lamp.material.emissiveIntensity=v?.9:0;hl.material.opacity=v?.7:0;p.on=v}};if(on)p.set(true);return p}
+function lanternas(n,cols,o={}){const P=[],dx=o.dx||1.15,dy=o.dy||1.35,rows=Math.ceil(n/cols),x0=(o.x||0)-(cols-1)*dx/2,y0=(o.y??.6)+(rows-1)*dy/2;
+ for(let i=0;i<n;i++)P.push(lanterna(x0+(i%cols)*dx,y0-Math.floor(i/cols)*dy,i<(o.pint||0)));return P}
+/* morador robô da vila */
+function morador(x,y,c=TICO,a=-90,o={}){const g=new THREE.Group(),s=o.s||1;
+ const body=new THREE.Mesh(new THREE.BoxGeometry(.62,.6,.46),mat(c,{roughness:.45}));body.position.y=.56;body.castShadow=true;g.add(body);
+ const head=new THREE.Mesh(new THREE.BoxGeometry(.68,.5,.5),mat(0xe9eef5,{roughness:.4}));head.position.y=1.14;head.castShadow=true;g.add(head);
+ const scr=new THREE.Mesh(new THREE.PlaneGeometry(.52,.32),new THREE.MeshBasicMaterial({color:0x172536}));scr.position.set(0,1.14,.256);g.add(scr);
+ [-.12,.12].forEach(ex=>{const e=new THREE.Mesh(new THREE.CircleGeometry(.055,14),new THREE.MeshBasicMaterial({color:0x5ef0e0}));e.position.set(ex,1.16,.26);g.add(e)});
+ const ant=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.3),mat(0x3b4250));ant.position.y=1.54;g.add(ant);
+ const bl=new THREE.Mesh(new THREE.SphereGeometry(.075,10,8),mat(c,{emissive:c,emissiveIntensity:.5}));bl.position.y=1.72;g.add(bl);
+ [-.16,.16].forEach(lx=>{const l=new THREE.Mesh(new THREE.BoxGeometry(.16,.26,.2),mat(0x3b4250));l.position.set(lx,.13,0);g.add(l)});
+ g.scale.setScalar(s);g.position.copy(P3(x,y));g.rotation.y=(a+90)*D2R;const ph=x*1.7+y;g.userData.tick=t=>{body.position.y=.56+Math.sin(t*2.2+ph)*.02;head.rotation.z=Math.sin(t*1.3+ph)*.06};if(o.nome)label(o.nome,x,y,2.15,{size:.42});return add(g)}
+/* robôs em fila, olhando para trás (para o que está sendo repartido) */
+function fila(n,y=-2.6,cols=[TICO,TECA,FORNA,PREF,0x6b4fd8,0x0e8f86,0xee5f2b,0x586779],dx,a=90){const step=dx||Math.min(1.5,10/n),x0=-(n-1)*step/2,X=[];
+ for(let i=0;i<n;i++){X.push(x0+i*step);morador(x0+i*step,y,cols[i%cols.length],a,{s:n>6?.8:1})}return X}
+const COLS=[TICO,TECA,FORNA,PREF,0x6b4fd8,0x0e8f86,0xee5f2b,0x586779];
+const NOMES={2:"um meio",3:"um terço",4:"um quarto",5:"um quinto",6:"um sexto",7:"um sétimo",8:"um oitavo",9:"um nono",10:"um décimo"};
+const EXT={2:"dois",3:"três",4:"quatro",5:"cinco",6:"seis",7:"sete",8:"oito",9:"nove",10:"dez"};
+const DESEQ={2:[.66,.34],3:[.5,.32,.18],4:[.36,.28,.22,.14],5:[.3,.25,.2,.15,.1]};
+
+/* ---------- Perguntas prontas (cada uma com versões, para não dar para chutar) ---------- */
+/* que fração está pintada? */
+function qPint(k,n,forma="barra"){const ds=[[k,n-k],[n,k],[n-k,n],[k+1,n]].filter(([a,b])=>b>0&&a>0&&!(a==k&&b==n)&&!(a*n==k*b)).map(([a,b])=>FR(a,b));
+ return {q:`Que fração ${forma=="bolo"?"do bolo":forma=="pao"?"do pão":"da barra"} está pintada?`,o:[FR(k,n),...[...new Set(ds)].slice(0,2)],ans:0,
+  scene(){forma=="bolo"?bolo(1.2,.4,n,{r:2,pint:k}):barra(1.2,.6,n,{pint:k,kind:forma=="pao"?"pao":"cris",L:6.4})},
+  ok:`Isso! ${k} de ${n} partes iguais: ${FR(k,n)}.`,no:"Embaixo vai o número de partes do inteiro (conte todas, pintadas e não pintadas). Em cima, só as pintadas."}}
+/* qual nome tem o pedaço aceso? */
+function qNome(n){const o=[NOMES[n],"um "+EXT[n],EXT[n]+" inteiros"];
+ return {q:"Qual é o nome do pedaço aceso?",o,ans:0,scene(){barra(1.2,.6,n,{pint:1,kind:"pao",L:6.4})},ok:`Isso: o pão foi cortado em ${n} partes iguais, então cada uma é <b>${NOMES[n]}</b> (${FR(1,n)}).`,no:"Conte em quantas partes iguais o pão foi cortado. O nome da parte vem desse número."}}
+/* qual destes foi cortado em n partes iguais? (a resposta muda de lugar em cada versão) */
+function qCortes(n,certo){const tipos=[["eq",n],["deseq",n],["eq",n==2?3:n+1]],ord=[1,2];ord.splice(certo,0,0);
+ return {q:`Qual bolo foi cortado em <b>${n} partes iguais</b>?`,o:["A","B","C"],ans:certo,
+  scene(){ord.forEach((t,i)=>{const [k,m]=tipos[t],x=-4+i*4;k=="eq"?bolo(x,.8,m,{r:1.3}):bolo(x,.8,m,{r:1.3,ang:DESEQ[m]});label("ABC"[i],x,-1.1,.3,{size:.6})})},
+  ok:`Isso! Só o bolo ${"ABC"[certo]} tem ${n} partes do <b>mesmo tamanho</b>.`,no:`Confira duas coisas: são ${n} partes? E todas têm o mesmo tamanho?`}}
+/* qual é maior: 1/a ou 1/b do mesmo inteiro? */
+function qUnit(a,b){const big=a<b?a:b;
+ return {q:`Do mesmo pão, qual pedaço é <b>maior</b>: ${FR(1,a)} ou ${FR(1,b)}?`,o:[FR(1,a),FR(1,b),"São iguais"],ans:a<b?0:1,
+  ok:`Isso! Quanto menos partes, maior cada uma: ${FR(1,big)} é maior.`,no:`O número de baixo diz em quantas partes o pão foi cortado. Mais partes = pedaços menores. Veja os dois pães.`,
+  why(){barra(0,1.5,a,{pint:1,kind:"pao",L:7});barra(0,-.5,b,{pint:1,kind:"pao",L:7});fracTag(1,a,4.4,1.5,.9,{size:.9});fracTag(1,b,4.4,-.5,.9,{size:.9})}}}
+function fim3(){B().place(0,-1.5,80);camTo({th:Math.PI/2-.1,ph:1.33,r:14,tx:2,tz:-7});acendeCristal(crystalCount(new Set([...save.done,lid(cw,cl)])))}
+/* move uma peça (fatia, pedaço de barra) até um lugar, com um arco */
+const voa=(p,x,y,ms=380)=>slide(p.m,x,y,ms,.7);
+
+const W3=[
+/* 1 */{t:"Repartir de forma justa",d:"Partes iguais e o que é o inteiro.",i:"½",steps:[
+ {m:"feliz",t:"Bem-vindo ao <b>Mundo 3</b>, o Arquipélago das Partes! No alto do farol ficava o <b>Cristal do Inteiro</b>. Ele caiu e se partiu em <b>21 pedaços</b>. Cada aula que você concluir devolve um pedaço.",
+  set(){B().place(0,-1.5,80);camTo({th:Math.PI/2-.1,ph:1.33,r:14,tx:2,tz:-7})},async play(){await B().turnTo(78)}},
+ {m:"aponta",t:"Esta é a <b>Vila da Partilha</b>, a primeira ilha. Aqui tudo é repartido entre os moradores… mas nem sempre de um jeito justo. Primeiro, uma revisão relâmpago do Mundo 2.",
+  set(){B().place(-4.5,-2.5,30);cam3();morador(-1.6,1.4,TICO,olha(-1.6,1.4,0,0),{nome:"Tico"});morador(1.6,1.4,TECA,olha(1.6,1.4,0,0),{nome:"Teca"});bolo(0,-.4,1,{r:1.2})}},
+ {m:"normal",t:FLASH+"Do Mundo 2: dividir é repartir em grupos iguais.",set(){B().place(-4.5,-2.5,30);cam3()},
+  a:{k:"opt",q:"Quanto é 12 ÷ 3?",o:["4","3","9"],ans:0,ok:"Isso! 12 repartido em 3 grupos iguais dá <b>4</b> em cada.",no:"Reparta 12 em 3 grupos iguais. Quanto fica em cada grupo?",
+   vars:[{q:"Quanto é 20 ÷ 4?",o:["5","4","16"],ans:0,ok:"Isso: <b>5</b> em cada grupo.",no:"Pense: 4 vezes quanto dá 20?"},{q:"Quanto é 18 ÷ 6?",o:["3","12","2"],ans:0,ok:"Certo: <b>3</b>.",no:"6 vezes quanto dá 18?"}]}},
+ {m:"normal",t:FLASH+"Repartir sem ninguém ganhar mais.",set(){B().place(-4.5,-2.5,30);cam3()},
+  a:{k:"opt",q:"30 balas para 5 robôs, todos com a mesma quantidade. Cada um recebe…",o:["6 balas","5 balas","25 balas"],ans:0,ok:"Isso: 30 ÷ 5 = <b>6</b>.",no:"Isso é uma divisão: 30 repartido em 5 partes iguais.",
+   vars:[{q:"24 figurinhas para 3 amigos, todos com a mesma quantidade. Cada um recebe…",o:["8","6","21"],ans:0,ok:"Isso: 24 ÷ 3 = <b>8</b>.",no:"Reparta 24 em 3 partes iguais."},{q:"28 parafusos em 4 caixas iguais. Quantos em cada caixa?",o:["7","6","24"],ans:0,ok:"Certo: 28 ÷ 4 = <b>7</b>.",no:"4 vezes quanto dá 28?"}]}},
+ {m:"pensa",t:"Os robôs <b>Tico</b> e <b>Teca</b> vão dividir um bolo. A Teca cortou assim. Olhe bem os pedaços…",set(){B().place(-5,-2.5,30);cam3()},
+  a:{k:"opt",q:"Esse corte é justo?",o:["Não: os pedaços têm tamanhos diferentes","Sim: são 2 pedaços, um para cada"],ans:0,
+   scene(){bolo(0,.4,2,{r:1.8,ang:[.68,.32],explode:.15});morador(-3,.4,TICO,0);morador(3,.4,TECA,180)},
+   ok:"Isso! Um pedaço é bem maior que o outro. Ter 2 pedaços <b>não basta</b>: eles precisam ser <b>iguais</b>.",no:"Compare o tamanho dos dois pedaços. Os dois robôs ganhariam a mesma quantidade?",
+   vars:[{q:"E esta barra de chocolate, para 3 robôs?",o:["Não: os pedaços têm tamanhos diferentes","Sim: são 3 pedaços, um para cada"],ans:0,scene(){barra(0,.8,3,{kind:"choc",w:[.5,.3,.2],L:6.5});fila(3,-1.8)},ok:"Isso! O primeiro pedaço é bem maior: não é justo.",no:"Os 3 pedaços têm o mesmo tamanho?"},
+    {q:"E este bolo, para 4 robôs?",o:["Sim: os 4 pedaços são iguais","Não: os pedaços têm tamanhos diferentes"],ans:0,scene(){bolo(0,.6,4,{r:1.8,explode:.12});fila(4,-2.6)},ok:"Isso! 4 pedaços do mesmo tamanho: corte justo.",no:"Olhe de novo: os 4 pedaços têm o mesmo tamanho?"}]}},
+ {m:"aponta",t:"<b>Repartir de forma justa</b> é cortar em partes do <b>mesmo tamanho</b>. O bolo todo, antes de cortar, é o <b>inteiro</b>. Veja o corte justo para o Tico e a Teca:",
+  set(){B().place(-5,-2.5,30);cam3();morador(-3.4,.4,TICO,0);morador(3.4,.4,TECA,180);ov(CARDS([["Inteiro","o bolo todo"],["Partes iguais","mesmo tamanho"],["Justo","todos ganham igual"]]))},
+  async play(){const P=bolo(0,.4,1,{r:1.8});if(!(await wait(700)))return;clearStage();this.set();const Q=bolo(0,.4,2,{r:1.8});if(!(await wait(500)))return;
+   await voa(Q[0],-1.6,.4,600);await voa(Q[1],1.6,.4,600);label("metade",-1.6,-1.6,.3,{size:.5});label("metade",1.6,-1.6,.3,{size:.5})}},
+ {m:"normal",t:"Chegaram mais 2 robôs: agora são <b>4</b>. Corte o bolo para todos ganharem a mesma quantidade e aperte <b>Conferir</b>.",set(){B().place(-5.5,-2.5,30);cam3()},
+  a:{k:"step",check:1,c:[["Partes",1,8]],init:[1],goal:[4],draw:v=>{bolo(0,.6,v[0],{r:1.6});[[-3.2,.6,0],[3.2,.6,180],[0,3.6,-90],[0,-2.4,90]].forEach(([x,y,a],i)=>morador(x,y,[TICO,TECA,FORNA,PREF][i],a))},
+   txt:v=>v[0]==1?"bolo inteiro":`${v[0]} partes iguais`,test:v=>v[0]==4,ok:()=>"Isso! 4 robôs, 4 partes iguais: cada um ganha <b>um quarto</b> do bolo.",
+   no:v=>v[0]<4?"Assim alguém fica sem pedaço. Conte quantos robôs há em volta do bolo.":"Assim sobram pedaços. Cada robô deve ganhar exatamente um."}},
+ {m:"pensa",t:"Partes iguais podem ter <b>formas diferentes</b>! Os dois quadrados foram cortados ao meio de jeitos diferentes. Nos dois, as partes têm o mesmo tamanho: são <b>metades</b>.",
+  set(){B().place(-6,-3,30);cam3();poly([[-5,-1],[-3,-1],[-3,2],[-5,2]],{color:0xe0457b,op:.45});poly([[-3,-1],[-1,-1],[-1,2],[-3,2]],{color:0x2f6fd6,op:.3});
+   poly([[1.5,-1],[4.5,-1],[1.5,2]],{color:0xe0457b,op:.45});poly([[4.5,-1],[4.5,2],[1.5,2]],{color:0x2f6fd6,op:.3});label("cortado ao meio",-3,-1.9,.3,{size:.45});label("cortado na diagonal",3,-1.9,.3,{size:.45})}},
+ {m:"normal",t:"Olhe os três bolos com atenção. Gire a câmera se precisar.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"opt",fix:1,...qCortes(3,0),vars:[qCortes(3,2),qCortes(4,1),qCortes(2,2)]}},
+ {m:"normal",t:"<b>Missão da aula:</b> a padaria tem 1 pão comprido para <b>6 robôs</b>. Corte o pão para todos ganharem a mesma quantidade.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"step",check:1,c:[["Partes",1,10]],init:[1],goal:[6],draw:v=>{barra(0,1.4,v[0],{kind:"pao",L:7.5});fila(6,-1.6)},txt:v=>v[0]==1?"pão inteiro":`${v[0]} partes iguais`,test:v=>v[0]==6,
+   ok:()=>"Missão cumprida! 6 robôs, 6 partes iguais: cada um ganha <b>um sexto</b> do pão.",no:v=>v[0]<6?"Faltou pedaço para alguém. Conte os robôs da fila.":"Sobrou pão. Cada robô ganha só um pedaço."}},
+ {m:"festa",end:1,t:"Você aprendeu a regra de ouro das frações: <b>partes iguais</b>! Olhe o farol: o primeiro pedaço do cristal voltou.",set(){fim3()},badge:["½","Repartidor justo","Partes iguais e o inteiro."]}]},
+
+/* 2 */{t:"Metade, terço, quarto",d:"Cada parte tem um nome: meio, terço, quarto, quinto…",i:"⅓",steps:[
+ {m:"feliz",t:"Esta é a <b>Dona Fornalha</b>, a padeira da vila. Ela corta os pães em partes iguais, e cada tipo de parte tem um <b>nome</b>.",
+  set(){B().place(-5,-2.5,30);cam3();morador(2.4,1.8,FORNA,-100,{nome:"Dona Fornalha"});barra(-.6,-.4,1,{kind:"pao",L:5})}},
+ {m:"normal",t:FLASH+"Do Mundo 2.",set(){B().place(-5,-2.5,30);cam3()},
+  a:{k:"opt",q:"Quanto é 15 ÷ 5?",o:["3","5","10"],ans:0,ok:"Isso: <b>3</b>.",no:"5 vezes quanto dá 15?",vars:[{q:"Quanto é 24 ÷ 6?",o:["4","6","18"],ans:0,ok:"Isso: <b>4</b>.",no:"6 vezes quanto dá 24?"},{q:"Quanto é 16 ÷ 2?",o:["8","4","14"],ans:0,ok:"Isso: <b>8</b>.",no:"Metade de 16 é quanto?"}]}},
+ {m:"normal",t:FLASH+"Da aula 1: corte justo.",set(){B().place(-6,-3,30);cam3()},a:{k:"opt",fix:1,...qCortes(4,2),vars:[qCortes(2,0),qCortes(3,1)]}},
+ {m:"aponta",t:"Veja os nomes. Pão cortado em 2: cada parte é <b>um meio</b> (a metade). Em 3: <b>um terço</b>. Em 4: <b>um quarto</b>. Em 5: <b>um quinto</b>.",
+  set(){B().place(-6.2,-3,30);cam3({tx:.4})},
+  async play(){const N=[2,3,4,5];for(let i=0;i<4;i++){const y=2.9-i*1.65;barra(-1.2,y,N[i],{kind:"pao",L:6,pint:1,d:.75});fracTag(1,N[i],2.9,y,.45,{size:.7});label(NOMES[N[i]],4.9,y,.3,{size:.4});if(!(await wait(650)))return}
+   ov(CARDS([[FR(1,2),"um meio (metade)"],[FR(1,3),"um terço"],[FR(1,4),"um quarto"],[FR(1,5),"um quinto"]]))}},
+ {m:"aponta",t:"Depois vêm <b>sexto, sétimo, oitavo, nono</b> e <b>décimo</b>. De 11 em diante, a gente fala o número e diz <b>avos</b>: um doze avos. E 1 de 100 partes é <b>um centésimo</b>.",
+  set(){B().place(-6,-3,30);cam3();barra(0,1.8,8,{kind:"pao",L:7,pint:1,d:.7});barra(0,.4,10,{kind:"pao",L:7,pint:1,d:.7});barra(0,-1,12,{kind:"pao",L:7,pint:1,d:.7});
+   ov(CARDS([[FR(1,8),"um oitavo"],[FR(1,10),"um décimo"],[FR(1,12),"um doze avos"],[FR(1,100),"um centésimo"]]))}},
+ {m:"normal",t:"Corte o pão para que o pedaço aceso seja <b>um quinto</b>. Depois aperte Conferir.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"step",check:1,c:[["Partes",1,8]],init:[1],goal:[5],draw:v=>{barra(0,.8,v[0],{kind:"pao",L:7,pint:v[0]>1?1:0})},txt:v=>v[0]==1?"pão inteiro":`cada parte = ${FR(1,v[0])} · ${NOMES[v[0]]}`,test:v=>v[0]==5,
+   ok:()=>`Isso! Em 5 partes iguais, cada uma é <b>um quinto</b>: ${FR(1,5)}.`,no:()=>"Quinto vem de cinco: em quantas partes iguais o pão precisa ser cortado?"}},
+ {m:"normal",t:"Agora diga o nome.",set(){B().place(-6,-3,30);cam3()},a:{k:"opt",...qNome(8),vars:[qNome(6),qNome(3),qNome(10)]}},
+ {m:"pensa",t:"Repare: <b>quanto mais partes, menor cada uma</b>. Um meio, um quarto e um oitavo do <b>mesmo</b> pão:",set(){B().place(-6.2,-3,30);cam3()},
+  async play(){[2,4,8].forEach((n,i)=>{barra(-.6,2-i*1.6,n,{kind:"pao",L:6.4,pint:1,d:.8});fracTag(1,n,3.6,2-i*1.6,.7,{size:.85})});if(!(await wait(400)))return;
+   label("o mesmo pão, mais partes, pedaço menor",0,-3.2,.3,{size:.45})}},
+ {m:"normal",t:"<b>Pegadinha!</b> Pense antes de responder.",set(){B().place(-6,-3,30);cam3()},a:{k:"opt",...qUnit(3,6),vars:[qUnit(10,4),qUnit(2,5),qUnit(8,7)]}},
+ {m:"normal",t:"<b>Missão da aula:</b> a Dona Fornalha quer dar <b>um quinto de pão</b> ao Tico. Toque no pedaço certo para acendê-lo (no 3D ou nos botões) e aperte Conferir.",set(){B().place(-6.3,-3,30);cam3()},
+  a:{k:"paint",q:`Acenda ${FR(1,5)} de pão`,draw:()=>{const A=barra(.4,2,4,{kind:"pao",L:6}),Bp=barra(.4,0,5,{kind:"pao",L:6});label("Pão A",-3.6,2,.4,{size:.45});label("Pão B",-3.6,0,.4,{size:.45});
+    A.forEach((p,i)=>p.tag="A"+(i+1));Bp.forEach((p,i)=>p.tag="B"+(i+1));return [...A,...Bp]},sol:[4],
+   test:(on,P)=>{if(on.size!=1)return `Ela quer só <b>um</b> pedaço, e você acendeu ${on.size}.`;const p=P[[...on][0]];return p.tag[0]=="B"?true:"Esse pão foi cortado em 4 partes iguais: cada pedaço é um <b>quarto</b>, não um quinto."},
+   ok:"Missão cumprida! O pão B tem 5 partes iguais, então cada pedaço dele é <b>um quinto</b>.",no:"Confira em quantas partes cada pão foi cortado."}},
+ {m:"festa",end:1,t:"Agora você sabe o nome de cada parte. Mais um pedaço do cristal voltou para o farol!",set(){fim3()},badge:["⅓","Nomeador de partes","Meio, terço, quarto, quinto…"]}]},
+
+/* 3 */{t:"Numerador e denominador",d:"Escrever e ler frações como 3/4.",i:"¾",steps:[
+ {m:"aponta",t:"Olhe a minha <b>barra de energia</b>: ela tem 4 partes iguais, e 3 estão acesas. Como escrever isso com números?",set(){B().place(-5,-2.5,30);cam3();barra(1,.8,4,{pint:3,L:6})}},
+ {m:"normal",t:FLASH+"Da aula 2: o nome das partes.",set(){B().place(-6,-3,30);cam3()},a:{k:"opt",...qNome(5),vars:[qNome(4),qNome(9),qNome(2)]}},
+ {m:"normal",t:FLASH+"Da aula 1: corte justo.",set(){B().place(-6,-3,30);cam3()},a:{k:"opt",fix:1,...qCortes(3,1),vars:[qCortes(4,0),qCortes(2,2)]}},
+ {m:"aponta",t:"Escrevemos <b>3/4</b>. O número de baixo, o <b>denominador</b>, diz em quantas partes iguais o inteiro foi dividido. O de cima, o <b>numerador</b>, conta quantas partes estamos usando.",
+  set(){B().place(-6,-3,30);cam3();barra(-1,.6,4,{pint:3,L:5.6});fracTag(3,4,3.6,.6,1.1,{size:1.5});label("partes acesas",5.7,1.3,.6,{size:.4});label("partes ao todo",5.7,-.1,.6,{size:.4});
+   ov(CARDS([["3","numerador: quantas eu conto"],["4","denominador: em quantas dividi"]]))}},
+ {m:"aponta",t:"Para ler: primeiro o numerador, depois o nome da parte. <b>3/4</b> se lê <b>três quartos</b>. Veja outros:",
+  set(){B().place(-6,-3,30);cam3();barra(-1,1.6,5,{pint:2,L:5.6,d:.75});fracTag(2,5,3.4,1.6,.8,{size:.9});barra(-1,-.2,8,{pint:5,L:5.6,d:.75});fracTag(5,8,3.4,-.2,.8,{size:.9});
+   ov(CARDS([[FR(2,5),"dois quintos"],[FR(5,8),"cinco oitavos"],[FR(7,10),"sete décimos"],[FR(4,12),"quatro doze avos"]]))}},
+ {m:"normal",t:"Sua vez: acenda a fração pedida, tocando nas partes, e aperte Conferir.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"paint",q:`Acenda ${FR(2,5)} da barra`,draw:()=>barra(.5,.8,5,{L:7}),sol:[0,1],test:on=>on.size==2||`Você acendeu ${on.size}. O numerador (em cima) diz quantas partes acender.`,ok:`Isso! 2 de 5 partes: ${FR(2,5)}, dois quintos.`}},
+ {m:"normal",t:"Agora no bolo.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"paint",q:`Pinte ${FR(5,8)} do bolo`,draw:()=>bolo(.8,.4,8,{r:2.2}),sol:[0,1,2,3,4],test:on=>on.size==5||`Você pintou ${on.size}. O bolo tem 8 partes: pinte o número que está em cima.`,ok:`Isso! 5 de 8 fatias: ${FR(5,8)}, cinco oitavos.`}},
+ {m:"normal",t:"Leia a figura.",set(){B().place(-6,-3,30);cam3()},a:{k:"opt",...qPint(5,6,"bolo"),vars:[qPint(2,5),qPint(3,8,"bolo"),qPint(3,4,"pao")]}},
+ {m:"pensa",t:"<b>Pegadinha!</b> Os robôs estão discutindo.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"opt",q:"O Tico disse que a parte acesa é <b>2/3</b>, porque são 2 acesas e 3 apagadas. Ele está certo?",o:[`Não: são 5 partes ao todo, então é ${FR(2,5)}`,"Sim, está certo"],ans:0,scene(){barra(1,.8,5,{pint:2,L:6.4});morador(-4,-1.4,TICO,60,{nome:"Tico"})},
+   ok:"Isso! O denominador conta <b>todas</b> as partes do inteiro: 2 acesas + 3 apagadas = 5.",no:"Conte todas as partes da barra, acesas e apagadas. Esse é o denominador.",
+   vars:[{q:"A Teca disse que a parte acesa é <b>3/4</b>. Ela está certa?",o:["Sim: 3 acesas de 4 partes",`Não: é ${FR(3,1)}`],ans:0,scene(){barra(1,.8,4,{pint:3,L:6.4});morador(-4,-1.4,TECA,60,{nome:"Teca"})},ok:"Isso! 3 acesas de 4 partes iguais: <b>3/4</b>.",no:"Conte: quantas partes ao todo? Quantas acesas?"},
+    {q:"O Tico disse que a fatia pintada é <b>1/5</b> do bolo. Ele está certo?",o:[`Não: o bolo tem 6 fatias, então é ${FR(1,6)}`,"Sim, está certo"],ans:0,scene(){bolo(1,.6,6,{r:2,pint:1});morador(-4,-1.4,TICO,60,{nome:"Tico"})},ok:"Isso! O bolo tem 6 fatias: a pintada é <b>1/6</b>.",no:"Conte todas as fatias do bolo."}]}},
+ {m:"pensa",t:"E se todas as partes estiverem acesas? <b>4/4</b> é a barra inteira: <b>4/4 = 1</b>. E nenhuma acesa é <b>0/4 = 0</b>.",set(){B().place(-6,-3,30);cam3()},
+  async play(){let tag=null;const P=barra(-.6,.8,4,{L:6});for(let k=0;k<=4;k++){P.forEach((p,i)=>p.set(i<k));if(tag)root.remove(tag);tag=fracTag(k,4,3.8,.8,1,{size:1.2});if(!(await wait(700)))return}
+   label("4/4 = 1 inteiro",0,-1.2,.3,{size:.55})}},
+ {m:"normal",t:"<b>Missão da aula:</b> a casa do farol tem 6 janelas, e 5 estão acesas. Monte a fração das janelas acesas e aperte Conferir.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"step",check:1,c:[["Numerador",0,10],["Denominador",1,10]],init:[1,1],goal:[5,6],
+   draw:v=>{const g=new THREE.Mesh(new THREE.BoxGeometry(5.2,3,.3),mat(0xf3e3c3,{roughness:.8}));g.position.copy(P3(-1.2,1.6,1.5));g.castShadow=true;add(g);
+    for(let i=0;i<6;i++){const w=new THREE.Mesh(new THREE.PlaneGeometry(1,.8),new THREE.MeshStandardMaterial({color:i<5?0xffe27a:0x4a5568,emissive:i<5?0xffc93a:0,emissiveIntensity:i<5?.8:0}));w.position.copy(P3(-2.8+(i%3)*1.6,1.44,2.3-Math.floor(i/3)*1.3));add(w)}
+    fracTag(v[0],v[1],3.6,.6,1.1,{size:1.3})},
+   txt:v=>`${FR(v[0],v[1])}`,test:v=>v[0]==5&&v[1]==6,ok:()=>`Missão cumprida! 5 de 6 janelas: ${FR(5,6)}, <b>cinco sextos</b>.`,
+   no:v=>v[1]!=6?"O denominador conta <b>todas</b> as janelas da casa.":"O numerador conta só as janelas <b>acesas</b>."}},
+ {m:"festa",end:1,t:"Agora você sabe escrever e ler frações! Mais um pedaço do cristal acendeu no farol.",set(){fim3()},badge:["¾","Escritor de frações","Numerador e denominador."]}]},
+
+/* 4 */{t:"Fração de um grupo",d:"O inteiro também pode ser um grupo de objetos.",i:"●○",steps:[
+ {m:"feliz",t:"O <b>Prefeito</b> da vila quer acender as lanternas da praça. Mas a energia só dá para <b>metade</b> delas. Quantas ele pode acender?",
+  set(){B().place(-6,-3,30);cam3();morador(-4.6,1.8,PREF,-30,{nome:"Prefeito"});lanternas(10,5,{x:.8,y:.6})}},
+ {m:"normal",t:FLASH+"Da aula 2: comparar partes.",set(){B().place(-6,-3,30);cam3()},a:{k:"opt",...qUnit(4,9),vars:[qUnit(6,3),qUnit(5,10)]}},
+ {m:"normal",t:FLASH+"Da aula 1: corte justo.",set(){B().place(-6,-3,30);cam3()},a:{k:"opt",fix:1,...qCortes(2,1),vars:[qCortes(4,2),qCortes(3,0)]}},
+ {m:"pensa",t:"Até agora o inteiro era <b>uma coisa só</b>: um bolo, uma barra. Mas o inteiro também pode ser um <b>grupo</b>. Aqui, o inteiro são as <b>10 lanternas</b>. Separando em 2 grupos iguais…",
+  set(){B().place(-6,-3,30);cam3()},
+  async play(){const P=lanternas(10,5,{x:.8,y:.6});if(!(await wait(700)))return;
+   for(let i=0;i<10;i++){const g=i<5?0:1,q=i%5;if(!(await slide(P[i].m,-2.6+g*5.2+(q%3-1)*1.1,1.4-Math.floor(q/3)*1.4,160,.5)))return}
+   label("5",-2.6,-1.6,.3,{size:.6});label("5",2.6,-1.6,.3,{size:.6})}},
+ {m:"aponta",t:"…ficam <b>5 em cada grupo</b>. Então metade das lanternas é 5: <b>1/2 de 10 = 5</b>. Para achar a fração de um grupo, a gente <b>divide</b> o grupo em partes iguais.",
+  set(){B().place(-6,-3,30);cam3();[0,1].forEach(g=>{for(let q=0;q<5;q++)lanterna(-2.6+g*5.2+(q%3-1)*1.1,1.4-Math.floor(q/3)*1.4,g==0)});
+   ov(CARDS([["10","o inteiro: o grupo todo"],["÷ 2","2 partes iguais"],["5",`${FR(1,2)} de 10`]]))}},
+ {m:"normal",t:"Sua vez. Toque nas lanternas para acender (ou use os botões) e aperte Conferir.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"paint",q:`Acenda ${FR(1,2)} das 10 lanternas`,draw:()=>lanternas(10,5,{x:.8,y:.6}),sol:[0,1,2,3,4],test:on=>on.size==5||`Você acendeu ${on.size}. Separe as 10 em 2 grupos iguais e acenda um grupo.`,ok:"Isso! 10 ÷ 2 = 5 lanternas acesas."}},
+ {m:"normal",t:"Agora são 12 lanternas.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"paint",q:`Acenda ${FR(1,3)} das 12 lanternas`,draw:()=>lanternas(12,4,{x:.8,y:.4}),sol:[0,1,2,3],test:on=>on.size==4||`Você acendeu ${on.size}. Divida as 12 em 3 grupos iguais: quantas ficam em cada grupo?`,ok:"Isso! 12 ÷ 3 = <b>4</b> lanternas."}},
+ {m:"aponta",t:"E <b>2/3 de 12</b>? Divido em 3 grupos iguais (12 ÷ 3 = 4) e acendo <b>2 grupos</b>: 2 × 4 = <b>8</b> lanternas.",set(){B().place(-6,-3,30);cam3()},
+  async play(){const P=lanternas(12,4,{x:.8,y:.4});label("4",4,1.75,.4,{size:.5});label("4",4,.4,.4,{size:.5});label("4",4,-.95,.4,{size:.5});if(!(await wait(600)))return;
+   for(let i=0;i<8;i++){P[i].set(true);if(!(await wait(160)))return}label("2/3 de 12 = 8",.8,-2.4,.3,{size:.55})}},
+ {m:"normal",t:"Agora com uma fração que não é de 1.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"paint",q:`Acenda ${FR(3,4)} das 8 lanternas`,draw:()=>lanternas(8,4,{x:.8,y:.6}),sol:[0,1,2,3,4,5],test:on=>on.size==6||`Você acendeu ${on.size}. Divida as 8 em 4 grupos iguais e acenda 3 grupos.`,ok:"Isso! 8 ÷ 4 = 2 em cada grupo, e 3 grupos dão <b>6</b>."}},
+ {m:"pensa",t:"<b>Pegadinha!</b> O Prefeito acendeu metade das lanternas de duas ruas.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"opt",q:"A Rua A tem 6 lanternas e a Rua B tem 10. Ele acendeu metade em cada rua. Acendeu o mesmo número nas duas?",o:["Não: 3 na Rua A e 5 na Rua B","Sim: metade é sempre igual"],ans:0,
+   ok:"Isso! A metade depende do inteiro: 1/2 de 6 = 3 e 1/2 de 10 = 5.",no:"Veja as duas ruas: metade de 6 é igual a metade de 10?",
+   why(){lanternas(6,6,{x:.4,y:1.6,pint:3});lanternas(10,10,{x:.4,y:-.6,pint:5,dx:.95});label("Rua A",-4.6,1.6,.3,{size:.42});label("Rua B",-4.6,-.6,.3,{size:.42})},
+   vars:[{q:`A Rua A tem 8 lanternas e a Rua B tem 12. Ele acendeu ${FR(1,4)} em cada rua. Acendeu o mesmo número nas duas?`,o:["Não: 2 na Rua A e 3 na Rua B","Sim: um quarto é sempre igual"],ans:0,ok:"Isso! 1/4 de 8 = 2 e 1/4 de 12 = 3.",no:"Calcule um quarto de cada rua."},
+    {q:"As duas ruas têm 8 lanternas cada. Ele acendeu metade em cada uma. Acendeu o mesmo número nas duas?",o:["Sim: 4 em cada rua","Não: metade nunca é igual"],ans:0,ok:"Isso! Mesmo inteiro (8), mesma metade (4).",no:"As duas ruas têm o mesmo número de lanternas. Quanto é metade de 8?"}]}},
+ {m:"normal",t:"<b>Missão da aula:</b> pense com calma; dá para fazer de cabeça.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"opt",q:"A vila tem 20 casas, e 3/5 delas já têm luz. Quantas casas têm luz?",o:["12","3","15"],ans:0,ok:"Missão cumprida! 20 ÷ 5 = 4 casas em cada grupo, e 3 grupos: 3 × 4 = <b>12</b>.",no:"Primeiro divida as 20 casas em 5 grupos iguais. Depois pegue 3 grupos.",
+   why(){for(let g=0;g<5;g++)for(let q=0;q<4;q++)cube(-4.4+g*2.2+(q%2)*.6,1+Math.floor(q/2)*.6,g<3?0xffd24a:0x9aa9bb,{s:.45});label("20 ÷ 5 = 4 em cada grupo",0,-.8,.3,{size:.45})},
+   vars:[{q:"A praça tem 15 bancos, e 2/3 deles estão pintados. Quantos bancos estão pintados?",o:["10","2","5"],ans:0,ok:"Isso! 15 ÷ 3 = 5, e 2 × 5 = <b>10</b>.",no:"Divida 15 em 3 grupos iguais e pegue 2 grupos."},
+    {q:"O pomar tem 16 árvores, e 3/4 delas já deram frutos. Quantas árvores deram frutos?",o:["12","4","3"],ans:0,ok:"Isso! 16 ÷ 4 = 4, e 3 × 4 = <b>12</b>.",no:"Divida 16 em 4 grupos iguais e pegue 3 grupos."}]}},
+ {m:"festa",end:1,t:"O inteiro pode ser um bolo, uma barra ou um grupo inteiro de coisas! O farol ganhou mais um pedaço do cristal.",set(){fim3()},badge:["●○","Contador de grupos","Fração de um grupo."]}]},
+
+/* 5 */{t:"Dividir dá fração",d:"3 barras para 4 robôs: cada um fica com 3/4.",i:"÷",steps:[
+ {m:"pensa",t:"Na feira, a Teca tem <b>3 barras de cristal</b> para repartir igualmente entre <b>4 robôs</b>. Não dá uma barra inteira para cada um… E agora?",
+  set(){B().place(-6,-3,30);cam3();[0,1,2].forEach(i=>barra(-.4,3.2-i*.95,1,{L:3,d:.7}));fila(4,0,COLS,1.7,-90);morador(4.2,2.6,TECA,-140,{nome:"Teca"})}},
+ {m:"normal",t:FLASH+"Da aula 3: ler a figura.",set(){B().place(-6,-3,30);cam3()},a:{k:"opt",...qPint(3,5),vars:[qPint(5,8,"bolo"),qPint(2,3,"pao"),qPint(4,6,"bolo")]}},
+ {m:"normal",t:FLASH+"Da aula 4: fração de um grupo.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"opt",q:`Quanto é ${FR(1,3)} de 12 lanternas?`,o:["4","3","36"],ans:0,ok:"Isso: 12 ÷ 3 = <b>4</b>.",no:"Divida as 12 em 3 grupos iguais.",
+   vars:[{q:`Quanto é ${FR(2,5)} de 10 lanternas?`,o:["4","2","5"],ans:0,ok:"Isso: 10 ÷ 5 = 2, e 2 × 2 = <b>4</b>.",no:"Divida 10 em 5 grupos iguais e pegue 2 grupos."},{q:`Quanto é ${FR(1,4)} de 20 lanternas?`,o:["5","4","80"],ans:0,ok:"Isso: 20 ÷ 4 = <b>5</b>.",no:"Divida as 20 em 4 grupos iguais."}]}},
+ {m:"pensa",t:"Começo pelo mais fácil: <b>1 barra para 4 robôs</b>. Corto a barra em 4 partes iguais, e cada robô ganha <b>1/4</b>. Então <b>1 ÷ 4 = 1/4</b>.",set(){B().place(-6,-3,30);cam3()},
+  async play(){const X=fila(4,0,COLS,1.7,-90);let P=barra(0,2.2,1,{L:5});if(!(await wait(700)))return;clearStage();fila(4,0,COLS,1.7,-90);P=barra(0,2.2,4,{L:5});if(!(await wait(500)))return;
+   for(let i=0;i<4;i++){P[i].set(true);if(!(await voa(P[i],X[i],-1.6)))return}label("1 ÷ 4 = 1/4 para cada um",0,-3,.3,{size:.5})}},
+ {m:"aponta",t:"Agora <b>3 barras para 4 robôs</b>: corto <b>cada barra</b> em 4 partes. Cada robô ganha um pedaço de cada barra: 3 pedaços de 1/4, ou seja, <b>3/4</b>.",set(){B().place(-6,-3,30);cam3()},
+  async play(){const X=fila(4,0,COLS,1.7,-90);const Bs=[0,1,2].map(j=>barra(0,3.6-j*.95,4,{L:5,d:.7}));if(!(await wait(600)))return;
+   for(let j=0;j<3;j++)for(let i=0;i<4;i++){Bs[j][i].set(true);if(!(await voa(Bs[j][i],X[i],-1.6,240)))return;Bs[j][i].m.position.y=.21+j*.44}
+   label("3 ÷ 4 = 3/4 para cada um",0,-3.1,.3,{size:.5})}},
+ {m:"aponta",t:"Então toda fração também é uma <b>divisão</b>: o numerador é o que se reparte, e o denominador é em quantas partes. <b>3/4 = 3 ÷ 4</b>.",
+  set(){B().place(-6,-3,30);cam3();fracTag(3,4,-1.5,.8,1.2,{size:1.6});label("=",.4,.8,1.2,{size:.9});label("3 ÷ 4",2.3,.8,1.2,{size:.9});
+   ov(CARDS([[FR(3,4),"= 3 ÷ 4"],[FR(2,5),"= 2 ÷ 5"],[FR(1,2),"= 1 ÷ 2"]]))}},
+ {m:"normal",t:"Hora da pizza na feira!",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"opt",q:"<b>2 pizzas</b> repartidas igualmente entre <b>3 robôs</b>. Quanto cada um recebe?",o:[FR(2,3),FR(3,2),FR(1,3)],ans:0,scene(){bolo(-1.6,1.4,1,{r:1.1,h:.18,pizza:1});bolo(1.6,1.4,1,{r:1.1,h:.18,pizza:1});fila(3,-2)},
+   ok:`Isso! 2 ÷ 3 = ${FR(2,3)} de pizza para cada um.`,no:"O que está sendo repartido (as pizzas) vai em cima. O número de robôs vai embaixo.",
+   vars:[{q:"<b>3 pizzas</b> para <b>5 robôs</b>, em partes iguais. Quanto cada um recebe?",o:[FR(3,5),FR(5,3),FR(1,5)],ans:0,scene(){[-2.4,0,2.4].forEach(x=>bolo(x,1.4,1,{r:1,h:.18,pizza:1}));fila(5,-2)},ok:`Isso: 3 ÷ 5 = ${FR(3,5)}.`,no:"Pizzas em cima, robôs embaixo."},
+    {q:"<b>1 pizza</b> para <b>6 robôs</b>. Quanto cada um recebe?",o:[FR(1,6),FR(6,1),FR(1,5)],ans:0,scene(){bolo(0,1.4,1,{r:1.2,h:.18,pizza:1});fila(6,-2)},ok:`Isso: 1 ÷ 6 = ${FR(1,6)}.`,no:"1 pizza repartida em 6 partes iguais."},
+    {q:"<b>4 pizzas</b> para <b>5 robôs</b>. Quanto cada um recebe?",o:[FR(4,5),FR(5,4),FR(1,4)],ans:0,scene(){[-3.3,-1.1,1.1,3.3].forEach(x=>bolo(x,1.4,1,{r:.95,h:.18,pizza:1}));fila(5,-2)},ok:`Isso: 4 ÷ 5 = ${FR(4,5)}.`,no:"Pizzas em cima, robôs embaixo."}]}},
+ {m:"normal",t:"Monte a fração: <b>5 barras</b> repartidas igualmente entre <b>8 robôs</b>. Quanto cada um recebe? Aperte Conferir.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"step",check:1,c:[["Numerador",0,10],["Denominador",1,10]],init:[1,1],goal:[5,8],draw:v=>{for(let i=0;i<5;i++)barra(-3.2,2.4-i*.75,1,{L:2.6,d:.5,h:.3});label("8 robôs",-3.2,-1.8,.3,{size:.5});fracTag(v[0],v[1],2.4,.8,1.1,{size:1.5})},
+   txt:v=>FR(v[0],v[1]),test:v=>v[0]==5&&v[1]==8,ok:()=>`Isso! 5 ÷ 8 = ${FR(5,8)} de barra para cada robô.`,
+   no:v=>v[0]==8&&v[1]==5?"Cuidado: o que está sendo repartido (as barras) vai em cima.":"O numerador é o que se reparte (as barras). O denominador é em quantas partes (os robôs)."}},
+ {m:"pensa",t:"E com <b>mais barras que robôs</b>? 5 barras para 4 robôs: cada um ganha 1 barra inteira, e a barra que sobra é cortada em 4. Cada um fica com <b>5/4</b>: mais que um inteiro! Vamos ver isso de perto na próxima ilha.",set(){B().place(-6,-3,30);cam3()},
+  async play(){const X=fila(4,0,COLS,1.7,-90);const W=[0,1,2,3].map(i=>barra(-3+i*2,3.5,1,{L:1.3,d:.6}));const R5=barra(0,2.2,4,{L:5,d:.6});if(!(await wait(500)))return;
+   for(let i=0;i<4;i++)if(!(await voa(W[i][0],X[i],-1.5,300)))return;for(let i=0;i<4;i++){R5[i].set(true);if(!(await voa(R5[i],X[i],-2.4,260)))return}label("5 ÷ 4 = 5/4 para cada um",0,-3.5,.3,{size:.5})}},
+ {m:"pensa",t:"<b>Pegadinha!</b> Os robôs estão discutindo de novo.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"opt",q:"Uma barra repartida entre 3 robôs. O Tico disse: “cada um fica com 3/1”. Ele acertou?",o:[`Não: cada um fica com ${FR(1,3)}`,"Sim, acertou"],ans:0,
+   ok:"Isso! 1 ÷ 3 = 1/3. O Tico trocou: 3/1 seriam 3 barras inteiras para cada um!",no:"O que se reparte vai em cima. Foi 1 barra, repartida em 3.",
+   why(){const X=fila(3,0,COLS,1.7,-90);const P=barra(0,2.2,3,{L:5});P.forEach((p,i)=>{p.set(true);p.m.position.copy(P3(X[i],-1.6,.21))});label("1 ÷ 3 = 1/3 para cada um",0,-2.9,.3,{size:.5})},
+   vars:[{q:"4 barras para 4 robôs. A Teca disse: “cada um fica com 4/4, ou seja, 1 barra inteira”. Ela acertou?",o:["Sim, acertou",`Não: cada um fica com ${FR(1,4)}`],ans:0,ok:"Isso! 4 ÷ 4 = 4/4 = 1 barra inteira.",no:"4 barras para 4 robôs: quantas barras cada um leva?"},
+    {q:"2 barras para 5 robôs. O Tico disse: “cada um fica com 5/2”. Ele acertou?",o:[`Não: cada um fica com ${FR(2,5)}`,"Sim, acertou"],ans:0,ok:"Isso! 2 ÷ 5 = 2/5. Barras em cima, robôs embaixo.",no:"Quem vai em cima: as barras ou os robôs?"}]}},
+ {m:"aponta",t:"<b>Desafio da ilha!</b> Perguntas misturadas de todas as aulas da Vila da Partilha. Cada erro troca a pergunta.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"opt",...qPint(3,8,"bolo"),vars:[{q:`Quanto é ${FR(1,4)} de 12 lanternas?`,o:["3","4","48"],ans:0,ok:"Isso: 12 ÷ 4 = <b>3</b>.",no:"Divida 12 em 4 grupos iguais."},
+   {q:"3 ÷ 7 é igual a…",o:[FR(3,7),FR(7,3),"21"],ans:0,ok:`Isso: 3 ÷ 7 = ${FR(3,7)}.`,no:"O que se divide vai em cima."},qUnit(5,9),qCortes(4,0)]}},
+ {m:"aponta",t:"<b>Desafio da ilha, parte 2.</b> Mais uma rodada misturada.",set(){B().place(-6,-3,30);cam3()},
+  a:{k:"opt",q:`Quanto é ${FR(2,3)} de 9?`,o:["6","3","27"],ans:0,ok:"Isso: 9 ÷ 3 = 3, e 2 × 3 = <b>6</b>.",no:"Divida 9 em 3 grupos e pegue 2.",
+   vars:[{q:"Como se lê 4/9?",o:["quatro nonos","quatro noves","nove quartos"],ans:0,ok:"Isso: <b>quatro nonos</b>.",no:"Primeiro o numerador, depois o nome da parte (9 partes = nono)."},
+    {q:"Uma pizza para 8 robôs, em partes iguais. Cada um recebe…",o:[FR(1,8),FR(8,1),FR(1,7)],ans:0,ok:`Isso: 1 ÷ 8 = ${FR(1,8)}.`,no:"1 pizza repartida em 8 partes."},qPint(2,6),qNome(7)]}},
+ {m:"festa",end:1,t:"Você completou a <b>Ilha 1: Vila da Partilha</b>! Repartir, nomear, escrever, achar fração de grupos e dividir. Próxima parada: a <b>Ponte da Reta</b>, onde a fração vira número.",set(){fim3()},badge:["★","Ilha 1 completa","Vila da Partilha"]}]}
+];
+
 const WORLDS=[
  {t:"Fundamentos da Geometria",d:"Do ponto ao círculo: os 5 axiomas de Euclides.",c:"#6b4fd8",L:W1},
  {t:"Números naturais",d:"Contar, o sistema decimal, as quatro operações, primos, MMC, MDC e potências.",c:"#0e8f86",L:W2},
- {t:"Frações e decimais",d:"Partes do inteiro, números decimais e porcentagem.",c:"#d93a7f",soon:["O que é fração","Frações equivalentes","Comparar frações","Somar e subtrair frações","Multiplicar e dividir frações","Números decimais","Operações com decimais","Porcentagem","Razão"]},
+ {t:"Frações: o Cristal do Inteiro",d:"Repartir, a fração como número, equivalência, contas, decimais, porcentagem e razão.",c:"#d93a7f",soon:["Fração na reta","Além do inteiro","Números mistos","Mais partes, partes menores","Frações equivalentes","Simplificar","Comparar e ordenar","Somar e subtrair (mesmo denominador)","Somar e subtrair (denominadores diferentes)","Fração de uma quantidade","Multiplicar frações","Dividir frações","Décimos e centésimos","Porcentagem","Razão","O Cristal do Inteiro"],L:W3},
  {t:"Números inteiros",d:"Números negativos, operações e plano cartesiano.",c:"#2f6fd6",soon:["Abaixo de zero","Reta numérica","Somar e subtrair inteiros","Regra de sinais","Plano cartesiano","Números racionais"]},
  {t:"Álgebra",d:"Letras no lugar de números: equações e proporções.",c:"#d58200",soon:["Expressões algébricas","Princípio da igualdade","Equações do 1º grau","Inequações","Proporção e regra de três","Sistemas de equações"]},
  {t:"Medidas e espaço",d:"Perímetro, área, volume e transformações.",c:"#1b9a52",soon:["Perímetro","Área do retângulo e do quadrado","Área do triângulo","Área do círculo","Volume","Simetria","Congruência de triângulos","Transformações no plano"]},
@@ -729,7 +1068,7 @@ const lid=(w,l)=>w+"-"+l;
 const XP_LESSON=BIPV.POR_AULA;
 
 /* um mundo abre quando todas as aulas do mundo anterior foram concluídas */
-function worldOpen(wi,done){if(wi==0)return true;const P=WORLDS[wi-1];return !!P.L&&P.L.every((_,li)=>done.has(lid(wi-1,li)))}
+function worldOpen(wi,done){if(wi==0)return true;const P=WORLDS[wi-1];return !!P.L&&!P.soon&&P.L.every((_,li)=>done.has(lid(wi-1,li)))}
 let unlockMsg="";
 /* visual do Bip (comprado na loja do menu) */
 const myLook=()=>BIPV.loja(typeof PID!="undefined"?PID:"visitante").look;
@@ -742,39 +1081,60 @@ function drawHome(){$("heroBip").innerHTML=FACE2D("feliz");
  let h="";WORLDS.forEach((W,wi)=>{
   if(!W.L){h+=`<section class="world lock"><div class="wh"><span class="wn" style="background:${W.c}">${wi+1}</span><div><h2>${W.t}</h2><p>${W.d}</p><span class="tagsoon">EM CONSTRUÇÃO</span></div></div><div class="soon">${W.soon.map(s=>`<span>${s}</span>`).join("")}</div></section>`;return}
   const n=W.L.filter((_,li)=>done.has(lid(wi,li))).length,open=worldOpen(wi,done),next=open?W.L.findIndex((_,li)=>!done.has(lid(wi,li))):-1;
-  h+=`<section class="world${open?"":" lock"}"><div class="wh"><span class="wn" style="background:${W.c}">${wi+1}</span><div><h2>${W.t}</h2><p>${W.d}</p>${open?"":`<span class="tagsoon">🔒 TERMINE O MUNDO ${wi} PARA ABRIR</span>`}</div><span class="wc">${n} de ${W.L.length}</span></div><div class="trail">`+
+  h+=`<section class="world${open?"":" lock"}"><div class="wh"><span class="wn" style="background:${W.c}">${wi+1}</span><div><h2>${W.t}</h2><p>${W.d}</p>${open?"":`<span class="tagsoon">🔒 TERMINE O MUNDO ${wi} PARA ABRIR</span>`}</div><span class="wc">${n} de ${W.L.length+(W.soon?W.soon.length:0)}</span></div>${wi==2&&open?`<div class="cristal"><i></i>Cristal do Inteiro: ${crystalCount(done)}/21 pedaços</div>`:""}<div class="trail">`+
   W.L.map((L,li)=>{const d=done.has(lid(wi,li)),st=d?"done":li==next?"next":"lock";
-   return `<button class="les ${st}" data-w="${wi}" data-l="${li}"><span class="num">${d?"✓":li+1}</span><span class="ico">${L.i}</span><span class="tx"><span class="tag">Aula ${String(li+1).padStart(2,"0")}${L.ax?" · Axioma "+L.ax:""}${d?" · concluída":""}</span><h3>${L.t}</h3><p>${L.d}</p></span><span class="go">${d?"Rever →":st=="lock"?"🔒":"Começar →"}<small>+${XP_LESSON} ${BIPV.COIN}</small></span></button>`}).join("")+`</div></section>`});
+   return `<button class="les ${st}" data-w="${wi}" data-l="${li}"><span class="num">${d?"✓":li+1}</span><span class="ico">${L.i}</span><span class="tx"><span class="tag">Aula ${String(li+1).padStart(2,"0")}${L.ax?" · Axioma "+L.ax:""}${d?" · concluída":""}${d&&save.stars&&save.stars[lid(wi,li)]?`<span class="stars" aria-label="${save.stars[lid(wi,li)]} de 3 estrelas">${STARS(save.stars[lid(wi,li)])}</span>`:""}</span><h3>${L.t}</h3><p>${L.d}</p></span><span class="go">${d?"Rever →":st=="lock"?"🔒":"Começar →"}<small>+${XP_LESSON} ${BIPV.COIN}</small></span></button>`}).join("")+`</div>${W.soon?`<div class="soonl"><small>Próximas aulas · em construção</small><div class="soon">${W.soon.map(s=>`<span>${s}</span>`).join("")}</div></div>`:""}</section>`});
  $("worlds").innerHTML=(unlockMsg?`<div class="unlock" role="status"><span style="font-size:2rem">🎉</span><div><b>${unlockMsg}</b>${/liberado/.test(unlockMsg)?"<div>Role a página para começar.</div>":""}</div></div>`:"")+h;unlockMsg=""}
 $("worlds").addEventListener("click",e=>{const b=e.target.closest(".les");if(!b||b.classList.contains("lock"))return;openLesson(+b.dataset.w,+b.dataset.l)});
+
+/* ---------- Contra o chute: erros da aula, espera depois do erro e estrelas ---------- */
+let errs=0,lockUntil=0,curOpt=null,curPaint=null;
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const starsFor=e=>e==0?3:e<=2?2:1;
+const STARS=n=>"★".repeat(n)+`<span class="off">${"★".repeat(3-n)}</span>`;
+/* trava os botões por alguns segundos depois de um erro, com uma barrinha esvaziando */
+function lock(sec,after){lockUntil=Date.now()+sec*1000;const id=runId;
+ $("act").querySelectorAll("button").forEach(b=>{if(!b.disabled){b.disabled=true;b.dataset.lk=1}});
+ const c=$("cool");if(c)c.innerHTML=`<div class="cool">Pense com calma antes de tentar de novo…<div class="cb"><i style="animation-duration:${sec}s"></i></div></div>`;
+ setTimeout(()=>{if(id!=runId||solved)return;lockUntil=0;$("act").querySelectorAll("[data-lk]").forEach(b=>{b.disabled=false;delete b.dataset.lk});const c=$("cool");if(c)c.innerHTML="";after&&after()},sec*1000)}
+/* quantos pedaços do Cristal do Inteiro (aulas do Mundo 3 concluídas) */
+const crystalCount=done=>[...done].filter(k=>k.startsWith("2-")).length;
 
 /* =====================================================================
    AULA: passos e atividades
    ===================================================================== */
 let cw=0,cl=0,step=0,solved=false,busy=false;
 const LES=()=>WORLDS[cw].L[cl];
-function openLesson(w,l){cw=w;cl=l;step=0;$("home").classList.add("hidden");$("lesson").classList.remove("hidden");if(!init3d())return;size();camTo({th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0});show()}
-function closeLesson(){runId++;onPick=null;$("lesson").classList.add("hidden");$("home").classList.remove("hidden");drawHome();window.scrollTo(0,0)}
+function openLesson(w,l){cw=w;cl=l;step=0;errs=0;$("home").classList.add("hidden");$("lesson").classList.remove("hidden");if(!init3d())return;setWorld(w);size();camTo({th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0});show()}
+function closeLesson(){runId++;onPick=null;onHit=null;lockUntil=0;$("lesson").classList.add("hidden");$("home").classList.remove("hidden");drawHome();window.scrollTo(0,0)}
 function say(t,cls="",m){const s=$("say");s.className=cls;$("txt").innerHTML=t;s.querySelector(".who").textContent=cls=="ok"?"BIP · ACERTOU!":cls=="no"?"BIP · QUASE!":"BIP";if(m){$("face").innerHTML=FACE2D(m);bip&&bip.face(m)}}
 function setMood(m){$("face").innerHTML=FACE2D(m);bip.face(m)}
 async function show(){const L=LES(),S=L.steps[step],n=L.steps.length,id=++runId;
  $("lnum").textContent="AULA "+String(cl+1).padStart(2,"0");$("ltit").textContent=`Mundo ${cw+1} · ${L.t}`;
  const pc=Math.round(step/(n-1)*100);$("lbar").style.width=pc+"%";$("lpc").textContent=pc+"%";
  $("back").style.visibility=step?"visible":"hidden";$("next").textContent=S.end?"Concluir aula ✓":"Prosseguir →";
- onPick=null;ov("");actP("");clearStage();bip.walking=0;bip.fix=S.fix||(S.a&&/turn|prog/.test(S.a.k))?1:0;
+ onPick=null;onHit=null;lockUntil=0;ov("");actP("");clearStage();bip.walking=0;bip.fix=S.fix||(S.a&&/turn|prog/.test(S.a.k))?1:0;
  solved=!S.a;say(S.t,"",S.m);
  if(S.set)S.set();
- if(S.badge)ov(`<div class="badge"><div class="medal">${S.badge[0]}</div><h2>${S.badge[1]}</h2><div>${S.badge[2]}</div><div class="xp">+${XP_LESSON} ${BIPV.COIN} Bipcoins</div></div>`);
+ if(S.badge){const st=starsFor(errs),k=lid(cw,cl),cr=cw==2?crystalCount(new Set([...save.done,k])):0;
+  ov(`<div class="badge${cw==2?" lado":""}"><div class="medal">${S.badge[0]}</div><h2>${S.badge[1]}</h2><div>${S.badge[2]}</div><div class="stars" aria-label="${st} de 3 estrelas">${STARS(st)}</div><small>${errs?errs+(errs>1?" erros":" erro")+" nesta aula"+(st<3?" · refaça para ganhar mais estrelas":""):"Sem nenhum erro!"}</small>${cr?`<div class="cristal"><i></i>Cristal do Inteiro: ${cr}/21</div>`:""}<div class="xp">+${XP_LESSON} ${BIPV.COIN} Bipcoins</div></div>`)}
  if(S.a)setup(S.a,S);
  $("next").disabled=!solved||!!S.play;
  if(S.play){await S.play();if(id==runId&&!S.a)$("next").disabled=false}}
 function win(msg){solved=true;$("next").disabled=false;say(msg,"ok","festa");if(bip)confetti(bip.x,bip.y);const id=runId;setTimeout(()=>{if(id==runId&&solved)setMood("feliz")},1800)}
-function miss(msg){say(msg,"no","ops")}
+function miss(msg){errs++;say(msg,"no","ops")}
 
 function setup(a,S){
- if(a.k=="opt"){actP(`<div class="panel"><div class="q">${a.q}</div><div class="opts">${a.o.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join("")}</div></div>`);
-  $("act").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(solved)return;const i=+b.dataset.i;
-   if(i==a.ans){b.classList.add("right");$("act").querySelectorAll(".opt").forEach(x=>x.disabled=true);win(a.ok)}else{b.classList.add("wrong");b.disabled=true;miss(a.no)}})}
+ if(a.k=="opt"){const V=[a,...(a.vars||[])];let vi=0,tries=0;
+  /* cada versão da pergunta pode ter o próprio desenho (scene) e uma explicação em 3D quando erra (why) */
+  const draw=v=>{if(V.some(x=>x.scene||x.why)){clearStage();S.set&&S.set();(v.scene||(()=>{}))()}};
+  const render=()=>{const v=curOpt=V[vi],ord=a.fix?v.o.map((_,i)=>i):shuffle(v.o.map((_,i)=>i));
+   actP(`<div class="panel"><div class="q">${v.q}</div><div class="opts">${ord.map(i=>`<button class="opt" data-i="${i}">${v.o[i]}</button>`).join("")}</div><div id="cool"></div></div>`);
+   $("act").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(solved||busy||Date.now()<lockUntil)return;const i=+b.dataset.i;
+    if(i==v.ans){b.classList.add("right");$("act").querySelectorAll(".opt").forEach(x=>x.disabled=true);win(v.ok)}
+    else{b.classList.add("wrong");b.disabled=true;tries++;miss(v.no);if(v.why){clearStage();S.set&&S.set();v.why()}
+     lock(tries==1?3:6,()=>{if(V.length>1){vi=(vi+1)%V.length;draw(V[vi]);render();say("Vamos tentar com outra pergunta parecida. "+(V[vi].t||S.t),"",S.m)}})}})};
+  if(a.scene)a.scene();render()}
  if(a.k=="pick"){let pts=[];actP(`<div class="panel tools"><span>Toque no chão · <b id="pc">0</b> de ${a.n}</span><button class="btn sm" id="pclr">Limpar</button></div>`);
   const reset=()=>{const id=runId;clearStage();S.set&&S.set();pts=[];$("pc").textContent=0;say(S.t,"",S.m)};
   $("pclr").onclick=()=>{if(busy||solved)return;runId++;show()};
@@ -790,10 +1150,21 @@ function setup(a,S){
   const typ=a=>a==0?"nulo":a<90?"agudo":a==90?"reto":a<180?"obtuso":"raso";
   const upd=()=>{const v=+$("sl").value;clearStage();S.set();pt("",0,0);semi([0,0],[1,0]);semi([0,0],[Math.cos(v*D2R),Math.sin(v*D2R)]);if(v==90)rightMark([0,0],0,.6);else if(v)arc([0,0],0,v,1.5,{txt:v+"°"});
    $("sv").textContent=v+"°";$("st").textContent=typ(v);if(!solved&&a.test(v))win(a.ok)};$("sl").oninput=upd;upd()}
- if(a.k=="step"){const v=(a.init||a.c.map(c=>c[1])).slice();
-  actP(`<div class="panel"><div class="readout" id="stv"></div><div class="tools">${a.c.map((c,i)=>`<span class="stp"><b>${c[0]}</b><button class="btn sm" data-d="${i}" data-s="-1" aria-label="Menos: ${c[0]}">−</button><span class="readout sn" id="sv${i}">${v[i]}</span><button class="btn sm" data-d="${i}" data-s="1" aria-label="Mais: ${c[0]}">+</button></span>`).join("")}</div></div>`);
-  const upd=()=>{clearStage();S.set&&S.set();a.draw(v);a.c.forEach((c,i)=>$("sv"+i).textContent=v[i]);$("stv").textContent=a.txt(v);if(!solved&&a.test(v))win(a.ok(v))};
-  $("act").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{if(solved)return;const i=+b.dataset.d,c=a.c[i];v[i]=Math.max(c[1],Math.min(c[2],v[i]+ +b.dataset.s));upd()});upd()}
+ if(a.k=="step"){const v=(a.init||a.c.map(c=>c[1])).slice();let tries=0;
+  /* com a.check o aluno aperta "Conferir": não dá para ir apertando + até acertar */
+  actP(`<div class="panel">${a.q?`<div class="q">${a.q}</div>`:""}<div class="readout" id="stv"></div><div class="tools">${a.c.map((c,i)=>`<span class="stp"><b>${c[0]}</b><button class="btn sm" data-d="${i}" data-s="-1" aria-label="Menos: ${c[0]}">−</button><span class="readout sn" id="sv${i}">${v[i]}</span><button class="btn sm" data-d="${i}" data-s="1" aria-label="Mais: ${c[0]}">+</button></span>`).join("")}${a.check?`<button class="btn chk" id="chk">Conferir</button>`:""}</div><div id="cool"></div></div>`);
+  const upd=()=>{clearStage();S.set&&S.set();a.draw(v);a.c.forEach((c,i)=>$("sv"+i).textContent=v[i]);$("stv").innerHTML=a.txt(v);if(!a.check&&!solved&&a.test(v))win(a.ok(v))};
+  $("act").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{if(solved||Date.now()<lockUntil)return;const i=+b.dataset.d,c=a.c[i];v[i]=Math.max(c[1],Math.min(c[2],v[i]+ +b.dataset.s));upd()});
+  if(a.check)$("chk").onclick=()=>{if(solved||Date.now()<lockUntil)return;if(a.test(v))win(a.ok(v));else{tries++;miss(a.no?a.no(v):"Ainda não. Leia a pergunta de novo com calma.");lock(tries==1?3:6)}};upd()}
+ if(a.k=="paint"){let P=a.draw();const on=new Set();let tries=0;curPaint=P;
+  /* pintar: toque nas peças no 3D ou nos botões numerados; depois "Conferir" */
+  actP(`<div class="panel"><div class="q">${a.q}</div><div class="chips">${P.map((p,i)=>`<button class="chip" data-p="${i}" aria-pressed="false" aria-label="Peça ${p.tag||i+1}">${p.tag||i+1}</button>`).join("")}</div><div class="tools"><span class="readout" id="pv"></span><button class="btn chk" id="chk">Conferir</button></div><div id="cool"></div></div>`);
+  const sync=()=>{P.forEach((p,i)=>{p.set(on.has(i));const c=$("act").querySelector(`[data-p="${i}"]`);c.classList.toggle("on",on.has(i));c.setAttribute("aria-pressed",on.has(i))});$("pv").innerHTML=a.txt?a.txt(on,P):`${on.size} de ${P.length}`};
+  const tog=i=>{if(solved||Date.now()<lockUntil)return;on.has(i)?on.delete(i):on.add(i);sync()};
+  $("act").querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>tog(+b.dataset.p));
+  onHit=m=>{for(let o=m;o&&o!==root;o=o.parent){const i=P.findIndex(p=>p.m===o);if(i>=0)return tog(i)}};
+  $("chk").onclick=()=>{if(solved||Date.now()<lockUntil)return;const r=a.test(on,P);if(r===true)win(a.ok);else{tries++;miss(typeof r=="string"?r:a.no);lock(tries==1?3:6)}};sync()}
+
  if(a.k=="prog"){let list=[],rep=1;const BL=a.blocks,cls={f:"f",t:"t"};
   actP(`<div class="panel"><div class="prog" id="pl"></div><div class="tools">${BL.map((b,i)=>`<button class="blk ${b[1]}" data-b="${i}">${b[0]}</button>`).join("")}<button class="blk rep" id="prep">Repetir tudo: 1×</button><button class="btn sm" id="pclr">Limpar</button><button class="btn main" id="prun" style="font-size:1rem;padding:6px 16px">▶ Executar</button></div></div>`);
   const draw=()=>{$("pl").innerHTML=list.length?(rep>1?`<span style="background:var(--loop)">Repetir ${rep}× [</span>`:"")+list.map(i=>`<span style="background:var(--${BL[i][1]=="f"?"go":"turn"})">${BL[i][0]}</span>`).join("")+(rep>1?`<span style="background:var(--loop)">]</span>`:""):'<span class="ph">Toque nos blocos para montar o programa</span>';$("prep").textContent=`Repetir tudo: ${rep}×`};draw();
@@ -813,7 +1184,7 @@ function setup(a,S){
    if(closed&&res.n==uniq.length&&a.check(res,tr)){poly(uniq,{edges:false});win(a.ok)}else miss(a.no)}}}
 
 $("next").onclick=()=>{const L=LES();if(!solved||$("next").disabled)return;
- if(L.steps[step].end){const k=lid(cw,cl),before=new Set(save.done);if(!save.done.includes(k))save.done.push(k);store();
+ if(L.steps[step].end){const k=lid(cw,cl),before=new Set(save.done);if(!save.done.includes(k))save.done.push(k);save.stars=save.stars||{};save.stars[k]=Math.max(save.stars[k]||0,starsFor(errs));store();
   const now=new Set(save.done),nx=cw+1;if(WORLDS[nx]&&!worldOpen(nx,before)&&worldOpen(nx,now))unlockMsg=WORLDS[nx].L?`Mundo ${nx+1} liberado: ${WORLDS[nx].t}!`:`Você terminou o Mundo ${cw+1}! O Mundo ${nx+1} (${WORLDS[nx].t}) está chegando.`;
   return closeLesson()}
  step++;show()};

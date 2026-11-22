@@ -598,7 +598,8 @@ function mergeLoja(a,b){if(!a)return b;if(!b)return a;const n=(a.t||0)>=(b.t||0)
 function mergeRobo(a,b){if(!a)return b;if(!b)return a;const r={...b,...a,v:1,all:0},st={...(b.stars||{})};
  for(const k in a.stars||{})st[k]=Math.max(st[k]||0,a.stars[k]);r.stars=st;const sk={...(b.skip||{}),...(a.skip||{})};for(const k in st)delete sk[k];r.skip=sk;
  r.seen={...(b.seen||{}),...(a.seen||{})};const n=x=>Object.keys(x.stars||{}).length+Object.keys(x.skip||{}).length;r.lvl=n(a)>=n(b)?a.lvl:b.lvl;return r}
-const mergeAcad=(a,b)=>(a||b)?{done:[...new Set([...((a&&a.done)||[]),...((b&&b.done)||[])])]}:null;
+const mergeAcad=(a,b)=>{if(!a&&!b)return null;const st={...((b&&b.stars)||{})};for(const k in (a&&a.stars)||{})st[k]=Math.max(+st[k]||0,+a.stars[k]||0);
+ return {done:[...new Set([...((a&&a.done)||[]),...((b&&b.done)||[])])],stars:st}};
 function absorb(p,remote){/* junta o que está na nuvem com o que está neste computador */
  const r=mergeRobo(roboSave(p.id),remote.robo||null),a=mergeAcad(acadSave(p.id),remote.academia||null);
  if(r)ls.set(KEYS.robo(p.id),r);if(a)ls.set(KEYS.academia(p.id),a);

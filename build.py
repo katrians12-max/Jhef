@@ -74,7 +74,7 @@ ACAD=[];ACADT=[];ACADW=[]
 # aulas de cada mundo, na ordem dos mundos (W1, W2, ...): conta os blocos "/* n */{t:" dentro de cada const Wn=[...]
 for m in re.finditer(r'^const W(\d+)=\[(.*?)^\];',s,re.M|re.S):
     w=int(m.group(1))-1;ts=re.findall(r'^/\* ?\d+ ?\*/\{t:"([^"]*)"',m.group(2),re.M);ACAD+= [f"{w}-{i}" for i in range(len(ts))];ACADT+=ts
-ACADW=re.findall(r'^ \{t:"([^"]*)",d:"[^"]*",c:"#[0-9a-fA-F]{6}",L:W\d+\}',s,re.M)
+ACADW=re.findall(r'^ \{t:"([^"]*)",d:"[^"]*",c:"#[0-9a-fA-F]{6}",(?:soon:\[[^\]]*\],)?L:W\d+\}',s,re.M)
 
 # ---------- Área do professor + conexão com o banco ----------
 CFG=json.load(open(os.path.join(F,'config.json'),encoding='utf8'))
