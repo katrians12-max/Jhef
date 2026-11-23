@@ -104,38 +104,59 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 @media (max-width:760px){.chip:disabled{display:none}.more{display:block}.scr{background:linear-gradient(0deg,rgba(7,10,26,.92) 0,rgba(7,10,26,.75) 55%,rgba(7,10,26,.15) 100%);align-items:end}.card{justify-self:center;margin:0;padding:18px}
  .score{min-width:0}.score b{font-size:1.5rem}.q{top:auto;bottom:auto;position:relative;left:auto;transform:none;margin:8px auto 0;width:fit-content}.q.pop{animation:none}.keys{display:none}}
 @media (prefers-reduced-motion:reduce){.newrec,.q.pop{animation:none}}
-/* ---- Bip Defesa (modo clássico) ---- */
+/* ---- Bip Defesa (infinito) ---- */
 .hud .htop{align-items:center}
 .stat{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:14px;font-weight:800;font-family:var(--display);font-size:1.25rem}
 .stat small{font-family:var(--body);font-weight:700;font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.stat .en{color:#5ef0e0}.stat .hv{color:#ff4f6d}
-.onda{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:min(430px,60vw)}
+.stat .en{color:#5ef0e0}.stat .hv{color:#ff4f6d}.stat .pt{color:#ffd24a}
+.onda{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:min(400px,calc(50vw - 250px))}
 .prev{padding:8px 12px;border-radius:14px;font-size:.85rem}
 .prev .lbl{margin:0 0 4px}
 .prev .chs{display:flex;flex-wrap:wrap;gap:4px}
-.prev .ch{display:inline-flex;align-items:center;gap:3px;padding:1px 8px 1px 5px;border-radius:99px;background:rgba(255,255,255,.1);font-weight:800;font-family:var(--display)}
+.prev .ch{display:inline-flex;align-items:center;gap:3px;padding:1px 8px 1px 5px;border-radius:99px;background:rgba(255,255,255,.1);font-weight:800;font-family:var(--display);border:1.5px solid transparent}
 .prev .ch i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--bc)}
+.prev .ch.esc{border-color:#9fd8ff;background:rgba(60,110,200,.35)}
 .onda .btn.go{padding:12px 20px;font-size:1.15rem}
-.dica{position:absolute;left:max(12px,env(safe-area-inset-left,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));max-width:min(520px,calc(100vw - 470px));display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:16px;font-size:.95rem;line-height:1.35}
+.onda .btn.go.cedo{background:linear-gradient(180deg,#7ff7ea,#2fc9b8);color:#05302b;box-shadow:0 6px 0 #1a8a7e}
+.dica{position:absolute;left:max(12px,env(safe-area-inset-left,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));max-width:min(400px,calc(50vw - 250px));display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:16px;font-size:.92rem;line-height:1.35}
 .dica .bf{flex:none;width:34px;height:34px;border-radius:10px;background:#f2c230;display:grid;place-items:center}
 .dica .bf i{display:block;width:22px;height:13px;border-radius:4px;background:#172536}
+/* Poder do Bip: teclado de divisores */
+.poder{position:absolute;left:50%;bottom:max(12px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px}
+.poder .pq{padding:6px 14px;border-radius:12px;font-weight:700;font-size:.92rem;white-space:nowrap;text-align:center}
+.poder .pq b{font-family:var(--display);font-size:1.25rem;color:#fff}
+.teclas{display:flex;gap:6px;padding:6px;border-radius:18px}
+.teclas button{min-width:50px;height:50px;border-radius:14px;border:2px solid #5ef0e0;background:rgba(10,14,36,.92);color:#fff;font-family:var(--display);font-weight:800;font-size:1.45rem;line-height:1}
+.teclas button:active{transform:scale(.94)}
+.teclas button.pr{padding:0 12px;font-size:1rem;border-color:#ffd24a;color:#ffd24a}
+.teclas button:disabled{opacity:.35}
+.carga{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#bff}
+.carga i{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(94,240,224,.55)}
+.carga i.on{background:#5ef0e0;box-shadow:0 0 8px #5ef0e0}
+.carga i.parc{background:conic-gradient(#5ef0e0 var(--p),rgba(255,255,255,.12) 0)}
+.carga em{font-style:normal;color:#ffd24a;margin-left:4px}
 /* menu circular em volta do lugar de construção */
 .ring{position:absolute;z-index:6;width:0;height:0;pointer-events:none}
-.ring .opt{position:absolute;left:0;top:0;transform:translate(-50%,-50%) translate(var(--x),var(--y));pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:1px;width:82px;padding:6px 4px 5px;border-radius:16px;border:2px solid var(--tc,#fff);background:rgba(10,14,36,.9);color:#fff;font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.45);animation:abre .18s ease-out}
-.ring .opt b{font-family:var(--display);font-size:1.25rem;line-height:1;color:var(--tc,#fff)}
+.ring .opt{position:absolute;left:0;top:0;transform:translate(-50%,-50%) translate(var(--x),var(--y));pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:1px;width:86px;padding:6px 4px 5px;border-radius:16px;border:2px solid var(--tc,#fff);background:rgba(10,14,36,.92);color:#fff;font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.45);animation:abre .18s ease-out}
+.ring .opt b{font-family:var(--display);font-size:1.2rem;line-height:1;color:var(--tc,#fff)}
 .ring .opt span{font-size:.64rem;color:var(--muted);line-height:1.1;text-align:center}
 .ring .opt em{font-style:normal;font-size:.78rem;color:#5ef0e0}
 .ring .opt:disabled{opacity:.4}
-.ring .info{position:absolute;left:0;top:0;transform:translate(-50%,46px);pointer-events:none;white-space:nowrap;padding:6px 10px;border-radius:12px;background:rgba(10,14,36,.92);font-size:.82rem;color:#dfe6ff;animation:abre .18s ease-out}
+.ring .info{position:absolute;left:0;top:0;transform:translate(-50%,46px);pointer-events:none;white-space:nowrap;padding:6px 10px;border-radius:12px;background:rgba(10,14,36,.92);font-size:.82rem;color:#dfe6ff}
 @keyframes abre{from{opacity:0;transform:translate(-50%,-50%) scale(.6)}}
-.legend{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;margin:0;font-size:.9rem;color:var(--muted)}
-.legend b{font-family:var(--display);font-size:1.05rem;text-align:center;min-width:64px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.08);color:var(--tc)}
+.legend{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;align-items:center;margin:0;font-size:.88rem;color:var(--muted)}
+.legend b{font-family:var(--display);font-size:1rem;text-align:center;min-width:64px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.08);color:var(--tc)}
+#sPause{background:rgba(7,10,26,.97)}
 .giro{display:none}
 .dica{cursor:pointer}.dica .dmin{display:none;font-family:var(--display)}.dica.min{padding:6px 12px}.dica.min #dicaT,.dica.min .bf{display:none}.dica.min .dmin{display:inline}
 @media (max-width:480px){.stat small{display:none}.stat{padding:6px 10px}}
 @media (orientation:portrait) and (max-width:760px){.giro{display:block;color:#ffd24a;font-weight:700;margin:0}}
-@media (max-width:900px){.dica{max-width:calc(100vw - 24px);bottom:auto;top:calc(max(12px,env(safe-area-inset-top,0px)) + 58px);font-size:.85rem}.dica .bf{display:none}}
-@media (max-height:520px){.stat{padding:4px 10px;font-size:1rem}.onda .btn.go{padding:8px 14px;font-size:.95rem}.prev{display:none}.dica{top:calc(max(8px,env(safe-area-inset-top,0px)) + 44px);max-width:46vw;font-size:.74rem;padding:6px 10px}.ring .opt{width:62px;padding:4px 3px}.ring .opt b{font-size:1.05rem}.ring .opt span{display:none}}
+@media (max-width:1100px){.prev{display:none}}
+@media (max-width:900px){.dica{max-width:calc(100vw - 24px);bottom:auto;top:calc(max(12px,env(safe-area-inset-top,0px)) + 58px);font-size:.85rem}.dica .bf{display:none}.onda{max-width:none}}
+@media (max-height:520px){.stat{padding:4px 10px;font-size:1rem}.onda .btn.go{padding:8px 12px;font-size:.9rem}.dica{top:calc(max(8px,env(safe-area-inset-top,0px)) + 44px);max-width:46vw;font-size:.74rem;padding:6px 10px}
+ .ring .opt{width:64px;padding:4px 3px}.ring .opt b{font-size:1rem}.ring .opt span{display:none}
+ .teclas{gap:4px;padding:4px}.teclas button{min-width:40px;height:40px;font-size:1.15rem;border-radius:11px}.teclas button.pr{font-size:.85rem;padding:0 8px}.poder{gap:3px}.poder .pq{font-size:.78rem;padding:3px 10px}.poder .pq b{font-size:1rem}.carga{padding:3px 8px}.carga i{width:12px;height:12px}}
+@media (max-width:640px){.teclas button{min-width:38px;height:42px;font-size:1.1rem}.teclas{gap:4px}}
 </style>
 <canvas id="cv" aria-hidden="true"></canvas>
 <div class="flash" id="flash"></div>
@@ -144,13 +165,21 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
  <div class="htop">
   <div class="stat glass" aria-label="Vidas da base"><span class="hv" aria-hidden="true">♥</span><span id="vid">10</span><small>vidas</small></div>
   <div class="stat glass"><span class="en" aria-hidden="true">⚡</span><span id="en">0</span><small>energia</small></div>
-  <div class="stat glass"><small>Onda</small><span id="onda">1/8</span></div>
+  <div class="stat glass"><small>Onda</small><span id="onda">1</span></div>
+  <div class="stat glass"><span class="pt" id="pts">0</span><small>pts</small></div>
   <span class="sp"></span>
   <button class="ib" id="bVel" aria-label="Velocidade">1×</button>
   <button class="ib" id="bPause" aria-label="Pausar">⏸</button>
  </div>
  <div class="toast" id="toast" aria-live="assertive"></div>
  <div class="dica glass" id="dica" aria-live="polite" role="button" tabindex="0" title="Toque para esconder ou mostrar a dica"><span class="bf" aria-hidden="true"><i></i></span><span id="dicaT"></span><b class="dmin">💡 Dica</b></div>
+ <div class="poder" id="poder">
+  <div class="pq glass" id="pq" aria-live="polite">Toque num Bug para usar o Poder do Bip</div>
+  <div class="teclas glass" id="teclas" role="group" aria-label="Escolha um divisor primo" hidden>
+   <button data-p="2">2</button><button data-p="3">3</button><button data-p="5">5</button><button data-p="7">7</button><button data-p="11">11</button><button data-p="13">13</button><button data-p="primo" class="pr">É primo!</button>
+  </div>
+  <div class="carga glass" id="carga" aria-label="Carga do Poder do Bip"></div>
+ </div>
  <div class="onda"><div class="prev glass" id="prev"></div><button class="btn go" id="bOnda">▶ Chamar onda</button></div>
  <div class="ring" id="ring" hidden></div>
 </div>
@@ -158,35 +187,32 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 <section class="scr" id="sStart">
  <div class="card glass">
   <div class="brandrow"><!--LOGO--></div>
-  <div><h1>Bip Defesa</h1><p>Os <b>Bugs</b> vêm pela trilha até a base do Bip. Cada Bug carrega um número. Construa torres nos <b>lugares marcados</b>: elas dividem o número até ele virar <b>primo</b> ou 1. Aí o Bug é destruído.</p></div>
+  <div><h1>Bip Defesa</h1><p>Os <b>Bugs</b> não param de vir, e cada onda é mais difícil. Cada Bug carrega um número: construa torres que dividem esse número até ele virar <b>primo</b> ou 1. Quem chegar mais longe fica no topo!</p></div>
   <div class="legend">
-   <b style="--tc:#3ce8ff">÷2</b><span><b style="all:unset;color:#fff">Canhão Gêmeo</b>: atira rápido em números pares</span>
-   <b style="--tc:#2fd47a">÷3</b><span><b style="all:unset;color:#fff">Tesla Tripla</b>: raio que pula em até 3 Bugs</span>
-   <b style="--tc:#ff9a3c">÷5</b><span><b style="all:unset;color:#fff">Morteiro Estrela</b>: longe e em área</span>
-   <b style="--tc:#c07aff">÷7</b><span><b style="all:unset;color:#fff">Balista</b>: alcance enorme, um tiro forte</span>
+   <b style="--tc:#3ce8ff">÷2</b><span><b style="all:unset;color:#fff">Canhão</b> rápido · <b style="all:unset;color:#fff">÷3 Tesla</b> pula em vários Bugs</span>
+   <b style="--tc:#ff9a3c">÷5 ÷7</b><span><b style="all:unset;color:#fff">Morteiro</b> em área · <b style="all:unset;color:#fff">Balista</b> de longe</span>
    <b style="--tc:#ffd24a">Primo</b><span><b style="all:unset;color:#fff">Obelisco</b>: destrói Bugs com número primo</span>
+   <b style="--tc:#9fd8ff">Você</b><span><b style="all:unset;color:#fff">Poder do Bip</b>: toque num Bug e escolha um primo que divide o número. É o único jeito de quebrar o <b style="all:unset;color:#9fd8ff">escudo</b>. Errar gasta carga e acelera o Bug!</span>
   </div>
-  <p style="margin:0">A ordem importa: o Bug passa primeiro pelas torres perto da entrada. Veja a prévia da onda e planeje sem pressa.</p>
-  <div class="rec"><div><b id="rBest">0</b><span>seu recorde (pontos)</span></div><div><b id="rCoins">0/60</b><span>Bipcoins hoje</span></div></div>
-  <div id="turmaRec" hidden><div class="lbl"><svg class="trf" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 3h14v8a7 7 0 0 1-14 0z" fill="#ffd24a" stroke="#a87000" stroke-width="2"/><path d="M9 6H4v2a5 5 0 0 0 5 5M23 6h5v2a5 5 0 0 1-5 5" fill="none" stroke="#a87000" stroke-width="2"/><path d="M14 18h4v5h-4z" fill="#e9a500"/><rect x="9" y="23" width="14" height="5" rx="1.5" fill="#5a3a00"/><path d="M12.5 6v5" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg> Melhores defesas da turma</div><ol class="trec" id="trec"></ol></div>
+  <div class="rec"><div><b id="rBest">—</b><span id="rBestS">seu recorde</span></div><div><b id="rCoins">0/60</b><span>Bipcoins hoje</span></div></div>
+  <div id="turmaRec" hidden><div class="lbl"><svg class="trf" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 3h14v8a7 7 0 0 1-14 0z" fill="#ffd24a" stroke="#a87000" stroke-width="2"/><path d="M9 6H4v2a5 5 0 0 0 5 5M23 6h5v2a5 5 0 0 1-5 5" fill="none" stroke="#a87000" stroke-width="2"/><path d="M14 18h4v5h-4z" fill="#e9a500"/><rect x="9" y="23" width="14" height="5" rx="1.5" fill="#5a3a00"/><path d="M12.5 6v5" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg> Quem foi mais longe na turma</div><ol class="trec" id="trec"></ol></div>
   <p class="giro">Gire o celular para jogar deitado.</p>
   <div class="row"><button class="btn go" id="bGo">▶ Jogar</button><a class="back" href="./" id="bBack">← Voltar ao Mundo do Bip</a></div>
  </div>
 </section>
 
 <section class="scr center" id="sPause" hidden>
- <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="pT"><h2 id="pT">Pausado</h2><p>Aproveite para pensar na sua defesa. Dá para construir e melhorar torres com o jogo pausado.</p>
-  <div class="row"><button class="btn go" id="bResume">▶ Continuar</button><button class="btn" id="bQuit">Sair do jogo</button></div></div>
+ <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="pT"><h2 id="pT">Pausado</h2><p>O jogo está parado. Quando voltar, os Bugs continuam de onde estavam.</p>
+  <div class="row"><button class="btn go" id="bResume">▶ Continuar</button><button class="btn" id="bQuit">Desistir</button></div></div>
 </section>
 
 <section class="scr" id="sEnd" hidden>
  <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="eT">
-  <div><div class="lbl" id="eSub">Fim de jogo</div><h2 id="eT" class="big">Vitória!</h2></div>
-  <div class="stars" id="eStars" style="font-size:2.2rem;color:#ffd24a;letter-spacing:4px"></div>
-  <div class="rec"><div><b id="ePts">0</b><span id="ePtsL">pontos</span></div><div><b id="eKill">0</b><span>Bugs destruídos</span></div><div><b id="eOnda">0</b><span>ondas vencidas</span></div><div><b id="eVid">0</b><span>vidas da base</span></div></div>
+  <div><div class="lbl" id="eSub">A base caiu…</div><h2 id="eT" class="big">Onda 1</h2></div>
+  <div class="rec"><div><b id="ePts">0</b><span id="ePtsL">pontos</span></div><div><b id="eKill">0</b><span>Bugs destruídos</span></div><div><b id="eConta">0</b><span id="eContaL">contas certas</span></div></div>
   <p id="eGanho" style="margin:0;font-weight:700"></p>
   <div id="eRev"><div class="lbl">Bugs que passaram (e como vencê-los)</div><div class="facts" id="eFacts"></div></div>
-  <div class="row"><button class="btn go" id="bAgain">↻ Tentar esta onda de novo</button><button class="btn" id="bNovo">Recomeçar do início</button><a class="back" href="./" id="bBack2">← Mundo do Bip</a></div>
+  <div class="row"><button class="btn go" id="bNovo">▶ Jogar de novo</button><a class="back" href="./" id="bBack2">← Mundo do Bip</a></div>
  </div>
 </section>
 
@@ -199,26 +225,29 @@ const rnd=(a,b)=>a+Math.random()*(b-a);
 let PID=(location.hash.match(/^#p-([\w-]+)/)||[])[1]||null;if(!PID)try{PID=localStorage.getItem("bipsite-cur")}catch(e){}
 const LOOK=PID?BIPV.loja(PID).look:Object.assign({},BIPV.DEFAULT);
 /* ---------- recorde e Bipcoins: guardados junto com o Bip Runner (mesma chave) ----------
-   best.defesa = pontos (100 por onda vencida + 25 por vida da base na vitória), druns = partidas,
-   dcoins = Bipcoins de cada dia (5 por onda vencida + 20 na vitória, no máximo DEF_DIA por dia) */
+   best.definf = ondas vencidas × 100000 + pontos (até 99.999): quem vai mais longe fica no topo; os pontos desempatam.
+   druns = partidas; dcoins = Bipcoins de cada dia (5 por onda vencida, no máximo DEF_DIA por dia) */
 const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const nf=n=>Math.floor(n).toLocaleString("pt-BR");
 const RKEY=BIPV.runKey(PID||"anon");
 const REC=Object.assign({v:1,best:{},runs:0,coins:{},err:{},tot:{},druns:0,dcoins:{}},ls.get(RKEY)||{});REC.best=REC.best||{};REC.dcoins=REC.dcoins||{};
 const dia=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const hojeCoins=()=>Math.min(BIPV.DEF_DIA,Math.floor(REC.dcoins[dia()]||0));
+const ENC=(o,p)=>o*100000+Math.min(99999,Math.max(0,Math.floor(p)));
 function salvar(){/* relê o que o Runner ou o Snake possam ter salvo e junta, para um jogo não apagar o outro */
- const o=ls.get(RKEY)||{};const R2=Object.assign({},o,{best:Object.assign({},o.best||{},{defesa:Math.max(+(o.best||{}).defesa||0,+REC.best.defesa||0)}),dcoins:Object.assign({},o.dcoins||{},REC.dcoins),druns:Math.max(o.druns||0,REC.druns||0),t:Date.now()});
+ const o=ls.get(RKEY)||{};const R2=Object.assign({},o,{best:Object.assign({},o.best||{},{definf:Math.max(+(o.best||{}).definf||0,+REC.best.definf||0)}),dcoins:Object.assign({},o.dcoins||{},REC.dcoins),druns:Math.max(o.druns||0,REC.druns||0),t:Date.now()});
  if(!R2.v)R2.v=1;ls.set(RKEY,R2)}
 let ganhoJogo=0,novoRec=false;
 function darCoins(n){const antes=hojeCoins(),add=Math.max(0,Math.min(n,BIPV.DEF_DIA-antes));if(add){REC.dcoins[dia()]=antes+add;ganhoJogo+=add}return add}
-function registrar(pts){if(pts>(+REC.best.defesa||0)){REC.best.defesa=pts;novoRec=true}salvar()}
-function drawRec(){$("rBest").textContent=(+REC.best.defesa||0).toLocaleString("pt-BR");$("rCoins").textContent=`${hojeCoins()}/${BIPV.DEF_DIA}`;turmaRec()}
+function registrar(){const v=ENC(vencidas,pts);if(v>(+REC.best.definf||0)){REC.best.definf=v;novoRec=true}salvar()}
+function drawRec(){const d=BIPV.defesaDec(REC.best.definf);$("rBest").textContent=REC.best.definf?`Onda ${d.onda}`:"—";$("rBestS").textContent=REC.best.definf?`seu recorde · ${nf(d.pts)} pts`:"seu recorde";
+ $("rCoins").textContent=`${hojeCoins()}/${BIPV.DEF_DIA}`;turmaRec()}
 let recPend=false;
 async function turmaRec(){if(recPend||typeof NUVEM=="undefined"||!NUVEM.on||!PID)return;let p=null;try{p=(JSON.parse(localStorage.getItem("bipsite-profiles"))||[]).find(q=>q.id==PID)}catch(e){}
  if(!p||!p.cloud||!p.cloud.token)return;recPend=true;
- try{const L=await NUVEM.rpc("aluno_recordes",{p_token:p.cloud.token,p_trilha:"defesa"});
-  if(Array.isArray(L)&&L.length){$("trec").innerHTML=L.map((r,i)=>`<li class="${r.eu?"eu":""}"><span class="md m${i+1}">${i+1}</span><span>${esc(r.apelido)}${r.eu?" (você)":""}</span><span>${(+r.pontos).toLocaleString("pt-BR")} pts</span></li>`).join("");$("turmaRec").hidden=false}
+ try{const L=await NUVEM.rpc("aluno_recordes",{p_token:p.cloud.token,p_trilha:"definf"});
+  if(Array.isArray(L)&&L.length){$("trec").innerHTML=L.map((r,i)=>{const d=BIPV.defesaDec(r.pontos);return `<li class="${r.eu?"eu":""}"><span class="md m${i+1}">${i+1}</span><span>${esc(r.apelido)}${r.eu?" (você)":""}</span><span>onda ${d.onda} · ${nf(d.pts)} pts</span></li>`}).join("");$("turmaRec").hidden=false}
   else $("turmaRec").hidden=true}
  catch(e){}finally{recPend=false}}
 const INFRAME=window.parent!==window;
@@ -229,43 +258,84 @@ $("bBack").onclick=voltar;$("bBack2").onclick=voltar;
 const primo=n=>{if(n<2)return false;for(let i=2;i*i<=n;i++)if(n%i==0)return false;return true};
 function fatora(n){const f=[];let m=n;for(let p=2;p*p<=m;p++)while(m%p==0){f.push(p);m/=p}if(m>1)f.push(m);return f}
 const fatTxt=n=>{const f=fatora(n);return f.length>1?`${n} = ${f.join(" × ")}`:`${n} é primo`};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 
 /* =====================================================================
-   TORRES: cada uma tem forma, tiro e papel próprios (não é só a cor)
-   ÷2 Canhão Gêmeo: rápido, alcance médio, um alvo
-   ÷3 Tesla Tripla: raio que pula em até 3 Bugs
-   ÷5 Morteiro Estrela: longe, lento, estrela que cai em área
-   ÷7 Balista: alcance enorme, lento, um alvo
-   Obelisco Primo: destrói Bugs cujo número é primo
+   TORRES: cada uma tem forma, tiro e papel próprios.
+   Nível 1 → 2 (melhorar) → 3 (escolher uma de duas especializações).
    ===================================================================== */
 const TIPOS={
- d2:{op:"÷2",d:2,cor:0x3ce8ff,css:"#3ce8ff",nome:"Canhão Gêmeo",custo:50,up:60,alc:[3.3,3.8],cad:[.75,.5],papel:"rápido, um alvo"},
- d3:{op:"÷3",d:3,cor:0x2fd47a,css:"#2fd47a",nome:"Tesla Tripla",custo:70,up:70,alc:[3.1,3.6],cad:[1.3,.95],alvos:[3,4],papel:"pula em vários Bugs"},
- d5:{op:"÷5",d:5,cor:0xff9a3c,css:"#ff9a3c",nome:"Morteiro Estrela",custo:90,up:80,alc:[4.6,5.3],cad:[2.1,1.6],area:[1.3,1.6],papel:"longe, em área"},
- d7:{op:"÷7",d:7,cor:0xc07aff,css:"#c07aff",nome:"Balista",custo:100,up:90,alc:[5.6,6.4],cad:[1.6,1.2],papel:"alcance enorme"},
- cp:{op:"Primo",cor:0xffd24a,css:"#ffd24a",nome:"Obelisco Primo",custo:90,up:80,alc:[3.4,4],cad:[1.5,1.1],papel:"destrói primos"}};
+ d2:{op:"÷2",d:2,cor:0x3ce8ff,css:"#3ce8ff",nome:"Canhão Gêmeo",custo:50,up:60,alc:[3.3,3.8],cad:[.75,.5],papel:"rápido, um alvo",
+  ramos:[{n:"Rajada",dsc:"atira muito rápido",custo:110,alc:4,cad:.26},{n:"Quádruplo",dsc:"divide por 4 quando dá",custo:120,alc:3.9,cad:.5,div4:1}]},
+ d3:{op:"÷3",d:3,cor:0x2fd47a,css:"#2fd47a",nome:"Tesla Tripla",custo:70,up:70,alc:[3.1,3.6],cad:[1.3,.95],alvos:[3,4],papel:"pula em vários Bugs",
+  ramos:[{n:"Corrente",dsc:"raio pula em 6 Bugs",custo:120,alc:3.9,cad:.85,alvos:6},{n:"Gelo",dsc:"deixa os Bugs lentos",custo:120,alc:3.7,cad:.9,alvos:4,gelo:2.2}]},
+ d5:{op:"÷5",d:5,cor:0xff9a3c,css:"#ff9a3c",nome:"Morteiro Estrela",custo:90,up:80,alc:[4.6,5.3],cad:[2.1,1.6],area:[1.3,1.6],papel:"longe, em área",
+  ramos:[{n:"Cratera",dsc:"área enorme",custo:130,alc:5.6,cad:1.45,area:2.4},{n:"Chuva",dsc:"2 estrelas por vez",custo:130,alc:5.6,cad:1.4,area:1.6,estrelas:2}]},
+ d7:{op:"÷7",d:7,cor:0xc07aff,css:"#c07aff",nome:"Balista",custo:100,up:90,alc:[5.6,6.4],cad:[1.6,1.2],papel:"alcance enorme",
+  ramos:[{n:"Perfurante",dsc:"atravessa até 3 Bugs",custo:140,alc:6.6,cad:1.05,fura:3},{n:"Águia",dsc:"alcança quase tudo",custo:140,alc:9,cad:.85}]},
+ cp:{op:"Primo",cor:0xffd24a,css:"#ffd24a",nome:"Obelisco Primo",custo:90,up:80,alc:[3.4,4],cad:[1.5,1.1],papel:"destrói primos",
+  ramos:[{n:"Raio duplo",dsc:"2 primos por vez",custo:130,alc:4.3,cad:1,duplo:2},{n:"Âncora",dsc:"Bugs perto ficam lentos",custo:130,alc:4.4,cad:1,ancora:1}]}};
 const ORDEM=["d2","d3","d5","d7","cp"];
 const pode=(tipo,n)=>tipo=="cp"?primo(n):n>1&&n%TIPOS[tipo].d==0;
+/* atributos da torre no nível atual (o nível 3 usa a especialização escolhida) */
+function st(t){const T=TIPOS[t.tipo],i=Math.min(t.nv,2)-1,b={alc:T.alc[i],cad:T.cad[i],alvos:T.alvos?T.alvos[i]:1,area:T.area?T.area[i]:0};return t.nv>2?Object.assign(b,T.ramos[t.ramo]):b}
 
-/* ---------- Bugs: 4 tipos ---------- */
+/* ---------- Bugs ---------- */
 const BUGS={
- c:{nome:"Bug",vel:1.1,cor:0xd23f6a,css:"#ff5a7a",esc:1,en:9},
- v:{nome:"Bug veloz",vel:1.9,cor:0xff8a2a,css:"#ff9a3c",esc:.75,en:8},
- t:{nome:"Bug tanque",vel:.66,cor:0x6b3fa0,css:"#a07aff",esc:1.35,en:20},
- r:{nome:"Bug Rei",vel:.45,cor:0xd4a017,css:"#ffd24a",esc:1.9,en:80}};
+ c:{nome:"Bug",vel:1.05,cor:0xd23f6a,css:"#ff5a7a",esc:1,en:6,pts:10},
+ v:{nome:"Bug veloz",vel:1.8,cor:0xff8a2a,css:"#ff9a3c",esc:.75,en:6,pts:10},
+ t:{nome:"Bug tanque",vel:.62,cor:0x6b3fa0,css:"#a07aff",esc:1.35,en:14,pts:25,dano:2},
+ g:{nome:"Gigante primo",vel:.55,cor:0x8a2030,css:"#ff8a8a",esc:1.45,en:16,pts:30,dano:2},
+ m:{nome:"Bug Multiplicador",vel:.95,cor:0x2fb36a,css:"#5ef08a",esc:1.05,en:10,pts:20},
+ s:{nome:"Bug Somador",vel:1,cor:0x3c7bff,css:"#6aa8ff",esc:1.05,en:10,pts:20},
+ r:{nome:"Bug Rei",vel:.42,cor:0xd4a017,css:"#ffd24a",esc:1.9,en:50,pts:120,dano:5}};
+const VIDAS=10,EN0=230,CMAX=5,RECARGA=2.6;
 
-/* ---------- ondas ---------- */
-const W=(t,...ns)=>ns.map(n=>[t,n]);
-const ONDAS=[
- {bugs:W("c",4,8,6,2,12,16,10,8),libera:["d2","cp"],dica:"Construa nos <b>lugares marcados</b> perto da trilha. O <b>Canhão Gêmeo (÷2)</b> divide os números pares. Quando o número vira primo (2, 3, 5…), o <b>Obelisco</b> destrói o Bug. Ponha o Obelisco <b>depois</b> dos canhões, mais perto da base."},
- {bugs:[...W("c",9,6,18,27,12,3),...W("v",4,8)],libera:["d3"],dica:"Chegou a <b>Tesla Tripla (÷3)</b>: o raio pula em até 3 Bugs. 18 = 2 × 3 × 3. Atenção aos <b>Bugs velozes</b> (laranja)!"},
- {bugs:[...W("c",10,25,15,20,30,45,50),...W("v",5,6)],libera:["d5"],dica:"Múltiplos de 5 terminam em 0 ou 5. O <b>Morteiro Estrela (÷5)</b> alcança longe e acerta todos os Bugs perto de onde a estrela cai."},
- {bugs:[...W("c",14,21,49,35,28,42,63),...W("v",7,2)],libera:["d7"],dica:"A <b>Balista (÷7)</b> tem o maior alcance. 49 = 7 × 7: um Bug desses precisa levar dois tiros de ÷7."},
- {bugs:[...W("c",36,60,13,22,75,84,11,90),...W("v",17,19)],libera:[],dica:"Onda misturada. Toque numa torre para <b>melhorar</b>: ela atira mais rápido e alcança mais longe."},
- {bugs:[...W("c",24,48,70,31),...W("t",120,180,210)],libera:[],dica:"Os <b>Bugs tanque</b> (roxos) são lentos e carregam números grandes. 210 = 2 × 3 × 5 × 7: precisa de quase todas as torres!"},
- {bugs:[...W("v",6,10,14,15,21,22,26,33,35,39),...W("t",96)],libera:[],dica:"Enxame de <b>Bugs velozes</b>! Torres rápidas (÷2 e Tesla) e o Morteiro em área ajudam muito."},
- {bugs:[...W("c",64,105,126),...W("t",150,144),...W("r",2520)],libera:[],dica:"O <b>Bug Rei</b> chegou: 2520 = 2 × 2 × 2 × 3 × 3 × 5 × 7. Ele é lento, mas precisa passar por muitas divisões. Melhore suas torres!"}];
-const VIDAS=10,EN0=260;
+/* =====================================================================
+   ONDAS INFINITAS: cada onda é sorteada e fica um pouco mais difícil
+   (mais Bugs, números maiores, mais rápidos, mais escudos, Bugs com poderes, primos 11 e 13)
+   ===================================================================== */
+const LIBERA=[["d2","cp"],["d3"],["d5"],["d7"]];
+const GRANDES=[23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97];
+function numero(n,k){const pool=n<1?[2]:n<2?[2,3]:n<4?[2,3,5]:[2,3,5,7];let v=1;
+ for(let i=0;i<k;i++){const p=pick(pool);if(v*p>4000)break;v*=p}
+ /* um fator primo "de sobra" (o Obelisco termina o serviço); 11 e 13 só o Poder do Bip divide */
+ const sobra=n<1?[3,5,7]:n<4?[3,5,7]:[5,7,7];if(Math.random()<.45){const p=pick(sobra);if(v*p<=6000)v*=p}
+ if(n>=7&&Math.random()<Math.min(.4,.1+(n-7)*.03)){const p=n>=10&&Math.random()<.45?13:11;if(v*p<=9999)v*=p}
+ return Math.max(2,v)}
+function gerarOnda(n){const L=[],vm=n<2?.85:1+Math.min(.75,(n-2)*.03),gap=Math.max(.5,1-n*.025),cnt=Math.min(38,7+Math.floor(n*1.3));
+ const kmin=1+Math.floor(n/6),kmax=Math.min(8,2+Math.floor(n/4)),pEsc=n<3?0:Math.min(.45,.06+(n-3)*.03);
+ let t=0;const add=(tipo,num,esc)=>{L.push({tipo,n:num,esc:esc||0,t,vm});t+=gap*({v:.75,t:2,g:2,r:3}[tipo]||1.3)};
+ let escN=0;
+ for(let i=0;i<cnt;i++){const r=Math.random();let tipo="c",k=rint(kmin,kmax);
+  if(n>=1&&r<.22)tipo="v";else if(n>=4&&r<.36){tipo="t";k+=2}else if(n>=6&&r<.47)tipo="m";else if(n>=9&&r<.56)tipo="s";
+  const esc=(n==2&&(i==3||i==6))||(n!=2&&Math.random()<pEsc)?1:0;escN+=esc;
+  add(tipo,numero(n,tipo=="m"?Math.max(1,k-1):k),esc)}
+ if(n>=5)for(let i=0;i<Math.min(4,1+Math.floor((n-5)/4));i++){const pos=rint(2,L.length-1);L.splice(pos,0,{tipo:"g",n:pick(GRANDES),esc:n>=12&&Math.random()<.35?1:0,t:0,vm})}
+ if(n%5==4){/* chefe a cada 5 ondas: número enorme e escudo de várias camadas */
+  let v=1;const fs=[2,2,3,3,5,7,2,3,5,7];for(let i=0;i<Math.min(10,5+Math.floor(n/5));i++){const p=fs[i%fs.length];if(v*p<=9999)v*=p}if(n>=14&&v*11<=9999)v*=11;
+  L.push({tipo:"r",n:v,esc:1+Math.floor(n/10),t:0,vm})}
+ /* recalcula os tempos depois de inserir gigantes e chefe */
+ t=0;L.forEach(q=>{q.t=t;t+=gap*({v:.75,t:2,g:2,r:3}[q.tipo]||1.3)});
+ return L}
+/* dicas: aparecem na primeira vez que cada coisa nova surge */
+function dicaDa(n,L,visto){const tem=k=>L.some(q=>q.tipo==k),f=(k,html)=>{if(visto.has(k))return "";visto.add(k);return html};
+ const d=[];
+ if(n==0)d.push(f("ini","Construa nos <b>lugares marcados</b>. O <b>Canhão (÷2)</b> divide números pares; quando o número vira primo, o <b>Obelisco</b> destrói o Bug. Ponha o Obelisco <b>depois</b> dos canhões."));
+ if(n==1)d.push(f("d3","Chegou a <b>Tesla (÷3)</b>: o raio pula em vários Bugs. Cuidado com os <b>velozes</b> (laranja)!"));
+ if(L.some(q=>q.esc&&q.tipo!="r"))d.push(f("esc","Bugs com <b>bolha azul</b> têm <b>escudo</b>: as torres não os atingem! <b>Toque no Bug</b> e escolha um primo que divide o número dele. Acertou: o escudo quebra. Errou: gasta carga e o Bug acelera."));
+ if(n==2)d.push(f("d5","O <b>Morteiro (÷5)</b> alcança longe e acerta todos os Bugs onde a estrela cai."));
+ if(n==3)d.push(f("d7","A <b>Balista (÷7)</b> tem o maior alcance. Melhore as torres: no <b>nível 3</b> você escolhe uma especialização."));
+ if(tem("t"))d.push(f("t","<b>Bugs tanque</b> (roxos) são lentos e têm números grandes. Se passarem, tiram 2 vidas."));
+ if(tem("g"))d.push(f("g","<b>Gigantes primos</b> (vermelhos) têm números como 89 ou 97: nenhuma divisão serve, só o <b>Obelisco</b> ou o Poder do Bip (“É primo!”)."));
+ if(tem("m"))d.push(f("m","<b>Bug Multiplicador</b> (verde): se ficar uns segundos sem levar dano, o número <b>dobra</b>. Ataque cedo!"));
+ if(tem("s"))d.push(f("s","<b>Bug Somador</b> (azul): soma +1 no Bug vizinho. Um 7 vira 8 e deixa de ser primo!"));
+ if(L.some(q=>q.n%11==0))d.push(f("11","Números com fator <b>11</b>: nenhuma torre divide por 11. Use o <b>Poder do Bip</b> (11) ou deixe virar primo para o Obelisco."));
+ if(L.some(q=>q.n%13==0))d.push(f("13","Agora também aparece o fator <b>13</b>. Só o Poder do Bip divide por 13!"));
+ if(tem("r"))d.push(f("r","<b>Bug Rei!</b> Escudo de "+L.find(q=>q.tipo=="r").esc+" camada(s): cada conta certa quebra uma. Número "+L.find(q=>q.tipo=="r").n+"."));
+ if(n==5)d.push(f("cedo","Dica de recorde: quando todos os Bugs já saíram do portal, dá para <b>chamar a próxima onda mais cedo</b>. Ganha energia e pontos extras."));
+ return d.filter(Boolean).join("<br>")}
 
 /* =====================================================================
    MAPA: trilha sinuosa e lugares de construção (estilo clássico)
@@ -378,24 +448,31 @@ function makeTower(tipo){const T=TIPOS[tipo],G=new THREE.Group(),top=new THREE.G
 function estrela(r,d){const s=new THREE.Shape();for(let i=0;i<10;i++){const a=i/10*Math.PI*2-Math.PI/2,rr=i%2?r*.45:r;i?s.lineTo(Math.cos(a)*rr,Math.sin(a)*rr):s.moveTo(Math.cos(a)*rr,Math.sin(a)*rr)}
  return new THREE.Mesh(new THREE.ExtrudeGeometry(s,{depth:d,bevelEnabled:false}),M(0xff9a3c,{emissive:0xff7a00,emissiveIntensity:.5}))}
 /* ---------- modelos dos Bugs ---------- */
-function makeBug(tipo,n){const B=BUGS[tipo],G=new THREE.Group(),c=B.cor,k=B.esc,inner=new THREE.Group();G.add(inner);
- const corpo=M(c,{roughness:.45}),escuro=M(0x2b1838,{roughness:.4});
- if(tipo=="v"){/* veloz: corpo baixo e comprido, com rodinhas */
+function makeBug(tipo,n,escudo){const B=BUGS[tipo],G=new THREE.Group(),c=B.cor,k=B.esc,inner=new THREE.Group();G.add(inner);
+ const corpo=M(c,{roughness:.45}),escuro=M(0x2b1838,{roughness:.4}),forma=tipo=="g"?"t":tipo;
+ if(forma=="v"){/* veloz: corpo baixo e comprido, com rodinhas */
   const b=new THREE.Mesh(new THREE.BoxGeometry(.4,.26,.62),corpo);b.position.y=.3;inner.add(b);const hd=new THREE.Mesh(new THREE.BoxGeometry(.34,.2,.22),escuro);hd.position.set(0,.36,.33);inner.add(hd);
   [[-.22,.2],[.22,.2],[-.22,-.2],[.22,-.2]].forEach(([x,z])=>{const w=new THREE.Mesh(new THREE.CylinderGeometry(.11,.11,.08,12),escuro);w.rotation.z=Math.PI/2;w.position.set(x,.12,z);inner.add(w)});
   const esp=new THREE.Mesh(new THREE.BoxGeometry(.04,.06,.4),M(0xffd24a));esp.position.set(0,.47,-.05);inner.add(esp)}
- else if(tipo=="t"){/* tanque: caixa larga, blindada, com placas */
+ else if(forma=="t"){/* tanque e gigante: caixa larga, blindada, com placas */
   const b=new THREE.Mesh(new THREE.BoxGeometry(.7,.55,.7),corpo);b.position.y=.42;inner.add(b);
   [-1,1].forEach(s=>{const pl=new THREE.Mesh(new THREE.BoxGeometry(.08,.45,.6),M(0x4a4f5c,{metalness:.6}));pl.position.set(s*.4,.42,0);inner.add(pl)});
-  const hd=new THREE.Mesh(new THREE.BoxGeometry(.5,.3,.42),escuro);hd.position.set(0,.84,.05);inner.add(hd)}
- else{/* comum e Rei: robozinho com cabeça e antenas; o Rei tem coroa */
+  const hd=new THREE.Mesh(new THREE.BoxGeometry(.5,.3,.42),escuro);hd.position.set(0,.84,.05);inner.add(hd);
+  if(tipo=="g")[-1,1].forEach(s=>{const ch=new THREE.Mesh(new THREE.ConeGeometry(.08,.3,6),M(0xffd0d0));ch.position.set(s*.2,1.1,.05);inner.add(ch)})}
+ else{/* comum, multiplicador, somador e Rei: robozinho com cabeça e antenas */
   const b=new THREE.Mesh(new THREE.BoxGeometry(.46,.4,.4),corpo);b.position.y=.42;inner.add(b);const hd=new THREE.Mesh(new THREE.BoxGeometry(.5,.34,.42),escuro);hd.position.y=.8;inner.add(hd);
   [-.12,.12].forEach(x=>{const a=new THREE.Mesh(new THREE.CylinderGeometry(.015,.015,.24),M(0x888888));a.position.set(x,1.05,0);a.rotation.z=x>0?-.3:.3;inner.add(a)});
-  if(tipo=="r"){const cr=new THREE.Mesh(new THREE.CylinderGeometry(.24,.2,.16,5,1,true),M(0xffd24a,{metalness:.8,roughness:.2,side:2}));cr.position.y=1.05;inner.add(cr)}}
- [-.1,.1].forEach(x=>{const e=new THREE.Mesh(new THREE.SphereGeometry(.05,10,8),new THREE.MeshBasicMaterial({color:0xff4f6d}));e.position.set(x,tipo=="v"?.38:tipo=="t"?.86:.82,tipo=="v"?.45:.22);inner.add(e)});
+  if(tipo=="r"){const cr=new THREE.Mesh(new THREE.CylinderGeometry(.24,.2,.16,5,1,true),M(0xffd24a,{metalness:.8,roughness:.2,side:2}));cr.position.y=1.05;inner.add(cr)}
+  if(tipo=="m"||tipo=="s"){/* símbolo no peito: × ou + */const sb=badge(tipo=="m"?"×2":"+1",{bg:"rgba(255,255,255,.9)",bd:B.css,fg:"#172536",k:.42});sb.position.set(0,.45,.3);inner.add(sb)}}
+ [-.1,.1].forEach(x=>{const e=new THREE.Mesh(new THREE.SphereGeometry(.05,10,8),new THREE.MeshBasicMaterial({color:0xff4f6d}));e.position.set(x,forma=="v"?.38:forma=="t"?.86:.82,forma=="v"?.45:.22);inner.add(e)});
  inner.traverse(o=>{if(o.isMesh)o.castShadow=true});inner.scale.setScalar(k*1.3);
- const bd=badge(n,{bd:B.css,k:1.1});bd.position.y=(tipo=="v"?.95:1.7)*k+.3;G.add(bd);G.userData={inner,bd};scene.add(G);return G}
-function setBugNum(b){const old=b.G.userData.bd;b.G.remove(old);old.material.map.dispose();old.material.dispose();const nb=badge(b.n,{bd:BUGS[b.tipo].css,k:1.1});nb.position.copy(old.position);b.G.add(nb);b.G.userData.bd=nb}
+ /* escudo: bolha azul que as torres não atravessam */
+ const bolha=new THREE.Mesh(new THREE.IcosahedronGeometry(.62*k*1.3,2),new THREE.MeshStandardMaterial({color:0x9fd8ff,emissive:0x3a7bd5,emissiveIntensity:.6,transparent:true,opacity:.38,roughness:.1,metalness:.3,depthWrite:false}));
+ bolha.position.y=.55*k*1.3;bolha.visible=!!escudo;G.add(bolha);
+ const bd=badgeBug(tipo,n,escudo);bd.position.y=(forma=="v"?.95:1.7)*k+.3;G.add(bd);G.userData={inner,bd,bolha};scene.add(G);return G}
+const badgeBug=(tipo,n,escudo)=>escudo?badge(n,{bd:"#e8f6ff",bg:"rgba(40,70,140,.95)",k:1.1}):badge(n,{bd:BUGS[tipo].css,k:1.1});
+function setBugNum(b){const old=b.G.userData.bd;b.G.remove(old);old.material.map.dispose();old.material.dispose();const nb=badgeBug(b.tipo,b.n,b.esc);nb.position.copy(old.position);b.G.add(nb);b.G.userData.bd=nb;
+ b.G.userData.bolha.visible=b.esc>0;b.G.userData.bolha.material.opacity=b.esc>1?.55:.38;if(b===alvoBip)drawPoder()}
 function dispose(o){scene.remove(o);o.traverse(n=>{if(n.material){[].concat(n.material).forEach(m=>{if(m.map&&m.map!==BIPV.glowTex())m.map.dispose();m.dispose()})}if(n.geometry)n.geometry.dispose()})}
 function floatTxt(txt,pos,col){const sp=badge(txt,{bg:"rgba(10,14,40,.85)",bd:col,fg:"#fff",k:.9,w:Math.max(192,String(txt).length*34+40)});sp.position.copy(pos);scene.add(sp);fx.push({o:sp,t:0,max:1.1,kind:"txt"})}
 function burst(pos,col,n=18){for(let i=0;i<n;i++){const s=glow(col,.9,.3);s.position.copy(pos);s.userData.v=new THREE.Vector3(rnd(-2.5,2.5),rnd(2,4.5),rnd(-2.5,2.5));scene.add(s);fx.push({o:s,t:0,max:.8,kind:"spark"})}}
@@ -403,130 +480,193 @@ function raio(a,b,col,larg){/* raio em zigue-zague */const pts=[a.clone()];for(l
  const l=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:col,transparent:true}));scene.add(l);fx.push({o:l,t:0,max:.25,kind:"beam"});const g=glow(col,.8,larg||.9);g.position.copy(b);scene.add(g);fx.push({o:g,t:0,max:.3,kind:"beam"})}
 
 /* ---------- estado ---------- */
-let state="menu",wi=0,en=EN0,vidas=VIDAS,kills=0,vel=1,last=performance.now(),tAll=0;
-let towers=[],bugs=[],fila=[],tSpawn=0,shots=[],escaparam=[],snap=null,menuPad=null;
-const liberadas=()=>new Set(ONDAS.slice(0,wi+1).flatMap(o=>o.libera));
+let state="menu",wi=0,en=EN0,vidas=VIDAS,kills=0,vel=1,last=performance.now(),tAll=0,pts=0,vencidas=0,carga=CMAX,combo=0,acertos=0,erros=0;
+let towers=[],bugs=[],fila=[],tSpawn=0,shots=[],escaparam=[],menuPad=null,alvoBip=null,cache={},ondas={},visto=new Set(),selRing=null,cedoVis=false,cargaDraw=-1;
+const liberadas=()=>new Set(LIBERA.slice(0,wi+1).flat());
 const towerAt=i=>towers.find(t=>t.pad==i);
-function novoJogo(){REC.druns=(REC.druns||0)+1;ganhoJogo=0;novoRec=false;salvar();wi=0;en=EN0;vidas=VIDAS;kills=0;escaparam=[];towers.forEach(t=>dispose(t.G));towers=[];prepOnda()}
-function prepOnda(){state="plan";bugs.forEach(b=>dispose(b.G));bugs=[];shots.forEach(s=>dispose(s.o));shots=[];
- let t=0;fila=ONDAS[wi].bugs.map(([tipo,n])=>{const q={tipo,n,t};t+=tipo=="v"?.8:tipo=="t"?2.2:tipo=="r"?3:1.35;return q});tSpawn=0;
- snap={towers:towers.map(k=>({pad:k.pad,tipo:k.tipo,nv:k.nv})),en,vidas,kills};
- ["sStart","sEnd","sPause"].forEach(id=>$(id).hidden=true);$("hud").hidden=false;$("bOnda").hidden=false;$("bOnda").textContent=`▶ Chamar onda ${wi+1}`;
- dica(ONDAS[wi].dica);drawHud();drawPrev();padsVisiveis()}
-function chamarOnda(){if(state!="plan")return;state="wave";$("bOnda").hidden=true;dica("");fecharMenu();toast(`Onda ${wi+1}!`,"lv");drawPrev()}
-function drawHud(){$("vid").textContent=vidas;$("en").textContent=en;$("onda").textContent=`${wi+1}/${ONDAS.length}`}
-function drawPrev(){const restam=fila.length+bugs.length;
- $("prev").innerHTML=state=="plan"?`<div class="lbl">Próxima onda · ${fila.length} Bugs</div><div class="chs">${fila.map(q=>`<span class="ch" style="--bc:${BUGS[q.tipo].css}" title="${BUGS[q.tipo].nome}"><i></i>${q.n}</span>`).join("")}</div>`
-  :`<div class="lbl">Onda ${wi+1} · faltam ${restam} Bugs</div><div class="chs">${fila.slice(0,8).map(q=>`<span class="ch" style="--bc:${BUGS[q.tipo].css}"><i></i>${q.n}</span>`).join("")}</div>`}
-let dicaTo=0;function dica(html){const d=$("dica");$("dicaT").innerHTML=html;d.hidden=!html;d.classList.remove("min");clearTimeout(dicaTo);if(html&&(innerHeight<=520||innerWidth<=900))dicaTo=setTimeout(()=>d.classList.add("min"),9000)}
+const proxima=()=>cache[wi]||(cache[wi]=gerarOnda(wi));
+function limpar(){bugs.forEach(b=>dispose(b.G));bugs=[];shots.forEach(s=>dispose(s.o));shots=[];fila=[];towers.forEach(t=>dispose(t.G));towers=[];soltar();fecharMenu()}
+function novoJogo(){REC.druns=(REC.druns||0)+1;ganhoJogo=0;novoRec=false;salvar();limpar();
+ wi=0;en=EN0;vidas=VIDAS;kills=0;pts=0;vencidas=0;carga=CMAX;combo=0;acertos=0;erros=0;escaparam=[];cache={};ondas={};visto=new Set();tSpawn=0;cedoVis=false;
+ ["sStart","sEnd","sPause"].forEach(id=>$(id).hidden=true);$("hud").hidden=false;padsVisiveis();planejar()}
+function planejar(){state="plan";const L=proxima(),bo=$("bOnda");bo.hidden=false;bo.classList.remove("cedo");bo.textContent=`▶ Chamar onda ${wi+1}`;cedoVis=false;
+ dica(dicaDa(wi,L,visto));drawHud();drawPrev();drawPoder()}
+const cedoOk=()=>state=="wave"&&!fila.length&&bugs.length>0;
+const bonusCedo=()=>10+3*bugs.length;
+function chamarOnda(){if(state!="plan"&&!cedoOk())return;const cedo=state=="wave",L=proxima();delete cache[wi];
+ if(cedo){const dd=dicaDa(wi,L,visto);if(dd)dica(dd)}
+ const base=tSpawn+(cedo?.8:0);L.forEach(q=>fila.push(Object.assign({},q,{t:base+q.t,w:wi})));fila.sort((a,b)=>a.t-b.t);ondas[wi]={tot:L.length,fim:0};
+ if(cedo){const bonus=bonusCedo();en+=bonus;pts+=bonus;toast(`Onda ${wi+1} mais cedo!<small style="color:#5ef0e0">+⚡${bonus} e +${bonus} pts</small>`,"lv",true)}else toast(`Onda ${wi+1}!`,"lv");
+ wi++;state="wave";$("bOnda").hidden=true;cedoVis=false;fecharMenu();drawHud();drawPrev()}
+function drawHud(){$("vid").textContent=vidas;$("en").textContent=en;$("onda").textContent=Math.max(1,state=="plan"?wi+1:wi);$("pts").textContent=nf(pts)}
+function chips(L,max){return L.slice(0,max).map(q=>`<span class="ch${q.esc?" esc":""}" style="--bc:${BUGS[q.tipo].css}" title="${BUGS[q.tipo].nome}${q.esc?" com escudo":""}"><i></i>${q.n}</span>`).join("")+(L.length>max?`<span class="ch">+${L.length-max}</span>`:"")}
+function drawPrev(){const p=$("prev");
+ if(state=="plan"){const L=proxima();p.innerHTML=`<div class="lbl">Onda ${wi+1} · ${L.length} Bugs</div><div class="chs">${chips(L,24)}</div>`}
+ else if(cedoVis){const L=proxima();p.innerHTML=`<div class="lbl">Próxima: onda ${wi+1} · ${L.length} Bugs</div><div class="chs">${chips(L,14)}</div>`}
+ else p.innerHTML=`<div class="lbl">Onda ${wi} · faltam ${fila.length+bugs.length} Bugs</div><div class="chs">${chips(fila,10)}</div>`}
+let dicaTo=0;function dica(html){const d=$("dica");$("dicaT").innerHTML=html;d.hidden=!html;d.classList.remove("min");clearTimeout(dicaTo);if(html&&(innerHeight<=520||innerWidth<=900))dicaTo=setTimeout(()=>d.classList.add("min"),12000)}
 $("dica").onclick=()=>{clearTimeout(dicaTo);$("dica").classList.toggle("min")};
 function toast(html,cls,long){const t=$("toast");t.className="toast";void t.offsetWidth;t.innerHTML=html;t.className="toast show "+cls+(long?" long":"")}
 function padsVisiveis(){padMeshes.forEach(g=>{const tem=!!towerAt(g.userData.pad);g.userData.plus.visible=!tem;g.userData.ri.visible=!tem})}
 
-/* ---------- menu circular (construir, melhorar, vender) ---------- */
+/* =====================================================================
+   PODER DO BIP: o aluno toca num Bug e escolhe um primo que divide o número.
+   Certo: divide (e quebra uma camada do escudo). Errado: gasta 2 cargas e o Bug acelera.
+   ===================================================================== */
+function drawPoder(){const c=$("carga");let h='<span>Poder do Bip</span>';
+ for(let i=0;i<CMAX;i++){const f=Math.max(0,Math.min(1,carga-i));h+=f>=1?'<i class="on"></i>':f>0?`<i class="parc" style="--p:${Math.round(f*100)}%"></i>`:'<i></i>'}
+ if(combo>1)h+=`<em>combo ×${combo}</em>`;c.innerHTML=h;cargaDraw=Math.floor(carga*8);
+ const b=alvoBip;$("teclas").hidden=!b;
+ $("pq").innerHTML=b?`Bug <b>${b.n}</b>${b.esc?` <span style="color:#9fd8ff">· escudo${b.esc>1?" ×"+b.esc:""}</span>`:""} · qual primo divide?`:state=="plan"?"Na onda, toque num Bug para usar o Poder do Bip":"Toque num Bug para usar o Poder do Bip";
+ $("teclas").querySelectorAll("button").forEach(x=>x.disabled=carga<1)}
+function selecionar(b){if(state!="wave"||b.dead)return;alvoBip=b;fecharMenu();SFX.sel();drawPoder()}
+function soltar(){alvoBip=null;if(selRing)selRing.visible=false;drawPoder()}
+function responder(p){const b=alvoBip;if(!b||b.dead||state!="wave")return;if(carga<1){toast("Sem carga!<small style='color:#bff'>Espere o Poder do Bip recarregar.</small>","no");return}
+ const pos=b.G.position.clone().setY(2.3*BUGS[b.tipo].esc+.6),ok=p=="primo"?primo(b.n):b.n%p==0;
+ if(!ok){carga=Math.max(0,carga-2);combo=0;erros++;pts=Math.max(0,pts-5);b.pressa=2.5;
+  floatTxt(p=="primo"?`${b.n} não é primo!`:`${b.n} ÷ ${p} não dá!`,pos,"#ff4f6d");SFX.erro();shake=.2;drawHud();drawPoder();return}
+ carga-=1;combo++;acertos++;const ganho=Math.round(15*(1+Math.min(4,combo-1)*.5));pts+=ganho;b.semDano=0;
+ if(b.esc>0){b.esc--;floatTxt(b.esc?`escudo: falta ${b.esc}`:"escudo quebrou!",pos.clone().setY(pos.y+.6),"#9fd8ff");burst(b.G.position.clone().setY(.8),0x9fd8ff,14)}
+ if(p=="primo"){floatTxt(`${b.n} é primo! +${ganho}`,pos,"#ffd24a");matar(b,"primo")}
+ else{const a=b.n;b.n/=p;floatTxt(`${a} ÷ ${p} = ${b.n}  +${ganho}`,pos,"#5ef0e0");if(b.n==1)matar(b,"um");else setBugNum(b)}
+ SFX.bip();drawHud();if(b.dead)soltar();else drawPoder()}
+$("teclas").addEventListener("click",e=>{const x=e.target.closest("[data-p]");if(!x)return;responder(x.dataset.p=="primo"?"primo":+x.dataset.p)});
+
+/* ---------- menu circular (construir, melhorar, especializar, vender) ---------- */
 const ray=new THREE.Raycaster();
 function screenOf(v){const p=v.clone().project(cam);return [(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]}
 function padAt(x,y){const r=R.domElement.getBoundingClientRect(),v=new THREE.Vector2((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);ray.setFromCamera(v,cam);
  const p=new THREE.Vector3();if(!ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),-.1),p))return null;let best=-1,bd=1.1;PADS.forEach(([a,b],i)=>{const d=Math.hypot(a-p.x,b-p.z);if(d<bd){bd=d;best=i}});return best}
+function bugAt(x,y){let best=null,bd=TOUCH?58:46;for(const b of bugs){if(b.dead)continue;const k=BUGS[b.tipo].esc;
+  for(const yy of [.55*k,(b.tipo=="v"?.95:1.7)*k+.3]){const [sx,sy]=screenOf(b.G.position.clone().setY(yy)),d=Math.hypot(sx-x,sy-y);if(d<bd){bd=d;best=b}}}return best}
 function mostraAlcance(i,alc,cor){const [x,z]=PADS[i];rangeRing.position.set(x,.09,z);rangeRing.scale.set(alc,alc,1);rangeRing.material.color.setHex(cor);rangeRing.children[0].material.color.setHex(cor);rangeRing.visible=true}
 function abrirMenu(i){menuPad=i;const [x,z]=PADS[i],[sx,sy]=screenOf(new THREE.Vector3(x,.4,z)),t=towerAt(i),ring=$("ring");ring.style.left=sx+"px";ring.style.top=sy+"px";
- const L=liberadas(),pos=(k,n,r=TOUCH&&innerHeight<=520?74:92)=>{const a=-Math.PI/2+(n==1?0:(k/(n-1)-.5)*Math.min(Math.PI*1.25,(n-1)*.72));return `--x:${Math.cos(a)*r}px;--y:${Math.sin(a)*r}px`};
+ const L=liberadas(),pos=(k,n,r=TOUCH&&innerHeight<=520?74:92)=>{const a=-Math.PI/2+(n==1?0:(k/(n-1)-.5)*Math.min(Math.PI*1.3,(n-1)*(r<80?1.05:.98)));return `--x:${Math.cos(a)*r}px;--y:${Math.sin(a)*r}px`};
  if(!t){const tipos=ORDEM.filter(k=>L.has(k));
   ring.innerHTML=tipos.map((k,j)=>{const T=TIPOS[k];return `<button class="opt" data-b="${k}" style="--tc:${T.css};${pos(j,tipos.length)}" ${en<T.custo?"disabled":""} aria-label="${T.nome}: ${T.papel}, custa ${T.custo}"><b>${T.op}</b><span>${T.nome}</span><em>⚡${T.custo}</em></button>`}).join("");
   rangeRing.visible=false;ring.querySelectorAll("[data-b]").forEach(b=>{b.onmouseenter=b.onfocus=()=>mostraAlcance(i,TIPOS[b.dataset.b].alc[0],TIPOS[b.dataset.b].cor);b.onclick=()=>construir(i,b.dataset.b)})}
- else{const T=TIPOS[t.tipo],venda=Math.floor((T.custo+(t.nv>1?T.up:0))*.6);
-  ring.innerHTML=`<div class="info">${T.nome} · nível ${t.nv} · alcance ${T.alc[t.nv-1]} · ${T.papel}</div>`+
-   (t.nv<2?`<button class="opt" id="mUp" style="--tc:#ffd24a;${pos(0,2)}" ${en<T.up?"disabled":""}><b>★</b><span>Melhorar</span><em>⚡${T.up}</em></button>`:"")+
-   `<button class="opt" id="mSell" style="--tc:#ff8a8a;${pos(t.nv<2?1:0,t.nv<2?2:1)}"><b>$</b><span>Vender</span><em>+⚡${venda}</em></button>`;
-  mostraAlcance(i,T.alc[t.nv-1],T.cor);
-  if($("mUp")){$("mUp").onmouseenter=()=>mostraAlcance(i,T.alc[1],T.cor);$("mUp").onclick=()=>melhorar(t)}$("mSell").onclick=()=>vender(t)}
+ else{const T=TIPOS[t.tipo],S=st(t),venda=Math.floor(t.gasto*.6),info=`${T.nome}${t.nv>2?" "+T.ramos[t.ramo].n:""} · nível ${t.nv} · ${t.nv>2?T.ramos[t.ramo].dsc:T.papel}`;
+  const ops=[];
+  if(t.nv==1)ops.push(`<button class="opt" data-up="1" style="--tc:#ffd24a" ${en<T.up?"disabled":""}><b>★</b><span>Melhorar</span><em>⚡${T.up}</em></button>`);
+  if(t.nv==2)T.ramos.forEach((r,k)=>ops.push(`<button class="opt" data-ramo="${k}" style="--tc:#ffd24a" ${en<r.custo?"disabled":""} title="${r.dsc}"><b>${k?"★★":"★"}</b><span>${r.n}</span><em>⚡${r.custo}</em></button>`));
+  ops.push(`<button class="opt" data-sell="1" style="--tc:#ff8a8a"><b>$</b><span>Vender</span><em>+⚡${venda}</em></button>`);
+  ring.innerHTML=`<div class="info" id="mInfo">${info}</div>`+ops.map((h,k)=>h.replace('style="',`style="${pos(k,ops.length)};`)).join("");
+  mostraAlcance(i,S.alc,T.cor);
+  const up=ring.querySelector("[data-up]");if(up){up.onmouseenter=()=>mostraAlcance(i,T.alc[1],T.cor);up.onclick=()=>melhorar(t)}
+  ring.querySelectorAll("[data-ramo]").forEach(b=>{const r=T.ramos[+b.dataset.ramo];b.onmouseenter=b.onfocus=()=>{mostraAlcance(i,r.alc,T.cor);$("mInfo").textContent=`${r.n}: ${r.dsc}`};b.onclick=()=>melhorar(t,+b.dataset.ramo)});
+  ring.querySelector("[data-sell]").onclick=()=>vender(t)}
  ring.hidden=false}
 function fecharMenu(){$("ring").hidden=true;menuPad=null;if(rangeRing)rangeRing.visible=false}
 function construir(i,tipo,gratis){const T=TIPOS[tipo];if(!gratis&&en<T.custo)return;if(towerAt(i))return;if(!gratis)en-=T.custo;
- const G=makeTower(tipo),[x,z]=PADS[i];G.position.set(x,.14,z);G.scale.setScalar(.2);towers.push({pad:i,tipo,G,cd:.3,nv:1,x,z,grow:0});burst(new THREE.Vector3(x,.6,z),T.cor,12);SFX.build();fecharMenu();drawHud();padsVisiveis()}
-function melhorar(t,gratis){const T=TIPOS[t.tipo];if(t.nv>1||(!gratis&&en<T.up))return;if(!gratis)en-=T.up;t.nv=2;t.G.userData.ouro.visible=true;t.grow=0;burst(t.G.position.clone().setY(1),0xffd24a,16);SFX.build();fecharMenu();drawHud()}
-function vender(t){const T=TIPOS[t.tipo];en+=Math.floor((T.custo+(t.nv>1?T.up:0))*.6);dispose(t.G);towers.splice(towers.indexOf(t),1);fecharMenu();drawHud();padsVisiveis()}
+ const G=makeTower(tipo),[x,z]=PADS[i];G.position.set(x,.14,z);G.scale.setScalar(.2);towers.push({pad:i,tipo,G,cd:.3,nv:1,x,z,grow:0,gasto:T.custo});burst(new THREE.Vector3(x,.6,z),T.cor,12);SFX.build();fecharMenu();drawHud();padsVisiveis()}
+function melhorar(t,ramo,gratis){const T=TIPOS[t.tipo];if(t.nv>2)return;
+ if(t.nv==1){if(!gratis&&en<T.up)return;if(!gratis)en-=T.up;t.gasto+=T.up;t.nv=2;t.G.userData.ouro.visible=true}
+ else{if(ramo==null)return;const r=T.ramos[ramo];if(!gratis&&en<r.custo)return;if(!gratis)en-=r.custo;t.gasto+=r.custo;t.nv=3;t.ramo=ramo;
+  const u=t.G.userData,old=u.lb;t.G.remove(old);old.material.map.dispose();old.material.dispose();const lb=badge(`${T.op} ${r.n}`,{bg:"rgba(10,14,40,.9)",bd:"#ffd24a",fg:T.css,k:.62,w:Math.max(192,(T.op.length+r.n.length)*30+60)});lb.position.copy(old.position);lb.position.y+=.15;t.G.add(lb);u.lb=lb}
+ t.grow=0;burst(t.G.position.clone().setY(1),0xffd24a,16);SFX.build();fecharMenu();drawHud()}
+function vender(t){en+=Math.floor(t.gasto*.6);dispose(t.G);towers.splice(towers.indexOf(t),1);fecharMenu();drawHud();padsVisiveis()}
 let downAt=null;
 $("cv").addEventListener("pointerdown",e=>{downAt=[e.clientX,e.clientY]});
 $("cv").addEventListener("pointerup",e=>{if(!downAt||Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1])>12)return;downAt=null;
- if(state!="plan"&&state!="wave"&&state!="pause")return;const i=padAt(e.clientX,e.clientY);if(i==null||i<0){fecharMenu();return}if(menuPad===i){fecharMenu();return}abrirMenu(i)});
+ if(state!="plan"&&state!="wave")return;
+ if(state=="wave"){const b=bugAt(e.clientX,e.clientY);if(b){selecionar(b);return}}
+ const i=padAt(e.clientX,e.clientY);if(i==null||i<0){fecharMenu();if(alvoBip)soltar();return}if(menuPad===i){fecharMenu();return}if(alvoBip)soltar();abrirMenu(i)});
 
 /* ---------- a onda ---------- */
-function spawn(q){const G=makeBug(q.tipo,q.n),[x,z]=noCaminho(0);G.position.set(x,0,z);bugs.push({tipo:q.tipo,n:q.n,n0:q.n,s:0,G,ph:Math.random()*6,dead:false,off:rnd(-.25,.25)});drawPrev()}
-function matar(b,porque){if(b.dead)return;b.dead=true;kills++;en+=BUGS[b.tipo].en;const p=b.G.position.clone().setY(.8);burst(p,porque=="primo"?0xffd24a:0x5ef0e0,b.tipo=="r"?60:24);dispose(b.G);drawHud();SFX.kill();if(menuPad!=null)abrirMenu(menuPad)}
-function aplicar(tipo,b){/* o efeito da torre no Bug, conferido na hora em que o tiro chega */
- if(b.dead||!pode(tipo,b.n))return false;const p=b.G.position.clone().setY(2.3*BUGS[b.tipo].esc+.5),T=TIPOS[tipo];
+function spawn(q){const G=makeBug(q.tipo,q.n,q.esc),[x,z]=noCaminho(0);G.position.set(x,0,z);
+ bugs.push({tipo:q.tipo,n:q.n,n0:q.n,esc:q.esc,esc0:q.esc,w:q.w,vm:q.vm||1,s:0,G,ph:Math.random()*6,dead:false,off:rnd(-.25,.25),semDano:0,somaT:Math.random()*2,gelo:0,pressa:0,lento:0});drawPrev()}
+function fimBug(b){const o=ondas[b.w];if(b===alvoBip)soltar();if(!o)return;o.fim++;
+ if(o.fim==o.tot){vencidas++;const bonus=20+b.w*2;en+=bonus;pts+=10*(b.w+1);darCoins(5);registrar();toast(`Onda ${b.w+1} vencida!<small style="color:#5ef0e0">+⚡${bonus}</small>`,"ok");SFX.lv();drawHud()}}
+function matar(b,porque){if(b.dead)return;b.dead=true;kills++;en+=BUGS[b.tipo].en;pts+=BUGS[b.tipo].pts+(b.esc0?10:0);const p=b.G.position.clone().setY(.8);burst(p,porque=="primo"?0xffd24a:0x5ef0e0,b.tipo=="r"?60:24);dispose(b.G);fimBug(b);drawHud();SFX.kill();if(menuPad!=null)abrirMenu(menuPad)}
+function aplicar(tipo,b,S){/* o efeito da torre no Bug, conferido na hora em que o tiro chega */
+ if(b.dead||b.esc>0||!pode(tipo,b.n))return false;const p=b.G.position.clone().setY(2.3*BUGS[b.tipo].esc+.5),T=TIPOS[tipo];b.semDano=0;if(S&&S.gelo)b.gelo=S.gelo;
  if(tipo=="cp"){floatTxt(`${b.n} é primo!`,p,T.css);matar(b,"primo");return true}
- const antes=b.n;b.n/=T.d;floatTxt(`${antes} ÷ ${T.d} = ${b.n}`,p,T.css);SFX.div(T.d);if(b.n==1){floatTxt("virou 1!",p.clone().setY(p.y+.5),"#5ef0e0");matar(b,"um")}else setBugNum(b);return true}
-function noAlcance(t,b){const dx=b.G.position.x-t.x,dz=b.G.position.z-t.z;return dx*dx+dz*dz<=Math.pow(TIPOS[t.tipo].alc[t.nv-1],2)}
-function disparar(t){const T=TIPOS[t.tipo],cands=bugs.filter(b=>!b.dead&&noAlcance(t,b)&&pode(t.tipo,b.n)&&!(t.tipo!="d3"&&b.reserva&&b.reserva[t.tipo]>=b.n)).sort((a,b)=>b.s-a.s);
+ const d=S&&S.div4&&b.n%4==0?4:T.d,antes=b.n;b.n/=d;floatTxt(`${antes} ÷ ${d} = ${b.n}`,p,T.css);SFX.div(d);if(b.n==1){floatTxt("virou 1!",p.clone().setY(p.y+.5),"#5ef0e0");matar(b,"um")}else setBugNum(b);return true}
+function noAlcance(t,b,alc){const dx=b.G.position.x-t.x,dz=b.G.position.z-t.z;return dx*dx+dz*dz<=alc*alc}
+function disparar(t){const T=TIPOS[t.tipo],S=st(t),cands=bugs.filter(b=>!b.dead&&!b.esc&&noAlcance(t,b,S.alc)&&pode(t.tipo,b.n)&&!(t.tipo!="d3"&&b.reserva&&b.reserva[t.tipo]>=b.n)).sort((a,b)=>b.s-a.s);
  if(!cands.length)return false;const top=t.G.userData.top,origem=t.G.position.clone().setY(t.G.position.y+top.position.y),alvo=cands[0];
- /* gira a parte de cima para o alvo */
  top.rotation.y=Math.atan2(alvo.G.position.x-t.x,alvo.G.position.z-t.z);
- if(t.tipo=="d3"){/* Tesla: raio que pula em até 3 (4 no nível 2) Bugs */
-  let de=origem;cands.slice(0,T.alvos[t.nv-1]).forEach(b=>{const a=b.G.position.clone().setY(.7*BUGS[b.tipo].esc);raio(de,a,T.cor);aplicar("d3",b);de=a});SFX.zap();return true}
- if(t.tipo=="cp"){const a=alvo.G.position.clone().setY(.7);raio(origem,a,T.cor,1.4);raio(a.clone().setY(6),a,0xffffff,1.2);aplicar("cp",alvo);SFX.zap();return true}
- /* projéteis que viajam: bala (÷2), estrela (÷5, em arco) e virote (÷7) */
- let o;if(t.tipo=="d2"){o=new THREE.Mesh(new THREE.SphereGeometry(.09,10,8),M(0x222831,{metalness:.6}));SFX.pum()}
- else if(t.tipo=="d5"){o=estrela(.2,.08);SFX.mort()}
- else{o=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.55,6),M(0x7a5536));{const pt=new THREE.Mesh(new THREE.ConeGeometry(.05,.14,8),M(0xc07aff));pt.position.y=.32;o.add(pt)}SFX.vush()}
- o.position.copy(origem);scene.add(o);const dist=origem.distanceTo(alvo.G.position);
- alvo.reserva=alvo.reserva||{};alvo.reserva[t.tipo]=(alvo.reserva[t.tipo]||0)+1;
- shots.push({o,tipo:t.tipo,alvo,de:origem.clone(),t:0,dur:t.tipo=="d5"?.9:t.tipo=="d7"?.18+dist*.03:.12+dist*.05,area:T.area?T.area[t.nv-1]:0,arco:t.tipo=="d5"?2.4:t.tipo=="d2"?.4:0});
- /* recuo e clarão do canhão */
- top.position.z=0;if(t.tipo=="d2"){const fl=glow(0xfff2a0,.9,.8);fl.position.copy(origem);scene.add(fl);fx.push({o:fl,t:0,max:.12,kind:"beam"})}return true}
+ if(t.tipo=="d3"){/* Tesla: raio que pula de Bug em Bug */
+  let de=origem;cands.slice(0,S.alvos).forEach(b=>{const a=b.G.position.clone().setY(.7*BUGS[b.tipo].esc);raio(de,a,S.gelo?0x9fe8ff:T.cor);aplicar("d3",b,S);de=a});SFX.zap();return true}
+ if(t.tipo=="cp"){cands.slice(0,S.duplo||1).forEach(b=>{const a=b.G.position.clone().setY(.7);raio(origem,a,T.cor,1.4);raio(a.clone().setY(6),a,0xffffff,1.2);aplicar("cp",b,S)});SFX.zap();return true}
+ const lanca=al=>{let o;if(t.tipo=="d2"){o=new THREE.Mesh(new THREE.SphereGeometry(.09,10,8),M(0x222831,{metalness:.6}));SFX.pum()}
+  else if(t.tipo=="d5"){o=estrela(.2,.08);SFX.mort()}
+  else{o=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.55,6),M(0x7a5536));{const pt=new THREE.Mesh(new THREE.ConeGeometry(.05,.14,8),M(0xc07aff));pt.position.y=.32;o.add(pt)}SFX.vush()}
+  o.position.copy(origem);scene.add(o);const dist=origem.distanceTo(al.G.position);
+  al.reserva=al.reserva||{};al.reserva[t.tipo]=(al.reserva[t.tipo]||0)+1;
+  shots.push({o,tipo:t.tipo,alvo:al,de:origem.clone(),t:0,dur:t.tipo=="d5"?.9:t.tipo=="d7"?.18+dist*.03:.12+dist*.05,S,arco:t.tipo=="d5"?2.4:t.tipo=="d2"?.4:0})};
+ if(t.tipo=="d5")cands.slice(0,S.estrelas||1).forEach(lanca);else lanca(alvo);
+ if(t.tipo=="d2"){const fl=glow(0xfff2a0,.9,.8);fl.position.copy(origem);scene.add(fl);fx.push({o:fl,t:0,max:.12,kind:"beam"})}return true}
 function voos(dt){for(let i=shots.length-1;i>=0;i--){const s=shots[i];s.t+=dt;const k=Math.min(1,s.t/s.dur),alvo=s.alvo.dead?s.ultimo||s.de:s.alvo.G.position.clone().setY(.6);s.ultimo=alvo;
-  const p=s.de.clone().lerp(alvo,k);p.y+=Math.sin(k*Math.PI)*s.arco;const ant=s.o.position.clone();s.o.position.copy(p);
+  const p=s.de.clone().lerp(alvo,k);p.y+=Math.sin(k*Math.PI)*s.arco;s.o.position.copy(p);
   if(s.tipo=="d7"){s.o.lookAt(alvo);s.o.rotateX(Math.PI/2)}else if(s.tipo=="d5"){s.o.rotation.z+=dt*9;s.o.rotation.x=-1}
   if(k>=1){if(s.alvo.reserva)s.alvo.reserva[s.tipo]=Math.max(0,(s.alvo.reserva[s.tipo]||1)-1);
    if(s.tipo=="d5"){/* a estrela cai e divide todos os Bugs múltiplos de 5 que estiverem perto */
-    const c=alvo;burst(c.clone().setY(.3),0xff9a3c,16);const ond=new THREE.Mesh(new THREE.RingGeometry(.1,.25,30),new THREE.MeshBasicMaterial({color:0xff9a3c,transparent:true,side:2}));ond.rotation.x=-Math.PI/2;ond.position.set(c.x,.12,c.z);ond.userData.r=s.area;scene.add(ond);fx.push({o:ond,t:0,max:.4,kind:"onda"});
-    bugs.forEach(b=>{if(!b.dead&&Math.hypot(b.G.position.x-c.x,b.G.position.z-c.z)<=s.area)aplicar("d5",b)})}
-   else aplicar(s.tipo,s.alvo);dispose(s.o);shots.splice(i,1)}}}
+    const c=alvo;burst(c.clone().setY(.3),0xff9a3c,16);const ond=new THREE.Mesh(new THREE.RingGeometry(.1,.25,30),new THREE.MeshBasicMaterial({color:0xff9a3c,transparent:true,side:2}));ond.rotation.x=-Math.PI/2;ond.position.set(c.x,.12,c.z);ond.userData.r=s.S.area;scene.add(ond);fx.push({o:ond,t:0,max:.4,kind:"onda"});
+    bugs.forEach(b=>{if(!b.dead&&Math.hypot(b.G.position.x-c.x,b.G.position.z-c.z)<=s.S.area)aplicar("d5",b,s.S)})}
+   else{aplicar(s.tipo,s.alvo,s.S);
+    if(s.S.fura){/* Balista perfurante: o virote continua e acerta outros Bugs perto */
+     const c=alvo;bugs.filter(b=>!b.dead&&b!==s.alvo&&Math.hypot(b.G.position.x-c.x,b.G.position.z-c.z)<1.8).slice(0,s.S.fura-1).forEach(b=>aplicar("d7",b,s.S))}}
+   dispose(s.o);shots.splice(i,1)}}}
 function step(dt){tSpawn+=dt;while(fila.length&&fila[0].t<=tSpawn)spawn(fila.shift());
- for(const b of bugs){if(b.dead)continue;b.s+=dt*BUGS[b.tipo].vel;const [x,z,a]=noCaminho(b.s);
+ carga=Math.min(CMAX,carga+dt/RECARGA);if(Math.floor(carga*8)!=cargaDraw)drawPoder();
+ const anc=towers.filter(t=>t.nv>2&&st(t).ancora);
+ for(const b of bugs){if(b.dead)continue;
+  if(anc.length&&anc.some(t=>noAlcance(t,b,st(t).alc)))b.lento=.15;
+  b.gelo=Math.max(0,b.gelo-dt);b.pressa=Math.max(0,b.pressa-dt);b.lento=Math.max(0,b.lento-dt);
+  b.s+=dt*BUGS[b.tipo].vel*b.vm*(b.gelo>0?.5:1)*(b.lento>0?.65:1)*(b.pressa>0?1.6:1);const [x,z,a]=noCaminho(b.s);
   const nx=Math.cos(a),nz=-Math.sin(a);b.G.position.set(x+nx*b.off,0,z+nz*b.off);b.G.userData.inner.rotation.y=a;
-  if(b.s>=PLEN){b.dead=true;const perde=b.tipo=="r"?5:b.tipo=="t"?2:1;vidas=Math.max(0,vidas-perde);escaparam.push(b);dispose(b.G);drawHud();SFX.hit();shake=.4;const f=$("flash");f.classList.add("on");setTimeout(()=>f.classList.remove("on"),60);
+  if(b.tipo=="m"){b.semDano+=dt;if(b.semDano>3.5&&b.n<5000){b.semDano=0;b.n*=2;setBugNum(b);floatTxt("×2",b.G.position.clone().setY(2.4),"#5ef08a")}}
+  if(b.tipo=="s"){b.somaT+=dt;if(b.somaT>3){b.somaT=0;let alvo=null,bd=2.6;for(const o of bugs){if(o===b||o.dead)continue;const d=o.G.position.distanceTo(b.G.position);if(d<bd){bd=d;alvo=o}}
+   if(alvo){alvo.n+=1;setBugNum(alvo);raio(b.G.position.clone().setY(.9),alvo.G.position.clone().setY(.9),0x6aa8ff);floatTxt("+1",alvo.G.position.clone().setY(2.4),"#6aa8ff")}}}
+  if(b.s>=PLEN){b.dead=true;const perde=BUGS[b.tipo].dano||1;vidas=Math.max(0,vidas-perde);escaparam.push(b);dispose(b.G);fimBug(b);drawHud();SFX.hit();shake=.4;const f=$("flash");f.classList.add("on");setTimeout(()=>f.classList.remove("on"),60);
    toast(`Um Bug ${b.n} passou! −${perde} ${perde>1?"vidas":"vida"}<small>${fatTxt(b.n)}${b.n!=b.n0?` (começou como ${b.n0})`:""}</small>`,"no",true);if(vidas<=0){perdeu();return}}}
  bugs=bugs.filter(b=>!b.dead);
- for(const t of towers){t.cd-=dt;if(t.cd>0)continue;if(disparar(t))t.cd=TIPOS[t.tipo].cad[t.nv-1]}
+ for(const t of towers){t.cd-=dt;if(t.cd>0)continue;if(disparar(t))t.cd=st(t).cad}
  voos(dt);bugs=bugs.filter(b=>!b.dead);
- if(!fila.length&&!bugs.length&&!shots.length)venceuOnda()}
-function venceuOnda(){darCoins(5);if(wi>=ONDAS.length-1){darCoins(20);registrar(ONDAS.length*100+vidas*25);fim(true);return}registrar((wi+1)*100);const bonus=30+wi*8;en+=bonus;wi++;toast(`Onda vencida! <small style="color:#5ef0e0">+⚡${bonus}</small>`,"ok");SFX.lv();prepOnda()}
-function perdeu(){state="over";setTimeout(()=>fim(false),900)}
-function fim(ok){state="end";$("hud").hidden=true;fecharMenu();
- $("eSub").textContent=ok?"Você defendeu a base do Bip!":"A base caiu…";$("eT").textContent=ok?"Vitória!":`Onda ${wi+1}`;
- const st=ok?(vidas>=9?3:vidas>=5?2:1):0;$("eStars").innerHTML=ok?"★".repeat(st)+`<span style="opacity:.25">${"★".repeat(3-st)}</span>`:"";
- $("eKill").textContent=kills;$("eOnda").textContent=ok?ONDAS.length:wi;$("eVid").textContent=Math.max(0,vidas);
+ const cv=cedoOk();if(cv!=cedoVis){cedoVis=cv;const bo=$("bOnda");bo.hidden=!cv;bo.classList.toggle("cedo",cv);drawPrev()}
+ if(cv){const tx=`⏩ Onda ${wi+1} agora · +⚡${bonusCedo()}`;if($("bOnda").textContent!=tx)$("bOnda").textContent=tx}
+ if(!fila.length&&!bugs.length&&!shots.length)planejar()}
+function perdeu(){if(state=="over"||state=="end")return;state="over";soltar();fecharMenu();registrar();setTimeout(fim,1000)}
+function fim(){state="end";$("hud").hidden=true;fecharMenu();$("sPause").hidden=true;
+ $("eT").textContent=vencidas?`Você venceu ${vencidas} ${vencidas==1?"onda":"ondas"}`:"Nenhuma onda vencida";
+ $("ePts").textContent=nf(pts);$("ePtsL").textContent=novoRec?"pontos · novo recorde!":"pontos";$("eKill").textContent=nf(kills);
+ $("eConta").textContent=nf(acertos);$("eContaL").textContent=erros?`contas certas · ${erros} ${erros==1?"errada":"erradas"}`:"contas certas";
  const u=[...new Map(escaparam.map(b=>[b.n0,b])).values()];$("eRev").hidden=!u.length;$("eFacts").innerHTML=u.slice(0,12).map(b=>`<span>${fatTxt(b.n0)}</span>`).join("");
- const pts=ok?ONDAS.length*100+vidas*25:wi*100;$("ePts").textContent=pts.toLocaleString("pt-BR");$("ePtsL").textContent=novoRec?"pontos · novo recorde!":"pontos";
- $("eGanho").innerHTML=ganhoJogo?`Você ganhou <b style="color:#ffd24a">${ganhoJogo} Bipcoins</b> nesta partida.`:hojeCoins()>=BIPV.DEF_DIA?"Você já ganhou todos os Bipcoins do Bip Defesa hoje. Volte amanhã!":"";drawRec();
- $("bAgain").hidden=ok;$("sEnd").hidden=false;(ok?$("bNovo"):$("bAgain")).focus();if(ok)SFX.lv()}
-function tentarDeNovo(){towers.forEach(t=>dispose(t.G));towers=[];snap.towers.forEach(k=>{construir(k.pad,k.tipo,true);if(k.nv>1)melhorar(towers[towers.length-1],true)});
- en=snap.en;vidas=snap.vidas;kills=snap.kills;prepOnda()}
+ $("eGanho").innerHTML=ganhoJogo?`Você ganhou <b style="color:#ffd24a">${ganhoJogo} Bipcoins</b> nesta partida.`:hojeCoins()>=BIPV.DEF_DIA?"Você já ganhou todos os Bipcoins do Bip Defesa hoje. O recorde continua valendo!":"";drawRec();
+ $("sEnd").hidden=false;$("bNovo").focus()}
 
 /* ---------- som ---------- */
 let AC=null;
 function tone(f,d,type="sine",v=.1,when=0,slide=0){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime+when,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
 const SFX={div:d=>tone(300+d*90,.08,"triangle",.05),kill:()=>{tone(660,.1,"triangle",.08);tone(990,.14,"triangle",.06,.06)},hit:()=>tone(150,.35,"sawtooth",.09,0,70),
- lv:()=>[0,4,7,12].forEach((s,i)=>tone(440*Math.pow(2,s/12),.16,"triangle",.1,i*.09)),pum:()=>tone(120,.12,"square",.05,0,60),mort:()=>tone(200,.25,"sine",.07,0,90),vush:()=>tone(900,.12,"sawtooth",.03,0,300),zap:()=>tone(1400,.12,"square",.03,0,500),build:()=>tone(520,.18,"triangle",.08,0,780)};
+ lv:()=>[0,4,7,12].forEach((s,i)=>tone(440*Math.pow(2,s/12),.16,"triangle",.1,i*.09)),pum:()=>tone(120,.12,"square",.05,0,60),mort:()=>tone(200,.25,"sine",.07,0,90),vush:()=>tone(900,.12,"sawtooth",.03,0,300),zap:()=>tone(1400,.12,"square",.03,0,500),build:()=>tone(520,.18,"triangle",.08,0,780),
+ bip:()=>{tone(880,.08,"square",.05);tone(1320,.12,"square",.05,.06)},erro:()=>tone(220,.3,"sawtooth",.08,0,110),sel:()=>tone(700,.06,"triangle",.05)};
 
 /* ---------- botões e teclado ---------- */
-$("bGo").onclick=novoJogo;$("bOnda").onclick=chamarOnda;$("bNovo").onclick=novoJogo;$("bAgain").onclick=tentarDeNovo;
+$("bGo").onclick=novoJogo;$("bOnda").onclick=chamarOnda;$("bNovo").onclick=novoJogo;
 $("bVel").onclick=()=>{vel=vel==1?2:1;$("bVel").textContent=vel+"×"};
 let antesPausa=null;
-function pausar(v){if(v&&(state=="wave"||state=="plan")){antesPausa=state;state="pause";$("sPause").hidden=false;$("bResume").focus()}else if(!v&&state=="pause"){state=antesPausa;$("sPause").hidden=true;last=performance.now()}}
+function pausar(v){if(v&&(state=="wave"||state=="plan")){antesPausa=state;state="pause";fecharMenu();$("sPause").hidden=false;$("bResume").focus()}else if(!v&&state=="pause"){state=antesPausa;$("sPause").hidden=true;last=performance.now()}}
 $("bPause").onclick=()=>pausar(true);$("bResume").onclick=()=>pausar(false);
-$("bQuit").onclick=()=>{drawRec();state="menu";$("sPause").hidden=true;$("hud").hidden=true;bugs.forEach(b=>dispose(b.G));bugs=[];towers.forEach(t=>dispose(t.G));towers=[];shots.forEach(s=>dispose(s.o));shots=[];padsVisiveis();$("sStart").hidden=false};
-document.addEventListener("keydown",e=>{const k=e.key.toLowerCase();if(k=="escape"&&menuPad!=null){fecharMenu();return}if(k=="p"||k=="escape"){state=="pause"?pausar(false):pausar(true);return}if(k==" "&&state=="plan"){e.preventDefault();chamarOnda()}});
+$("bQuit").onclick=()=>{$("sPause").hidden=true;if(antesPausa)state=antesPausa;perdeu()};
+const TECLA={"2":2,"3":3,"5":5,"7":7,"enter":"primo"};
+document.addEventListener("keydown",e=>{const k=e.key.toLowerCase();
+ if(alvoBip&&state=="wave"&&k in TECLA){e.preventDefault();responder(TECLA[k]);return}
+ if(k=="escape"&&(menuPad!=null||alvoBip)){fecharMenu();soltar();return}
+ if(k=="p"||k=="escape"){state=="pause"?pausar(false):pausar(true);return}
+ if(k==" "&&(state=="plan"||cedoOk())){e.preventDefault();chamarOnda()}});
 document.addEventListener("visibilitychange",()=>{if(document.hidden)pausar(true)});
 
 /* ---------- animação ---------- */
 function loop(now){requestAnimationFrame(loop);const raw=(now-last)/1000,dt=Math.min(.05,raw);last=now;if(document.hidden)return;tAll+=dt;const t=tAll;
  if(Q>.55&&raw<.5){if(qWait>0)qWait-=raw;else{qN++;qT+=raw;if(qN>=40||qT>.9){if(qT/qN>1/28){Q=Math.max(.55,Q*.75);size()}qN=0;qT=0;qWait=.4}}}
- if(state=="wave")step(dt*vel);
- bugs.forEach(b=>{const u=b.G.userData;u.inner.position.y=Math.abs(Math.sin(t*(b.tipo=="v"?14:8)+b.ph))*(b.tipo=="t"?.03:.06)});
- towers.forEach(k=>{const u=k.G.userData;if(k.grow<1){k.grow=Math.min(1,k.grow+dt*4);const s=(k.nv>1?1.42:1.28)*(.2+.8*(1-Math.pow(1-k.grow,3)));k.G.scale.setScalar(s)}
+ /* com o teclado do Poder do Bip aberto, o tempo corre mais devagar (mas não para) */
+ if(state=="wave")step(dt*vel*(alvoBip?.4:1));
+ bugs.forEach(b=>{const u=b.G.userData;u.inner.position.y=Math.abs(Math.sin(t*(b.tipo=="v"?14:8)+b.ph))*(b.tipo=="t"||b.tipo=="g"?.03:.06);if(u.bolha.visible)u.bolha.rotation.y+=dt*.8});
+ if(alvoBip&&!alvoBip.dead){if(!selRing){selRing=new THREE.Mesh(new THREE.RingGeometry(.7,.88,36),new THREE.MeshBasicMaterial({color:0x5ef0e0,transparent:true,opacity:.9,depthWrite:false}));selRing.rotation.x=-Math.PI/2;scene.add(selRing)}
+  selRing.visible=true;selRing.position.set(alvoBip.G.position.x,.12,alvoBip.G.position.z);const s=BUGS[alvoBip.tipo].esc*(1+Math.sin(t*8)*.08);selRing.scale.set(s,s,1)}
+ towers.forEach(k=>{const u=k.G.userData;if(k.grow<1){k.grow=Math.min(1,k.grow+dt*4);const s=(k.nv>2?1.55:k.nv>1?1.42:1.28)*(.2+.8*(1-Math.pow(1-k.grow,3)));k.G.scale.setScalar(s)}
   if(k.tipo=="cp"){u.top.rotation.y+=dt*1.2;if(u.top.userData.an)u.top.userData.an.rotation.z+=dt*2}if(k.tipo=="d3")u.gl.material.opacity=.2+Math.abs(Math.sin(t*6+k.pad))*.25});
  padMeshes.forEach((g,i)=>{if(g.userData.plus.visible)g.userData.plus.position.y=.55+Math.sin(t*3+i)*.05});
  for(let i=fx.length-1;i>=0;i--){const f=fx[i];f.t+=dt;const k=f.t/f.max;

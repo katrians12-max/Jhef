@@ -516,8 +516,8 @@ body.full .foot{padding:0 16px 30px}
   <rect x="70" y="4" width="40" height="20" rx="10" fill="rgba(10,14,40,.9)" stroke="#ff5a7a" stroke-width="2"/><text x="90" y="19" font-family="Baloo 2,system-ui,sans-serif" font-weight="800" font-size="14" fill="#fff" text-anchor="middle">12</text></g>
  <g font-family="Baloo 2,system-ui,sans-serif" font-weight="800" font-size="15" text-anchor="middle"><text x="200" y="40" fill="#fff" stroke="#0a0e28" stroke-width="4" paint-order="stroke">÷2</text></g>
 </svg></div>
-       <div class="bd"><span class="eyebrow">Fatoração</span><h3>Bip Defesa</h3><p>Construa torres que dividem os números dos Bugs antes que cheguem à base.</p>
-        <div class="prog"><div class="row"><span id="dTxt">Recorde: 0</span><span id="dLv"></span></div><div class="bar"><i id="dBar" style="background:linear-gradient(90deg,#2fd47a,#ffd24a)"></i></div></div>
+       <div class="bd"><span class="eyebrow">Fatoração</span><h3>Bip Defesa</h3><p>Defenda a base dos Bugs com torres e contas. Quanto mais longe, melhor!</p>
+        <div class="prog"><div class="row"><span id="dTxt">Recorde: —</span><span id="dLv"></span></div><div class="bar"><i id="dBar" style="background:linear-gradient(90deg,#2fd47a,#ffd24a)"></i></div></div>
         <button class="btn main go" data-open="defesa" id="dGo">Jogar</button></div>
       </article>
      </div></div>
@@ -719,7 +719,7 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  const ru=runSave(p.id),hoje=Math.min(BIPV.RUN_DIA,Math.floor((ru.coins||{})[diaHoje()]||0));
  $("uTxt").textContent=`Recorde: ${BIPV.fmt((ru.best||{}).tabuada||0)}`;$("uLv").innerHTML=`hoje ${hoje}/${BIPV.RUN_DIA} ${BIPV.COIN}`;$("uBar").style.width=hoje/BIPV.RUN_DIA*100+"%";
  {const sh=Math.min(BIPV.SNAKE_DIA,Math.floor((ru.scoins||{})[diaHoje()]||0)),sb=BIPV.snakeBest(ru);$("sTxt").textContent=`Recorde: ${sb}`;$("sTxt").title=`${sb} ${sb==1?"vagão":"vagões"}`;$("sLv").innerHTML=`hoje ${sh}/${BIPV.SNAKE_DIA} ${BIPV.COIN}`;$("sBar").style.width=sh/BIPV.SNAKE_DIA*100+"%"}
- {const dh=Math.min(BIPV.DEF_DIA,Math.floor((ru.dcoins||{})[diaHoje()]||0));$("dTxt").textContent=`Recorde: ${BIPV.fmt(BIPV.defesaBest(ru))}`;$("dLv").innerHTML=`hoje ${dh}/${BIPV.DEF_DIA} ${BIPV.COIN}`;$("dBar").style.width=dh/BIPV.DEF_DIA*100+"%"}
+ {const dh=Math.min(BIPV.DEF_DIA,Math.floor((ru.dcoins||{})[diaHoje()]||0));{const d=BIPV.defesaDec(BIPV.defesaBest(ru));$("dTxt").textContent=d.onda?`Recorde: onda ${d.onda}`:"Recorde: —";$("dTxt").title=`${BIPV.fmt(d.pts)} pontos`}$("dLv").innerHTML=`hoje ${dh}/${BIPV.DEF_DIA} ${BIPV.COIN}`;$("dBar").style.width=dh/BIPV.DEF_DIA*100+"%"}
  $("myCode").textContent=makeCode(st);
  $("codeBox").hidden=!!p.cloud;$("cloudBox").hidden=!p.cloud;$("foot").hidden=!NUVEM.on;
  if(p.cloud){$("cloudTurma").textContent="☁ Turma "+p.cloud.turma.nome;if(p.cloud.expired)setSync("Entre de novo para salvar",true)}
@@ -738,7 +738,7 @@ const runSave=id=>ls.get(BIPV.runKey(id),null)||{};
 function drawPlay(p,st){const g=lastGame(p),b=$("bPlay");b.dataset.open=g;
  if(g=="runner"){b.querySelector("b").textContent="▶ CORRER";$("playSub").textContent=`Bip Runner · recorde ${BIPV.fmt((runSave(p.id).best||{}).tabuada||0)}`;return}
  if(g=="snake"){b.querySelector("b").textContent="▶ JOGAR";$("playSub").textContent=`Bip Snake · recorde ${BIPV.snakeBest(runSave(p.id))} vagões`;return}
- if(g=="defesa"){b.querySelector("b").textContent="▶ DEFENDER";$("playSub").textContent=`Bip Defesa · recorde ${BIPV.fmt(BIPV.defesaBest(runSave(p.id)))} pontos`;return}
+ if(g=="defesa"){b.querySelector("b").textContent="▶ DEFENDER";{const d=BIPV.defesaDec(BIPV.defesaBest(runSave(p.id)));$("playSub").textContent=d.onda?`Bip Defesa · recorde: onda ${d.onda}`:"Bip Defesa"}return}
  const novo=g=="robo"?!st.rDone:!st.aDone;b.querySelector("b").textContent=novo?"▶ COMEÇAR":"▶ CONTINUAR";
  $("playSub").textContent=g=="robo"?`Robô Programador · fase ${Math.min(st.rDone+1,ROBO.length)}`:`Academia do Bip · aula ${Math.min(st.aDone+1,ACAD.length)}`}
 /* Bipcoins na tela (com uma animação quando o valor sobe) */

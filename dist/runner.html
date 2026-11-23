@@ -185,10 +185,12 @@ function ganhosRunner(run){let c=0;const m=(run&&run.coins)||{};for(const k in m
 const SNAKE_DIA=60;
 function ganhosSnake(run){let c=0;const m=(run&&run.scoins)||{};for(const k in m)c+=Math.max(0,Math.min(SNAKE_DIA,Math.floor(+m[k]||0)));return c}
 const snakeBest=run=>{const b=(run&&run.best)||{};return Math.max(+b.snakemisto||0,+b.snakeregras||0,+b.snakecontas||0)};
-/* Bip Defesa: também na chave do Runner; recorde em best.defesa (pontos), Bipcoins do dia em dcoins, no máximo DEF_DIA */
+/* Bip Defesa (infinito): também na chave do Runner. Recorde em best.definf = ondas vencidas × 100000 + pontos;
+   Bipcoins do dia em dcoins, no máximo DEF_DIA */
 const DEF_DIA=60;
 function ganhosDefesa(run){let c=0;const m=(run&&run.dcoins)||{};for(const k in m)c+=Math.max(0,Math.min(DEF_DIA,Math.floor(+m[k]||0)));return c}
-const defesaBest=run=>+(((run&&run.best)||{}).defesa)||0;
+const defesaBest=run=>+(((run&&run.best)||{}).definf)||0;
+const defesaDec=v=>({onda:Math.floor((+v||0)/100000),pts:(+v||0)%100000});
 const lojaKey=pid=>"bipsite-loja:"+pid;
 /* loja: itens comprados, visual escolhido e o desconto de cada conjunto comprado (kits) */
 function loja(pid){const l=ls(lojaKey(pid))||{};return {owned:Array.isArray(l.owned)?l.owned:[],look:Object.assign({},DEFAULT,l.look||{}),kits:(l.kits&&typeof l.kits=="object")?l.kits:{},t:l.t||0}}
@@ -529,7 +531,7 @@ const ICON=(()=>{const SZ=160;let R=null,scene,cam,P,arc,props,ok=null;const cac
   if(fila.length)requestAnimationFrame(proximo);else rodando=false}
  return {item:(id,look,cb)=>pedir("i:"+id,look,l=>fazItem(id,l),cb),pose:(n,look,cb)=>pedir("p:"+n,look,l=>fazPose(n,l),cb),ok:()=>init()}})();
 
-return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
+return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
  faceTex,eyePreview,buildBody,dress,tick,setMood,glowTex,face2d,patTex,ICON}})();
 </script>
 <script>window.BIP_CFG={"url": "https://plxnximnaphzcfoazbpk.supabase.co", "key": "sb_publishable_wUTEKu_akkP0lR2uDm44vQ_i2rrtHPn"};</script>
