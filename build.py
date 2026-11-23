@@ -91,13 +91,14 @@ logo=rd(os.path.join(MK,'logo-cor.svg')).replace('<svg xmlns="http://www.w3.org/
 page('index.src.html','index.html',SHARE)
 page('professor.src.html','professor.html','<meta name="robots" content="noindex">\n')
 page('runner.src.html','runner.html','<meta name="robots" content="noindex">\n')
+page('snake.src.html','snake.html','<meta name="robots" content="noindex">\n')
 
 # ---------- conferência ----------
-for f in ['index.html','professor.html','robo.html','academia.html','runner.html']:
+for f in ['index.html','professor.html','robo.html','academia.html','runner.html','snake.html']:
     h=rd(OUT+'/'+f)
     for js in re.findall(r'<script>(.*?)</script>',h,re.S):
         p=os.path.join(tempfile.gettempdir(),'chk.js');wr(p,js)
         r=subprocess.run(['node','--check',p],capture_output=True,text=True);assert r.returncode==0,(f,r.stderr[:400])
 assert len(ACADT)==len(ACAD) and len(ACADW)>=2 and len(ROBOW)>=5,(len(ACADT),ACADW,ROBOW)
 print(f"dist/ pronto · {len(ROBO)} fases do robô · {len(ACAD)} aulas da academia")
-for f in ['index.html','professor.html','robo.html','academia.html','runner.html']:print(f"  {f}: {os.path.getsize(OUT+'/'+f)//1024} KB")
+for f in ['index.html','professor.html','robo.html','academia.html','runner.html','snake.html']:print(f"  {f}: {os.path.getsize(OUT+'/'+f)//1024} KB")
