@@ -25,7 +25,7 @@ async def main():
         await c.route('**/*',rt);P=await c.new_page();errs=[];P.on('pageerror',lambda e:errs.append(str(e)))
         await P.goto(B+'/professor.html')
         await P.click('#toUp');await P.fill('#upName','Prof. Jhef');await P.fill('#upEmail','prof2@escola.br');await P.fill('#upPass','segredo123');await P.click('#bUp')
-        await P.wait_for_selector('#scrTurmas:not([hidden])');await P.fill('#tNome','7º ano B');await P.click('#bTurma');await P.wait_for_selector('#scrTurma:not([hidden])')
+        await P.wait_for_selector('#scrTurmas:not([hidden])');await P.fill('#tNome','7º ano B');await P.click('#bTurma');await P.wait_for_selector('#scrTurma:not([hidden])');await P.click('#bAula');await P.wait_for_timeout(400)
         tid=db("select id from turmas where nome='7º ano B'")
         for ap,nf,na,dias,itens,pint in ALUNOS:
             stars={LV[i]:random.choice([1,2,3,3]) for i in range(nf)}

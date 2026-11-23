@@ -56,6 +56,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance}
 .colors button{width:40px;height:40px;border-radius:12px;border:3px solid transparent}
 .colors button[aria-pressed="true"]{border-color:var(--ink)}
 .err{color:var(--bad);font-weight:700;min-height:1.4em;margin:0}
+.aviso{margin:0 0 16px;padding:12px 16px;border-radius:14px;border:2px solid var(--run);background:color-mix(in srgb,var(--run) 10%,transparent);font-weight:600;line-height:1.4}
 .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--bad) 10%,var(--panel));border:1px solid var(--bad)}
 
 /* Menu */
@@ -376,6 +377,7 @@ body.full .foot{padding:0 16px 30px}
     <div class="tx"><h3>Entrar na minha turma</h3><p>Use o código que seu professor passou. Seu progresso fica salvo e você continua em qualquer computador.</p></div>
     <button class="btn main" id="bTurma">Entrar na turma</button>
    </div>
+   <div class="aviso" id="avisoTurma" role="status" hidden></div>
    <h2>Quem vai jogar?</h2>
    <div class="profiles" id="profiles"></div>
    <p class="empty" id="emptyMsg" hidden>Ainda não tem ninguém neste computador. Crie seu perfil para começar!</p>
@@ -609,7 +611,7 @@ function applyCode(id,{n,s,a}){
 /* ---- tela: quem vai jogar ---- */
 const show=(id)=>{["whoList","fNew","fCode","fTurma","fTurmaNova"].forEach(k=>$(k).hidden=k!=id)};
 let pending=null;
-function drawWho(){document.body.classList.remove("full");$("scrWho").hidden=false;$("scrMenu").hidden=true;$("scrLoja").hidden=true;show("whoList");
+function drawWho(){$("avisoTurma").hidden=true;document.body.classList.remove("full");$("scrWho").hidden=false;$("scrMenu").hidden=true;$("scrLoja").hidden=true;show("whoList");
  $("emptyMsg").hidden=profiles.length>0;
  $("ctaTurma").hidden=!NUVEM.on;$("foot").hidden=!NUVEM.on;
  $("profiles").innerHTML=profiles.map(p=>{const st=stats(p.id);return `<div><button class="prof" data-p="${p.id}"><span class="av" style="background:${p.color}">${esc(p.name[0].toUpperCase())}</span><span class="tx"><span class="nm">${esc(p.name)}</span><small>${st.rDone} fases · ${st.aDone} aulas</small>${p.cloud?`<span class="tag">☁ ${esc(p.cloud.turma.nome)}</span>`:""}</span></button>`+
@@ -664,7 +666,7 @@ function absorb(p,remote){/* junta o que está na nuvem com o que está neste co
  const l=mergeLoja(ls.get(KEYS.loja(p.id),null),remote.loja||null);if(l)ls.set(KEYS.loja(p.id),l);
  const u=mergeRunner(ls.get(KEYS.runner(p.id),null),remote.runner||null);if(u)ls.set(KEYS.runner(p.id),u)}
 function cloudLogin(res){const id=cid(res.aluno_id);let p=profiles.find(q=>q.id==id);
- const c={token:res.token,turma:res.turma,apelido:res.apelido};
+ const c={token:res.token,turma:res.turma,apelido:res.apelido,vista:Date.now()};
  if(p){p.name=res.apelido;p.color=res.cor;p.cloud=c}else{p={id,name:res.apelido,color:res.cor,cloud:c};profiles.push(p)}
  saveProfiles();absorb(p,res.progresso||{});pushed={};enter(id,true);push(p)}
 async function busy(btn,fn){const t=btn.textContent;btn.disabled=true;btn.textContent="Aguarde…";try{await fn()}finally{btn.disabled=false;btn.textContent=t}}
@@ -693,11 +695,24 @@ async function push(p,keepalive){if(!p||!p.cloud||!NUVEM.on)return;
   try{await NUVEM.rpc("aluno_salvar",{p_token:p.cloud.token,p_jogo:jogo,p_dados:d},null,keepalive);pushed[p.id+jogo]=s;
    setSync("✓ Salvo às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}))}
   catch(x){if(x.code=="jogo_invalido"||x.code=="dados_invalidos")continue;  /* banco ainda sem a parte da loja: guarda só neste computador */
+   if(x.code=="turma_fechada"){turmaFechada(p,true);return}
    if(x.code=="sessao_expirada"){setSync("Entre de novo para salvar",true);p.cloud.expired=1;saveProfiles()}else setSync("Sem internet: salvo neste computador",true);return}}}
 async function pull(p){/* ao escolher o perfil: busca o que está na nuvem */
- try{const res=await NUVEM.rpc("aluno_dados",{p_token:p.cloud.token});p.cloud.turma=res.turma;delete p.cloud.expired;saveProfiles();absorb(p,res.progresso||{});return true}
+ try{const res=await NUVEM.rpc("aluno_dados",{p_token:p.cloud.token});p.cloud.turma=res.turma;p.cloud.vista=Date.now();delete p.cloud.expired;saveProfiles();absorb(p,res.progresso||{});return true}
  catch(x){if(x.code=="sessao_expirada"){show("fTurma");$("scrWho").hidden=false;$("scrMenu").hidden=true;$("tCod").value=p.cloud.turma.codigo.slice(0,3)+"-"+p.cloud.turma.codigo.slice(3);$("tApe").value=p.name;$("tPin").value="";$("errTurma").textContent=erroBip(x);$("tPin").focus();return false}
+  if(x.code=="turma_fechada"){turmaFechada(p,false);return false}
+  /* sem internet: só entra no perfil da turma se a turma estava aberta há pouco (por exemplo, a internet da escola caiu na aula) */
+  if(Date.now()-(p.cloud.vista||0)>36e5){drawWho();aviso(`Sem internet agora. Para jogar na turma <b>${esc(p.cloud.turma.nome)}</b> é preciso estar conectado. Enquanto isso, você pode jogar no modo normal.`);return false}
   setSync("Sem internet: salvo neste computador",true);return true}}
+/* turma fechada pelo professor: o perfil da turma fica bloqueado até a próxima aula (o modo normal continua livre) */
+function aviso(html){const a=$("avisoTurma");a.innerHTML=html;a.hidden=false}
+function turmaFechada(p,jogando){p.cloud.vista=0;saveProfiles();
+ /* apaga deste aparelho o que não chegou ao banco: o progresso da turma volta inteiro na próxima aula, e nada feito com a turma fechada é aproveitado */
+ for(const jogo in KEYS)try{localStorage.removeItem(KEYS[jogo](p.id))}catch(e){}pushed={};
+ if(!$("play").hidden){$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";LOBBY.pause(false)}
+ cur=null;try{localStorage.removeItem("bipsite-cur")}catch(e){}drawWho();
+ aviso(jogando?`A aula terminou: o professor fechou a turma <b>${esc(p.cloud.turma.nome)}</b>. O que você fez na aula ficou salvo e volta na próxima aula. Para continuar jogando agora, use o modo normal (crie seu perfil abaixo), que não conta para a turma.`
+  :`A turma <b>${esc(p.cloud.turma.nome)}</b> está fechada agora. Ela abre quando o professor começar a aula. Enquanto isso, você pode jogar no modo normal: crie seu perfil abaixo (ele não conta para a turma).`)}
 const curP=()=>profiles.find(q=>q.id==cur);
 setInterval(()=>{if(!$("play").hidden)push(curP())},20000);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState=="hidden")push(curP(),true)});

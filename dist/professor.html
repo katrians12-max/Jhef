@@ -62,6 +62,13 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .tcard .cd{font-family:var(--mono);letter-spacing:.12em;color:var(--turn)}
 .tcard small{color:var(--muted)}
 .tcard.off{opacity:.65}
+.tcard .ab{align-self:flex-start;padding:2px 10px;border-radius:99px;font-size:.8rem;font-weight:800;background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.aula{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px;padding:14px 18px;border-radius:18px;border:2px solid var(--line);background:var(--soft)}
+.aula .tx{flex:1;min-width:220px}.aula .tx b{display:block;font-size:1.15rem}.aula .tx span{color:var(--muted);font-size:.92rem}
+.aula .luz{width:16px;height:16px;border-radius:50%;background:var(--muted);flex:none}
+.aula.on{border-color:var(--good);background:color-mix(in srgb,var(--good) 10%,transparent)}.aula.on .luz{background:var(--good);box-shadow:0 0 0 5px color-mix(in srgb,var(--good) 25%,transparent)}
+.aula .btn{font-size:1.05rem;padding:10px 22px}
+.aula .btn.abre{background:var(--good);color:#fff;border-color:transparent}
 .head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
 .head .tx{flex:1;min-width:240px}
 .head h2{font-size:1.8rem}
@@ -236,6 +243,7 @@ th button[data-dir]::after{content:attr(data-dir);font-size:.9em}
    <div class="tx"><h2 id="tTitle">Turma</h2><p class="hint">Os alunos abrem <b id="siteUrl"></b>, tocam em <b>Entrar na turma</b> e usam este código. Na primeira vez, cada um cria um apelido e um PIN.</p></div>
    <div class="codebig"><small>Código da turma</small><b id="tCode">———</b><button class="btn sm" id="bCopy">Copiar</button></div>
   </div>
+  <div class="aula" id="aula"></div>
   <div class="stats" id="stats"></div>
   <div class="tabbar">
    <div role="tablist" aria-label="O que ver da turma" class="acts" style="gap:4px">
@@ -667,6 +675,7 @@ const ERROS_BIP={
  pin_invalido:"O PIN precisa ter 4 números.",
  turma_cheia:"Essa turma já está cheia. Fale com seu professor.",
  sessao_expirada:"Sua entrada expirou. Digite seu PIN de novo.",
+ turma_fechada:"Sua turma está fechada agora. Ela abre quando o professor começar a aula. Enquanto isso, você pode jogar no modo normal (volte e toque em “Criar meu perfil”).",
  sem_internet:"Sem internet agora. Confira a conexão e tente de novo.",
  nome_invalido:"Escreva um nome para a turma.",
  limite_turmas:"Você chegou ao limite de 30 turmas.",
@@ -735,7 +744,7 @@ $("fNewPass").onsubmit=e=>{e.preventDefault();busy($("bNp"),async()=>{try{
 let turmas=[],turma=null,alunos=[];
 async function loadTurmas(){$("turmas").innerHTML='<p class="hint">Carregando…</p>';
  try{turmas=await rpc("professor_turmas",{});drawTurmas()}catch(x){$("turmas").innerHTML=`<p class="err">${esc(erroBip(x))}</p>`}}
-function drawTurmas(){$("turmas").innerHTML=turmas.length?turmas.map(t=>`<button class="tcard${t.ativa?"":" off"}" data-t="${t.id}"><h3>${esc(t.nome)}</h3><span class="cd">${fmtCode(t.codigo)}</span><small>${t.alunos} aluno${t.alunos==1?"":"s"}${t.ativa?"":" · pausada"}</small></button>`).join("")
+function drawTurmas(){$("turmas").innerHTML=turmas.length?turmas.map(t=>`<button class="tcard${t.ativa?"":" off"}" data-t="${t.id}"><h3>${esc(t.nome)}</h3><span class="cd">${fmtCode(t.codigo)}</span><small>${t.alunos} aluno${t.alunos==1?"":"s"}${t.ativa?"":" · pausada"}</small>${t.aberta?'<span class="ab">● Aula aberta</span>':""}</button>`).join("")
  :'<p class="empty">Você ainda não tem turmas. Crie a primeira acima.</p>'}
 $("turmas").onclick=e=>{const b=e.target.closest("[data-t]");if(b)openTurma(turmas.find(t=>t.id==b.dataset.t))};
 $("fTurma").onsubmit=e=>{e.preventDefault();const n=$("tNome").value.trim();$("errTurma").textContent="";if(!n)return $("errTurma").textContent="Escreva o nome da turma.";
@@ -743,7 +752,15 @@ $("fTurma").onsubmit=e=>{e.preventDefault();const n=$("tNome").value.trim();$("e
 
 /* ---- uma turma ---- */
 let pinOpen=null,delOpen=null,dzOpen=null;
-function openTurma(t){turma=t;pinOpen=delOpen=dzOpen=null;$("tTitle").textContent=t.nome;$("tCode").textContent=fmtCode(t.codigo);go("turma");loadAlunos()}
+function openTurma(t){turma=t;pinOpen=delOpen=dzOpen=null;$("tTitle").textContent=t.nome;$("tCode").textContent=fmtCode(t.codigo);go("turma");drawAula();loadAlunos()}
+/* ---- abrir e fechar a aula: com a turma fechada, os alunos só jogam no modo normal (não conta para a turma) ---- */
+const hora=d=>new Date(d).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+function drawAula(){const t=turma,el=$("aula");
+ if(t.aberta===undefined){el.className="aula";el.innerHTML='<span class="luz"></span><div class="tx"><b>Abrir e fechar aula</b><span>Para usar, falta rodar a atualização <b style="display:inline;font-size:inherit">004_aula.sql</b> no Supabase.</span></div>';return}
+ el.className="aula"+(t.aberta?" on":"");
+ el.innerHTML=t.aberta?`<span class="luz"></span><div class="tx"><b>Aula aberta${t.aberta_em?" desde "+hora(t.aberta_em):""}</b><span>Os alunos podem entrar na turma, e o progresso conta para o ranking.</span></div><button class="btn" id="bAula">■ Fechar aula</button>`
+  :`<span class="luz"></span><div class="tx"><b>Turma fechada</b><span>Ninguém entra na turma. Em casa, os alunos podem jogar só no modo normal, que não conta para a turma.</span></div><button class="btn abre" id="bAula">▶ Abrir aula</button>`;
+ $("bAula").onclick=()=>busy($("bAula"),async()=>{try{const r=await rpc("professor_aula",{p_turma:t.id,p_aberta:!t.aberta});t.aberta=r.aberta;t.aberta_em=r.aberta_em;drawAula()}catch(x){$("errRows").textContent=erroBip(x)}})}
 $("bBack").onclick=()=>go("turmas");
 $("bReload").onclick=()=>busy($("bReload"),loadAlunos);
 $("bCopy").onclick=()=>{const t=$("tCode").textContent;try{navigator.clipboard.writeText(t).then(()=>{$("bCopy").textContent="Copiado!";setTimeout(()=>$("bCopy").textContent="Copiar",1500)})}catch(e){}};

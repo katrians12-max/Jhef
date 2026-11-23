@@ -96,7 +96,7 @@ async def main():
         # nuvem: compra sincroniza
         c,pg,errs=await ctx(b)
         await pg.goto(B+'/professor.html');await pg.click('#toUp');await pg.fill('#upName','P');await pg.fill('#upEmail','p@x.br');await pg.fill('#upPass','segredo123');await pg.click('#bUp')
-        await pg.wait_for_selector('#scrTurmas:not([hidden])');await pg.fill('#tNome','T');await pg.click('#bTurma');await pg.wait_for_selector('#scrTurma:not([hidden])');code=(await pg.inner_text('#tCode')).strip()
+        await pg.wait_for_selector('#scrTurmas:not([hidden])');await pg.fill('#tNome','T');await pg.click('#bTurma');await pg.wait_for_selector('#scrTurma:not([hidden])');code=(await pg.inner_text('#tCode')).strip();await pg.click('#bAula');await pg.wait_for_timeout(400)
         await pg.goto(B+'/');await pg.click('#bTurma');await pg.click('#bTurmaNova');await pg.fill('#nCod',code);await pg.fill('#nApe','Caio');await pg.fill('#nPin','1234');await pg.fill('#nPin2','1234');await pg.click('#bNovaOk')
         await pg.wait_for_selector('#scrMenu:not([hidden])');await pg.wait_for_timeout(800)
         await pg.click('#bLoja');await pg.click('[data-cat="pintura"]');await pg.click('[data-id="p-verde"]');await pg.click('#sBuy');await pg.click('#sOk');await pg.wait_for_timeout(1500)
