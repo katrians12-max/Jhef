@@ -74,6 +74,13 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1}
 .bar{flex:1;height:8px;border-radius:9px;background:var(--line);overflow:hidden;min-width:60px}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--turn),var(--run));border-radius:9px;transition:width .4s}
 .ltop .pc{font-weight:700;font-size:.9rem;width:3.2em;text-align:right}
+/* vidas da aula: 3 corações; perdeu todos, a aula recomeça */
+.vidas{display:inline-flex;gap:2px;font-size:1.25rem;line-height:1;color:#ff4f6d;white-space:nowrap}
+.vidas span{transition:transform .25s,opacity .25s,filter .25s;display:inline-block}
+.vidas span.off{opacity:.25;filter:grayscale(1);transform:scale(.8)}
+.vidas.bate{animation:bate .5s ease}
+@keyframes bate{20%{transform:scale(1.35)}45%{transform:scale(.9)}70%{transform:scale(1.1)}}
+.badge .btn.main{margin-top:12px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:9px 16px;font-weight:700}
 .btn.sm{padding:6px 12px;border-radius:11px;font-size:.9rem}
 .btn.main{background:var(--run);border-color:var(--run);color:#fff;box-shadow:0 4px 0 #b9441c;font-family:var(--display);font-size:1.1rem;padding:8px 22px}
@@ -194,6 +201,7 @@ input[type=range]{width:min(420px,70vw);accent-color:var(--run)}
  <div class="ltop">
   <span class="ln" id="lnum">AULA 01</span><span class="lt" id="ltit"></span>
   <div class="bar"><i id="lbar"></i></div><span class="pc" id="lpc">0%</span>
+  <span class="vidas" id="lvidas" role="img" aria-label="3 de 3 vidas" hidden></span>
   <button class="btn sm" id="exit">Sair ✕</button>
  </div>
  <div class="lbody">
@@ -1108,7 +1116,7 @@ const crystalCount=done=>[...done].filter(k=>k.startsWith("2-")).length;
    ===================================================================== */
 let cw=0,cl=0,step=0,solved=false,busy=false;
 const LES=()=>WORLDS[cw].L[cl];
-function openLesson(w,l){cw=w;cl=l;step=0;errs=0;seen=new Set();$("home").classList.add("hidden");$("lesson").classList.remove("hidden");if(!init3d())return;setWorld(w);size();camTo({th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0});show()}
+function openLesson(w,l){cw=w;cl=l;step=0;errs=0;seen=new Set();vidasOn=!save.done.includes(lid(w,l))&&!window.__semVidas;vidas=3;tentativa=0;busy=false;drawVidas();$("home").classList.add("hidden");$("lesson").classList.remove("hidden");if(!init3d())return;setWorld(w);size();camTo({th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0});show()}
 function closeLesson(){runId++;onPick=null;onHit=null;lockUntil=0;$("lesson").classList.add("hidden");$("home").classList.remove("hidden");drawHome();window.scrollTo(0,0)}
 function say(t,cls="",m){const s=$("say");s.className=cls;$("txt").innerHTML=t;s.querySelector(".who").textContent=cls=="ok"?"BIP · ACERTOU!":cls=="no"?"BIP · QUASE!":"BIP";if(m){$("face").innerHTML=FACE2D(m);bip&&bip.face(m)}}
 function setMood(m){$("face").innerHTML=FACE2D(m);bip.face(m)}
@@ -1133,10 +1141,18 @@ function readGate(t,id){const words=(t.replace(/<[^>]+>/g," ").match(/\S+/g)||[]
  b.style.setProperty("--rd",ms+"ms");b.classList.remove("lendo");void b.offsetWidth;b.classList.add("lendo");
  return new Promise(r=>setTimeout(()=>{b.classList.remove("lendo");r()},ms))}
 function win(msg){solved=true;$("next").disabled=false;say(msg,"ok","festa");if(bip)confetti(bip.x,bip.y);const id=runId;setTimeout(()=>{if(id==runId&&solved)setMood("feliz")},1800)}
-function miss(msg){errs++;say(msg,"no","ops")}
+function miss(msg){errs++;say(msg,"no","ops");
+ if(vidasOn&&vidas>0){vidas--;drawVidas();const h=$("lvidas");h.classList.remove("bate");void h.offsetWidth;h.classList.add("bate");if(!vidas){busy=true;const id=runId;setTimeout(()=>{if(id==runId)semVidas()},1800)}}}
+/* ---------- vidas: 3 por aula (só na primeira vez; revisar uma aula concluída não tem vidas) ---------- */
+let vidas=3,vidasOn=false,tentativa=0;
+function drawVidas(){const el=$("lvidas");el.hidden=!vidasOn;if(!vidasOn)return;el.innerHTML=[0,1,2].map(i=>`<span class="${i<vidas?"":"off"}" aria-hidden="true">♥</span>`).join("");el.setAttribute("aria-label",`${vidas} de 3 vidas`)}
+function semVidas(){runId++;onPick=null;onHit=null;lockUntil=0;actP("");$("next").disabled=true;$("back").style.visibility="hidden";setMood("ops");
+ say("Acabaram as vidas desta aula. Sem problema: vamos recomeçar com mais atenção!","no","ops");
+ ov(`<div class="badge"><div class="medal">💔</div><h2>Acabaram as vidas</h2><div>Você errou 3 vezes nesta aula. Ela vai recomeçar do início.<br>As explicações que você já leu ficam liberadas, e as perguntas podem mudar.</div><button class="btn main" id="bRe">↻ Recomeçar a aula</button></div>`);
+ $("bRe").onclick=()=>{busy=false;step=0;errs=0;vidas=3;tentativa++;drawVidas();show()};$("bRe").focus()}
 
 function setup(a,S){
- if(a.k=="opt"){const V=[a,...(a.vars||[])];let vi=0,tries=0;
+ if(a.k=="opt"){const V=[a,...(a.vars||[])];let vi=tentativa%V.length,tries=0;
   /* cada versão da pergunta pode ter o próprio desenho (scene) e uma explicação em 3D quando erra (why) */
   const draw=v=>{if(V.some(x=>x.scene||x.why)){clearStage();S.set&&S.set();(v.scene||(()=>{}))()}};
   const render=()=>{const v=curOpt=V[vi],ord=a.fix?v.o.map((_,i)=>i):shuffle(v.o.map((_,i)=>i));
@@ -1145,11 +1161,11 @@ function setup(a,S){
     if(i==v.ans){b.classList.add("right");$("act").querySelectorAll(".opt").forEach(x=>x.disabled=true);win(v.ok)}
     else{b.classList.add("wrong");b.disabled=true;tries++;miss(v.no);if(v.why){clearStage();S.set&&S.set();v.why()}
      lock(tries==1?3:6,()=>{if(V.length>1){vi=(vi+1)%V.length;draw(V[vi]);render();say("Vamos tentar com outra pergunta parecida. "+(V[vi].t||S.t),"",S.m)}})}})};
-  if(a.scene)a.scene();render()}
+  {const s0=V[vi].scene;if(s0)s0()}render()}
  if(a.k=="pick"){let pts=[];actP(`<div class="panel tools"><span>Toque no chão · <b id="pc">0</b> de ${a.n}</span><button class="btn sm" id="pclr">Limpar</button></div>`);
   const reset=()=>{const id=runId;clearStage();S.set&&S.set();pts=[];$("pc").textContent=0;say(S.t,"",S.m)};
   $("pclr").onclick=()=>{if(busy||solved)return;runId++;show()};
-  onPick=async p=>{if(busy||solved)return;if(pts.some(q=>q[0]==p[0]&&q[1]==p[1]))return miss("Esse ponto já foi marcado. Escolha outro lugar.");
+  onPick=async p=>{if(busy||solved)return;if(pts.some(q=>q[0]==p[0]&&q[1]==p[1]))return say("Esse ponto já foi marcado. Escolha outro lugar.","no","pensa");
    pts.push(p);if(a.mark!==0)pt(a.names?a.names[pts.length-1]:"",p[0],p[1]);$("pc").textContent=pts.length;
    if(pts.length==a.n){busy=true;const r=await a.check(pts);busy=false;if(!r)return;if(r.ok)win(r.msg);else{miss(r.msg);if(a.n>1){const id=runId;await wait(1400);if(id==runId&&!solved){const t=$("txt").innerHTML;runId++;await show();say(t,"no","ops")}}else pts=[]}}}}
  if(a.k=="turn"){let h=bip.a;const base=bip.a;const draw=()=>{const d=((h-base)%360+360)%360;$("tv").textContent=d+"°";clearStage();S.set();bip.place(bip.x,bip.y,h);if(d)arc([0,0],base,base+d,1.4,{txt:d+"°"})};
