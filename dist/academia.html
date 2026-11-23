@@ -507,6 +507,9 @@ input[type=range]{width:min(420px,70vw);accent-color:var(--run)}
 .chip.on{background:var(--paint);border-color:var(--paint);color:#fff}
 .btn.chk{background:var(--go);border-color:var(--go);color:#fff}
 .btn:disabled,.chip:disabled{opacity:.5;cursor:not-allowed}
+#next.lendo{position:relative;overflow:hidden;opacity:.75}
+#next.lendo::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:0;background:rgba(255,255,255,.9);animation:ler var(--rd,3s) linear forwards}
+@keyframes ler{to{width:100%}}
 .stars{color:var(--star);letter-spacing:2px;font-size:1.3rem;line-height:1}
 .stars .off{color:var(--line)}
 .les .stars{font-size:.85rem;letter-spacing:1px;margin-left:4px}
@@ -1470,7 +1473,7 @@ const crystalCount=done=>[...done].filter(k=>k.startsWith("2-")).length;
    ===================================================================== */
 let cw=0,cl=0,step=0,solved=false,busy=false;
 const LES=()=>WORLDS[cw].L[cl];
-function openLesson(w,l){cw=w;cl=l;step=0;errs=0;$("home").classList.add("hidden");$("lesson").classList.remove("hidden");if(!init3d())return;setWorld(w);size();camTo({th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0});show()}
+function openLesson(w,l){cw=w;cl=l;step=0;errs=0;seen=new Set();$("home").classList.add("hidden");$("lesson").classList.remove("hidden");if(!init3d())return;setWorld(w);size();camTo({th:Math.PI/2-.35,ph:.95,r:13.5,tx:0,tz:0});show()}
 function closeLesson(){runId++;onPick=null;onHit=null;lockUntil=0;$("lesson").classList.add("hidden");$("home").classList.remove("hidden");drawHome();window.scrollTo(0,0)}
 function say(t,cls="",m){const s=$("say");s.className=cls;$("txt").innerHTML=t;s.querySelector(".who").textContent=cls=="ok"?"BIP · ACERTOU!":cls=="no"?"BIP · QUASE!":"BIP";if(m){$("face").innerHTML=FACE2D(m);bip&&bip.face(m)}}
 function setMood(m){$("face").innerHTML=FACE2D(m);bip.face(m)}
@@ -1484,8 +1487,16 @@ async function show(){const L=LES(),S=L.steps[step],n=L.steps.length,id=++runId;
  if(S.badge){const st=starsFor(errs),k=lid(cw,cl),cr=cw==2?crystalCount(new Set([...save.done,k])):0;
   ov(`<div class="badge${cw==2?" lado":""}"><div class="medal">${S.badge[0]}</div><h2>${S.badge[1]}</h2><div>${S.badge[2]}</div><div class="stars" aria-label="${st} de 3 estrelas">${STARS(st)}</div><small>${errs?errs+(errs>1?" erros":" erro")+" nesta aula"+(st<3?" · refaça para ganhar mais estrelas":""):"Sem nenhum erro!"}</small>${cr?`<div class="cristal"><i></i>Cristal do Inteiro: ${cr}/21</div>`:""}<div class="xp">+${XP_LESSON} ${BIPV.COIN} Bipcoins</div></div>`)}
  if(S.a)setup(S.a,S);
- $("next").disabled=!solved||!!S.play;
- if(S.play){await S.play();if(id==runId&&!S.a)$("next").disabled=false}}
+ /* explicação: o "Prosseguir" só libera depois de um tempo mínimo de leitura (na primeira vez que o aluno vê o passo) */
+ const need=!S.a&&!S.end&&!window.__semEspera&&!save.done.includes(lid(cw,cl))&&!seen.has(step);
+ $("next").disabled=!solved||!!S.play||need;
+ const tasks=[];if(S.play)tasks.push(S.play());if(need)tasks.push(readGate(S.t,id));
+ if(tasks.length){await Promise.all(tasks);if(id==runId&&!S.a){$("next").disabled=false;seen.add(step)}}else if(!S.a)seen.add(step)}
+/* tempo mínimo de leitura: cerca de 4 palavras por segundo, entre 2,5 s e 9 s, com uma barrinha enchendo no botão */
+let seen=new Set();
+function readGate(t,id){const words=(t.replace(/<[^>]+>/g," ").match(/\S+/g)||[]).length,ms=Math.min(9000,Math.max(2500,words*240)),b=$("next");
+ b.style.setProperty("--rd",ms+"ms");b.classList.remove("lendo");void b.offsetWidth;b.classList.add("lendo");
+ return new Promise(r=>setTimeout(()=>{b.classList.remove("lendo");r()},ms))}
 function win(msg){solved=true;$("next").disabled=false;say(msg,"ok","festa");if(bip)confetti(bip.x,bip.y);const id=runId;setTimeout(()=>{if(id==runId&&solved)setMood("feliz")},1800)}
 function miss(msg){errs++;say(msg,"no","ops")}
 
@@ -1515,7 +1526,7 @@ function setup(a,S){
   const typ=a=>a==0?"nulo":a<90?"agudo":a==90?"reto":a<180?"obtuso":"raso";
   const upd=()=>{const v=+$("sl").value;clearStage();S.set();pt("",0,0);semi([0,0],[1,0]);semi([0,0],[Math.cos(v*D2R),Math.sin(v*D2R)]);if(v==90)rightMark([0,0],0,.6);else if(v)arc([0,0],0,v,1.5,{txt:v+"°"});
    $("sv").textContent=v+"°";$("st").textContent=typ(v);if(!solved&&a.test(v))win(a.ok)};$("sl").oninput=upd;upd()}
- if(a.k=="step"){const v=(a.init||a.c.map(c=>c[1])).slice();let tries=0;
+ if(a.k=="step"){const v=(a.init||a.c.map(c=>c[1])).slice();let tries=0;a.check=a.check!==false;
   /* com a.check o aluno aperta "Conferir": não dá para ir apertando + até acertar */
   actP(`<div class="panel">${a.q?`<div class="q">${a.q}</div>`:""}<div class="readout" id="stv"></div><div class="tools">${a.c.map((c,i)=>`<span class="stp"><b>${c[0]}</b><button class="btn sm" data-d="${i}" data-s="-1" aria-label="Menos: ${c[0]}">−</button><span class="readout sn" id="sv${i}">${v[i]}</span><button class="btn sm" data-d="${i}" data-s="1" aria-label="Mais: ${c[0]}">+</button></span>`).join("")}${a.check?`<button class="btn chk" id="chk">Conferir</button>`:""}</div><div id="cool"></div></div>`);
   const upd=()=>{clearStage();S.set&&S.set();a.draw(v);a.c.forEach((c,i)=>$("sv"+i).textContent=v[i]);$("stv").innerHTML=a.txt(v);if(!a.check&&!solved&&a.test(v))win(a.ok(v))};

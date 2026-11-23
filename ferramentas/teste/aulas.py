@@ -19,7 +19,7 @@ async def main():
             elif u.startswith('file:'):await r.continue_()
             else:await r.abort()
         await c.route('**/*',rt);pg=await c.new_page();errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
-        await pg.goto('file:///home/claude/mundo-do-bip/dist/academia.html');await pg.wait_for_timeout(500)
+        await pg.goto('file:///home/claude/mundo-do-bip/dist/academia.html');await pg.wait_for_timeout(500);await pg.evaluate('window.__semEspera=1')
         W=await pg.evaluate("WORLDS.map(W=>W.L?W.L.length:0)");prob=[]
         for wi,n in enumerate(W):
             if ONLY is not None and str(wi)!=ONLY:continue

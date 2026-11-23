@@ -45,7 +45,12 @@ async def main():
         await P.click('#bAgain');await P.wait_for_timeout(3600);await P.keyboard.press('p');await P.wait_for_timeout(200)
         z1=await P.evaluate('gates[0]&&gates[0].G.position.z');await P.wait_for_timeout(600);z2=await P.evaluate('gates[0]&&gates[0].G.position.z')
         check('pausa congela a corrida',await P.is_visible('#sPause') and z1==z2,(z1,z2))
+        check('na pausa a conta e os portais somem',await P.evaluate("getComputedStyle($('q')).visibility=='hidden'&&gates.filter(g=>!g.done).every(g=>!g.G.visible)"))
+        q1=await P.evaluate("S.q.txt+'|'+S.q.opts.join(',')")
         await P.keyboard.press('p');check('P de novo continua',await P.is_hidden('#sPause'))
+        check('na volta tem contagem 3, 2, 1',await P.evaluate("state")=='count')
+        await P.wait_for_timeout(2600)
+        check('na volta vem uma conta nova',await P.evaluate("state")=='run' and await P.evaluate("gates.filter(g=>!g.done).length")==1 and await P.evaluate("getComputedStyle($('q')).visibility")=='visible',q1)
         # contas: 300 geradas, todas com 3 opções diferentes, positivas e uma certa
         r=await P.evaluate("(()=>{let bad=0;for(let lv=0;lv<7;lv++)for(let i=0;i<300;i++){const q=pergunta(lv);const ok=new Set(q.opts).size==3&&q.opts.every(x=>Number.isInteger(x)&&x>0)&&q.opts[q.ok]==q.c&&q.opts.filter(x=>x==q.c).length==1;const [a,op,b]=q.txt.split(' ');if(!ok||(op=='×'?a*b:a/b)!=q.c)bad++}return bad})()")
         check('2.100 contas geradas: todas corretas e com 3 opções válidas',r==0,r)
