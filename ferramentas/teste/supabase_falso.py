@@ -19,7 +19,7 @@ class H(http.server.SimpleHTTPRequestHandler):
         n=int(s.headers.get('Content-Length') or 0);return json.loads(s.rfile.read(n) or b'{}')
     def do_GET(s):
         p=urllib.parse.urlparse(s.path).path
-        if p in('/','/index.html','/professor.html','/runner.html','/snake.html'):
+        if p in('/','/index.html','/professor.html','/runner.html','/snake.html','/defesa.html'):
             f=os.path.join(DIST,'index.html' if p=='/' else p[1:]);h=open(f,encoding='utf8').read()
             h=re.sub(r'window\.BIP_CFG=\{[^}]*\};',f'window.BIP_CFG={{"url":"http://localhost:{PORT}","key":"chave-teste"}};',h)
             b=h.encode();s.send_response(200);s.send_header('Content-Type','text/html; charset=utf-8');s.send_header('Content-Length',str(len(b)));s.end_headers();s.wfile.write(b);return

@@ -38,6 +38,7 @@ async def main():
             if nf>=8:
                 ee={'7 × 8':{'n':2,'r':{'54':1,'63':1}},'6 × 9':{'n':1,'r':{'56':1}}} if ap in ('Theo','Bia','Enzo','Malu') else {'8 × 7':{'n':1,'r':{'54':1}}}
                 run={'v':1,'best':{'tabuada':nf*11+na},'runs':nf//4,'coins':{'2026-11-17':60,'2026-11-18':25},'err':ee,'tot':{'tabuada':{'ok':nf*3,'bad':4}},'t':1}
+                if ap!='Ana7':run['best']['defesa']=nf*50+7;run['druns']=2
             for jogo,d in [('robo',robo),('academia',acad),('loja',loja),('runner',run)]:
                 if d is None:continue
                 if jogo=='loja' and not itens:continue
@@ -50,9 +51,12 @@ async def main():
         await P.click('[data-crit="coins"]');t=await P.inner_text('#rankBox');check('ranking por Bipcoins ganhos','Ana7' in t)
         await P.click('[data-crit="run"]');t=await P.inner_text('#rankBox')
         check('ranking do Bip Runner (Ana7 tem o maior recorde)','Ana7' in t and '454 pontos' in t,t[:200])
+        await P.click('[data-crit="defesa"]');t=await P.inner_text('#rankBox')
+        check('ranking do Bip Defesa em pontos','pontos' in t and 'Ana7' not in t.split('Ainda')[0],t[:200])
         await P.click('[data-crit="est"]');await P.click('[data-crit="ativ"]')
         await P.click('[data-tab="alunos"]');rows=await P.inner_text('#rows')
         check('tabela mostra saldo e itens','gastou' in rows and '2 itens' in rows,rows[:300])
+        check('tabela mostra o Bip Defesa','2 partidas' in rows and 'BIP DEFESA' in (await P.inner_text('#thead')).upper(),[rows[:900],await P.inner_text('#thead')])
         check('tabela mostra recorde do Runner e quem ainda não correu','454 pts' in rows and 'ainda não correu' in rows,rows[:300])
         check('Bipcoins do Runner entram no ganho (Ana7: 1.570 + 85)','ganhou 1.655' in rows,rows[:400])
         await P.click('[data-sort="saldo"]');first=(await P.inner_text('#rows tr:first-child'));check('ordena por Bipcoins (maior primeiro)','Davi' in first or 'Ana7' in first or 'Lia' in first,first)
@@ -69,8 +73,11 @@ async def main():
         f=await (await d.value).path();txt=open(f,encoding='utf-8-sig').read()
         check('planilha baixada com 14 alunos e colunas',txt.count('\n')==14 and txt.startswith('Posição;Apelido') and 'Ana7' in txt.split('\n')[1],txt[:200])
         check('planilha tem colunas do Runner','Recorde no Bip Runner' in txt.split('\n')[0])
+        check('planilha tem colunas do Bip Defesa','Recorde no Bip Defesa (pontos)' in txt.split('\n')[0])
         tok=db(f"insert into sessoes(aluno_id) select id from alunos where apelido='Lia' and turma_id='{tid}' returning token").split('\n')[0]
         rec=await P.evaluate(f"fetch('/rest/v1/rpc/aluno_recordes',{{method:'POST',headers:{{apikey:'chave-teste','Content-Type':'application/json'}},body:JSON.stringify({{p_token:'{tok}',p_trilha:'tabuada'}})}}).then(r=>r.json())")
+        rd=await P.evaluate(f"fetch('/rest/v1/rpc/aluno_recordes',{{method:'POST',headers:{{apikey:'chave-teste','Content-Type':'application/json'}},body:JSON.stringify({{p_token:'{tok}',p_trilha:'defesa'}})}}).then(r=>r.json())")
+        check('recordes da turma no Bip Defesa (sem SQL novo)',isinstance(rd,list) and len(rd)==5 and rd[0]['pontos']>=rd[-1]['pontos'],rd)
         check('aluno vê os 5 recordes da turma, com ele marcado',isinstance(rec,list) and len(rec)==5 and rec[0]['apelido']=='Ana7' and any(r['eu'] and r['apelido']=='Lia' for r in rec) and set(rec[0].keys())=={'apelido','pontos','eu'},rec)
         sv=await P.evaluate(f"fetch('/rest/v1/rpc/aluno_salvar',{{method:'POST',headers:{{apikey:'chave-teste','Content-Type':'application/json'}},body:JSON.stringify({{p_token:'{tok}',p_jogo:'runner',p_dados:{{v:1,best:{{tabuada:999}}}}}})}}).then(r=>r.json())")
         check('banco aceita salvar o jogo runner',sv.get('ok') is True,sv)

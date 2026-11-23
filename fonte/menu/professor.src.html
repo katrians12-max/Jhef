@@ -62,7 +62,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .stat b{display:block;font-family:var(--display);font-size:1.7rem;line-height:1.1;font-variant-numeric:tabular-nums}
 .stat span{color:var(--muted);font-size:.85rem}
 .tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
-table{border-collapse:collapse;width:100%;min-width:900px;font-variant-numeric:tabular-nums}
+table{border-collapse:collapse;width:100%;min-width:1000px;font-variant-numeric:tabular-nums}
 th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
 th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft)}
 tr:last-child td{border-bottom:none}
@@ -327,7 +327,7 @@ function stat(a){const pg=a.progresso||{},r=pg.robo||{},ac=pg.academia||{},lj=pg
  const owned=Array.isArray(lj.owned)?lj.owned:[],ganhos=BIPV.ganhos(r,ac,ru),gastos=BIPV.gasto(owned,lj.kits);
  const dias=a.ultimo_acesso?(Date.now()-new Date(a.ultimo_acesso))/864e5:Infinity;
  return {a,feitas,done,fases:feitas.size,est,aulas:done.size,ativ:feitas.size+done.size,ganhos,gastos,saldo:ganhos-gastos,itens:owned.filter(id=>!BIPV.gratis(id)).length,look:lj.look||{},dias,
-  run:+((ru.best||{}).tabuada)||0,runs:+ru.runs||0,rerr:ru.err||{},rtot:(ru.tot||{}).tabuada||{ok:0,bad:0},snake:BIPV.snakeBest(ru),sruns:+ru.sruns||0}}
+  run:+((ru.best||{}).tabuada)||0,runs:+ru.runs||0,rerr:ru.err||{},rtot:(ru.tot||{}).tabuada||{ok:0,bad:0},snake:BIPV.snakeBest(ru),sruns:+ru.sruns||0,defesa:BIPV.defesaBest(ru),druns:+ru.druns||0}}
 const av=S=>`<span class="bipav" aria-hidden="true">${BIPV.face2d(S.look)}</span>`;
 const pl=(n,um,varios)=>`${nf(n)} ${n==1?um:varios}`;
 let SS=[],tab=ls.get("bipsite-prof-tab")||"rank",crit=ls.get("bipsite-prof-crit")||"ativ",sortK=["apelido",1];
@@ -339,7 +339,8 @@ const CRIT={
  est:{n:"Estrelas",v:S=>S.est,tie:S=>S.fases,fmt:S=>`${nf(S.est)} ★`,note:"Estrelas do Robô Programador: até 3 por fase."},
  aulas:{n:"Aulas",v:S=>S.aulas,tie:S=>S.ganhos,fmt:S=>pl(S.aulas,"aula","aulas"),note:"Aulas concluídas na Academia do Bip."},
  run:{n:"Bip Runner",v:S=>S.run,tie:S=>S.runs,fmt:S=>`${nf(S.run)} pontos`,note:"Recorde de cada aluno no Bip Runner (trilha da tabuada)."},
- snake:{n:"Bip Snake",v:S=>S.snake,tie:S=>S.sruns,fmt:S=>pl(S.snake,"vagão","vagões"),note:"Maior trem de cada aluno no Bip Snake (o melhor entre os modos Misturado, Só regras e Só contas)."}};
+ snake:{n:"Bip Snake",v:S=>S.snake,tie:S=>S.sruns,fmt:S=>pl(S.snake,"vagão","vagões"),note:"Maior trem de cada aluno no Bip Snake (o melhor entre os modos Misturado, Só regras e Só contas)."},
+ defesa:{n:"Bip Defesa",v:S=>S.defesa,tie:S=>S.druns,fmt:S=>`${nf(S.defesa)} pontos`,note:"Recorde de cada aluno no Bip Defesa: 100 pontos por onda vencida (são 8) e, quando vence o jogo todo, mais 25 por vida que sobrou na base."}};
 function ranking(c){const R=SS.slice().sort((x,y)=>c.v(y)-c.v(x)||c.tie(y)-c.tie(x)||x.a.apelido.localeCompare(y.a.apelido,"pt-BR"));
  R.forEach((S,i)=>{const P=R[i-1];S.pos=P&&c.v(S)==c.v(P)&&c.tie(S)==c.tie(P)?P.pos:i+1});return R}
 function rankHTML(c,max){const R=ranking(c),top=R.filter(S=>c.v(S)>0),zero=R.filter(S=>c.v(S)<=0);
@@ -365,8 +366,8 @@ $("bTelao").onclick=openTelao;
 
 /* ---- planilha (abre no Excel e no Google Planilhas) ---- */
 $("bCsv").onclick=()=>{const R=ranking(CRIT.ativ),q=v=>{v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
- const L=[["Posição","Apelido","Fases do Robô","Estrelas","Aulas da Academia","Atividades","Recorde no Bip Runner","Corridas no Bip Runner","Recorde no Bip Snake (vagões)","Partidas no Bip Snake","Bipcoins ganhos","Bipcoins gastos","Saldo de Bipcoins","Itens comprados","Último acesso"],
-  ...R.map(S=>[S.pos,S.a.apelido,S.fases,S.est,S.aulas,S.ativ,S.run,S.runs,S.snake,S.sruns,S.ganhos,S.gastos,S.saldo,S.itens,S.a.ultimo_acesso?new Date(S.a.ultimo_acesso).toLocaleString("pt-BR"):"nunca"])].map(r=>r.map(q).join(";"));
+ const L=[["Posição","Apelido","Fases do Robô","Estrelas","Aulas da Academia","Atividades","Recorde no Bip Runner","Corridas no Bip Runner","Recorde no Bip Snake (vagões)","Partidas no Bip Snake","Recorde no Bip Defesa (pontos)","Partidas no Bip Defesa","Bipcoins ganhos","Bipcoins gastos","Saldo de Bipcoins","Itens comprados","Último acesso"],
+  ...R.map(S=>[S.pos,S.a.apelido,S.fases,S.est,S.aulas,S.ativ,S.run,S.runs,S.snake,S.sruns,S.defesa,S.druns,S.ganhos,S.gastos,S.saldo,S.itens,S.a.ultimo_acesso?new Date(S.a.ultimo_acesso).toLocaleString("pt-BR"):"nunca"])].map(r=>r.map(q).join(";"));
  const u=URL.createObjectURL(new Blob(["﻿"+L.join("\r\n")],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");
  a.href=u;a.download=`mundo-do-bip_${turma.nome.replace(/[^\p{L}\p{N}]+/gu,"-")}_${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000)};
 
@@ -376,7 +377,7 @@ function showTab(t){tab=t;ls.set("bipsite-prof-tab",t);document.querySelectorAll
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
 /* ---- tabela de alunos (ordenável) ---- */
-const COLS=[["apelido","Aluno"],["fases","Robô Programador"],["aulas","Academia do Bip"],["run","Bip Runner"],["snake","Bip Snake"],["saldo","Bipcoins"],["itens","Loja"],["dias","Último acesso"],[null,"Ações"]];
+const COLS=[["apelido","Aluno"],["fases","Robô Programador"],["aulas","Academia do Bip"],["run","Bip Runner"],["snake","Bip Snake"],["defesa","Bip Defesa"],["saldo","Bipcoins"],["itens","Loja"],["dias","Último acesso"],[null,"Ações"]];
 $("thead").onclick=e=>{const b=e.target.closest("[data-sort]");if(!b)return;const k=b.dataset.sort;sortK=[k,sortK[0]==k?-sortK[1]:(k=="apelido"||k=="dias"?1:-1)];drawTable()};
 function drawTable(){const [k,d]=sortK,n=SS.length;
  $("thead").innerHTML=COLS.map(([c,l])=>c?`<th aria-sort="${c==k?(d>0?"ascending":"descending"):"none"}"><button data-sort="${c}"${c==k?` data-dir="${d>0?"▲":"▼"}"`:""}>${l}</button></th>`:`<th>${l}</th>`).join("");
@@ -390,10 +391,11 @@ function drawTable(){const [k,d]=sortK,n=SS.length;
    <td><div class="mini"><span class="bar"><i style="width:${ACAD.length?S.aulas/ACAD.length*100:0}%;background:var(--turn)"></i></span>${S.aulas} aulas</div></td>
    <td>${S.runs?`${nf(S.run)} pts<span class="sub">${pl(S.runs,"corrida","corridas")}</span>`:'<span class="sub">ainda não correu</span>'}</td>
    <td>${S.sruns?`${pl(S.snake,"vagão","vagões")}<span class="sub">${pl(S.sruns,"partida","partidas")}</span>`:'<span class="sub">ainda não jogou</span>'}</td>
+   <td>${S.druns?`${nf(S.defesa)} pts<span class="sub">${pl(S.druns,"partida","partidas")}</span>`:'<span class="sub">ainda não jogou</span>'}</td>
    <td><span class="coinv">${COIN}${nf(S.saldo)}</span><span class="sub">ganhou ${nf(S.ganhos)} · gastou ${nf(S.gastos)}</span></td>
    <td>${pl(S.itens,"item","itens")}</td>
    <td><span class="dot${on?" on":""}"></span>${ago(a.ultimo_acesso)}</td><td>${acts}</td></tr>`}).join("")
-  :`<tr><td colspan="9" class="empty">Nenhum aluno ainda. Passe o código <b>${fmtCode(turma.codigo)}</b> para a turma.</td></tr>`}
+  :`<tr><td colspan="10" class="empty">Nenhum aluno ainda. Passe o código <b>${fmtCode(turma.codigo)}</b> para a turma.</td></tr>`}
 
 /* ---- por atividade: até onde cada aluno chegou e onde a turma está agora ---- */
 function drawAtiv(){const n=SS.length;if(!n){$("tabAtiv").innerHTML='<p class="empty">Os gráficos aparecem quando os alunos começarem a jogar.</p>';return}

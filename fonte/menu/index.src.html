@@ -325,6 +325,21 @@ body.full .foot{padding:0 16px 30px}
 @media (max-height:1000px) and (min-width:900px){.saguao .side{gap:9px}.saguao .game .art{min-height:96px}.saguao .game .bd{padding:9px 12px;gap:4px}.saguao .game h3{font-size:1.12rem}.saguao .game .go{padding:4px 14px;font-size:.88rem}.btn.play{padding:9px 20px 11px}.btn.play b{font-size:1.6rem}.shopcard{padding:10px 16px}.shopcard h3{font-size:1.4rem}.shopcard .ic{font-size:2rem}}
 @media (max-height:780px) and (min-width:900px){.saguao .game .eyebrow{display:none}.saguao .game .art{min-height:80px}.saguao .game .go{padding:2px 12px}.shopcard p{display:none}.saguao .game .bd{gap:3px}}
 @media (max-height:700px) and (min-width:900px){.saguao .game .prog .bar{display:none}.saguao .game .bd{padding:7px 12px}.btn.play small{display:none}.btn.play{padding:7px 18px 9px}.saguao .game .art{min-height:82px}.saguao .game .eyebrow{display:none}.saguao .prog .row{font-size:.78rem}.shopcard p{display:none}}
+/* jogos rápidos: três cartões pequenos lado a lado */
+.game .art .novo{position:absolute;z-index:1;top:5px;right:5px;padding:1px 7px;border-radius:99px;background:var(--run);color:#fff;font-family:var(--display);font-weight:800;font-size:.66rem;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.minis{display:flex;flex-direction:column;gap:6px;flex:none;min-width:0}
+.minis .mh{font-family:var(--display);font-weight:800;font-size:.95rem;color:#fff;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.minis .mh small{font-family:var(--body,inherit);font-weight:600;font-size:.72rem;color:rgba(255,255,255,.7)}
+.minis .mrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.saguao .minis .game.mini{flex-direction:column}
+.saguao .minis .game.mini .art{width:100%;height:62px;min-height:0;flex:none}
+.saguao .minis .game.mini .bd{padding:7px 8px 9px;gap:3px}
+.saguao .minis .game.mini h3{font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saguao .minis .game.mini .eyebrow{display:block;font-size:.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saguao .minis .game.mini .prog .row{flex-direction:column;align-items:flex-start;gap:0;font-size:.7rem;line-height:1.3}.saguao .minis .game.mini .prog .row span{white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.saguao .minis .game.mini .prog .bar{display:block;height:5px;margin-top:3px}
+.saguao .minis .game.mini .go{width:100%;padding:3px 6px;font-size:.84rem;margin-top:4px}
+@media (max-height:780px) and (min-width:900px){.saguao .minis .game.mini .eyebrow{display:none}.saguao .minis .game.mini .art{height:52px}.minis .mh small{display:none}}
 /* celular e tablet em pé: o Bip em cima, e os cartões numa faixa escura logo abaixo (zona do polegar) */
 @media (max-width:899px){
  .stage{min-height:440px}
@@ -434,7 +449,8 @@ body.full .foot{padding:0 16px 30px}
         <div class="prog"><div class="row"><span id="aTxt">0 de 0 aulas</span><span id="aLv"></span></div><div class="bar"><i id="aBar" style="background:var(--turn)"></i></div></div>
         <button class="btn main go" data-open="academia" id="aGo">Começar</button></div>
       </article>
-     <article class="game">
+     <div class="minis"><div class="mh">Jogos rápidos <small>cada um vale até 60 Bipcoins por dia</small></div><div class="mrow">
+     <article class="game mini">
        <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice">
  <defs><linearGradient id="ruSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1136"/><stop offset=".55" stop-color="#3a1d6e"/><stop offset=".72" stop-color="#b8467e"/><stop offset=".74" stop-color="#151a44"/><stop offset="1" stop-color="#0e1132"/></linearGradient>
  <filter id="ruGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter></defs>
@@ -460,11 +476,11 @@ body.full .foot{padding:0 16px 30px}
  <g stroke="#fff" stroke-linecap="round" opacity=".55"><path d="M110 150h-30M120 160h-46M300 150h30M290 160h46" stroke-width="2"/></g>
  <text x="58" y="58" font-family="Baloo 2,system-ui,sans-serif" font-weight="800" font-size="22" fill="#ff4fd8" opacity=".75">÷</text><text x="330" y="74" font-family="Baloo 2,system-ui,sans-serif" font-weight="800" font-size="20" fill="#5ef0e0" opacity=".75">×</text>
 </svg></div>
-       <div class="bd"><span class="eyebrow">Cálculo rápido</span><h3>Bip Runner</h3><p>Corra pela pista e passe pelo portal com a resposta certa. Até 60 Bipcoins por dia!</p>
+       <div class="bd"><span class="eyebrow">Tabuada</span><h3>Bip Runner</h3><p>Corra pela pista e passe pelo portal com a resposta certa. Até 60 Bipcoins por dia!</p>
         <div class="prog"><div class="row"><span id="uTxt">Recorde: 0</span><span id="uLv"></span></div><div class="bar"><i id="uBar" style="background:linear-gradient(90deg,#5ef0e0,#ff4fd8)"></i></div></div>
         <button class="btn main go" data-open="runner" id="uGo">Correr</button></div>
       </article>
-     <article class="game">
+     <article class="game mini">
        <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice">
  <defs><linearGradient id="snSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1136"/><stop offset="1" stop-color="#2a1d6e"/></linearGradient>
  <pattern id="snGrid" width="26" height="26" patternUnits="userSpaceOnUse"><rect width="26" height="26" fill="#1a2160"/><rect width="13" height="13" fill="#202a72"/><rect x="13" y="13" width="13" height="13" fill="#202a72"/></pattern>
@@ -483,10 +499,28 @@ body.full .foot{padding:0 16px 30px}
   <rect x="120" y="34" width="160" height="24" rx="12" fill="rgba(10,14,40,.85)" stroke="rgba(255,255,255,.3)"/><text x="200" y="51" font-size="13" fill="#fff">múltiplos de 3</text>
  </g>
 </svg></div>
-       <div class="bd"><span class="eyebrow">Múltiplos e primos · <b style="color:var(--run)">Novo!</b></span><h3>Bip Snake</h3><p>Puxe o trem do Bip e pegue só os números certos. Cada acerto vira um vagão!</p>
-        <div class="prog"><div class="row"><span id="sTxt">Recorde: 0 vagões</span><span id="sLv"></span></div><div class="bar"><i id="sBar" style="background:linear-gradient(90deg,#ffd24a,#ff4fd8)"></i></div></div>
+       <div class="bd"><span class="eyebrow">Múltiplos</span><h3>Bip Snake</h3><p>Puxe o trem do Bip e pegue só os números certos. Cada acerto vira um vagão!</p>
+        <div class="prog"><div class="row"><span id="sTxt">Recorde: 0</span><span id="sLv"></span></div><div class="bar"><i id="sBar" style="background:linear-gradient(90deg,#ffd24a,#ff4fd8)"></i></div></div>
         <button class="btn main go" data-open="snake" id="sGo">Jogar</button></div>
       </article>
+     <article class="game mini">
+       <div class="art" aria-hidden="true"><span class="novo">Novo!</span><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice">
+ <defs><linearGradient id="dfSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd06a"/><stop offset="1" stop-color="#4fa83f"/></linearGradient>
+ <filter id="dfGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter></defs>
+ <rect width="400" height="170" fill="url(#dfSky)"/>
+ <path d="M410 40H250V128H150V40H-10" fill="none" stroke="#a98a55" stroke-width="40" stroke-linejoin="round"/>
+ <path d="M410 40H250V128H150V40H-10" fill="none" stroke="#e2c487" stroke-width="32" stroke-linejoin="round"/>
+ <g><circle cx="200" cy="84" r="30" fill="#5ef0e0" opacity=".25" filter="url(#dfGlow)"/><rect x="183" y="70" width="34" height="30" rx="6" fill="#8b93a0"/><rect x="186" y="58" width="28" height="16" rx="4" fill="#3ce8ff"/><rect x="194" y="46" width="5" height="16" rx="2" fill="#3b4250"/><rect x="202" y="46" width="5" height="16" rx="2" fill="#3b4250"/></g>
+ <g><rect x="296" y="112" width="30" height="10" fill="#8b93a0"/><path d="M304 112l5-40h6l5 40z" fill="#e8c45a"/><path d="M312 58l7 9-7 9-7-9z" fill="#ffd24a"/><ellipse cx="312" cy="67" rx="14" ry="4" fill="none" stroke="#ffd24a" stroke-width="2.5"/></g>
+ <g><rect x="78" y="34" width="24" height="20" rx="4" fill="#d23f6a"/><rect x="77" y="26" width="26" height="12" rx="3" fill="#2b1838"/><circle cx="85" cy="32" r="2" fill="#ff4f6d"/><circle cx="95" cy="32" r="2" fill="#ff4f6d"/>
+  <rect x="70" y="4" width="40" height="20" rx="10" fill="rgba(10,14,40,.9)" stroke="#ff5a7a" stroke-width="2"/><text x="90" y="19" font-family="Baloo 2,system-ui,sans-serif" font-weight="800" font-size="14" fill="#fff" text-anchor="middle">12</text></g>
+ <g font-family="Baloo 2,system-ui,sans-serif" font-weight="800" font-size="15" text-anchor="middle"><text x="200" y="40" fill="#fff" stroke="#0a0e28" stroke-width="4" paint-order="stroke">÷2</text></g>
+</svg></div>
+       <div class="bd"><span class="eyebrow">Fatoração</span><h3>Bip Defesa</h3><p>Construa torres que dividem os números dos Bugs antes que cheguem à base.</p>
+        <div class="prog"><div class="row"><span id="dTxt">Recorde: 0</span><span id="dLv"></span></div><div class="bar"><i id="dBar" style="background:linear-gradient(90deg,#2fd47a,#ffd24a)"></i></div></div>
+        <button class="btn main go" data-open="defesa" id="dGo">Jogar</button></div>
+      </article>
+     </div></div>
      <button class="btn play" id="bPlay" data-open="robo"><b>▶ CONTINUAR</b><small id="playSub">Robô Programador</small></button>
     </div>
    </div>
@@ -615,7 +649,7 @@ const KEYS={robo:id=>"robo4:"+id,academia:id=>"academia-bip-3d-v1:"+id,loja:id=>
 function mergeRunner(a,b){if(!a)return b;if(!b)return a;const mx=(x,y)=>{const o={...(y||{})};for(const k in x||{})o[k]=Math.max(+o[k]||0,+x[k]||0);return o};
  const err={...(b.err||{})};for(const k in a.err||{}){const e=a.err[k],f=err[k]||{n:0,r:{}};err[k]={n:Math.max(e.n||0,f.n||0),r:mx(e.r,f.r)}}
  const tot={};for(const k of new Set([...Object.keys(a.tot||{}),...Object.keys(b.tot||{})]))tot[k]=mx((a.tot||{})[k],(b.tot||{})[k]);
- return {v:1,best:mx(a.best,b.best),runs:Math.max(a.runs||0,b.runs||0),coins:mx(a.coins,b.coins),err,tot,sruns:Math.max(a.sruns||0,b.sruns||0),scoins:mx(a.scoins,b.scoins),t:Math.max(a.t||0,b.t||0)}}
+ return {v:1,best:mx(a.best,b.best),runs:Math.max(a.runs||0,b.runs||0),coins:mx(a.coins,b.coins),err,tot,sruns:Math.max(a.sruns||0,b.sruns||0),scoins:mx(a.scoins,b.scoins),druns:Math.max(a.druns||0,b.druns||0),dcoins:mx(a.dcoins,b.dcoins),t:Math.max(a.t||0,b.t||0)}}
 /* loja: junta os itens comprados nos dois lugares; o visual é o mais recente */
 function mergeLoja(a,b){if(!a)return b;if(!b)return a;const n=(a.t||0)>=(b.t||0)?a:b,kits={...(a.kits||{})};for(const k in b.kits||{})kits[k]=Math.max(+kits[k]||0,+b.kits[k]||0);
  return {owned:[...new Set([...(a.owned||[]),...(b.owned||[])])],look:n.look||{},kits,t:Math.max(a.t||0,b.t||0)}}
@@ -684,7 +718,8 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  $("aGo").textContent=st.aDone?"Continuar":"Começar";
  const ru=runSave(p.id),hoje=Math.min(BIPV.RUN_DIA,Math.floor((ru.coins||{})[diaHoje()]||0));
  $("uTxt").textContent=`Recorde: ${BIPV.fmt((ru.best||{}).tabuada||0)}`;$("uLv").innerHTML=`hoje ${hoje}/${BIPV.RUN_DIA} ${BIPV.COIN}`;$("uBar").style.width=hoje/BIPV.RUN_DIA*100+"%";
- {const sh=Math.min(BIPV.SNAKE_DIA,Math.floor((ru.scoins||{})[diaHoje()]||0)),sb=BIPV.snakeBest(ru);$("sTxt").textContent=`Recorde: ${sb} ${sb==1?"vagão":"vagões"}`;$("sLv").innerHTML=`hoje ${sh}/${BIPV.SNAKE_DIA} ${BIPV.COIN}`;$("sBar").style.width=sh/BIPV.SNAKE_DIA*100+"%"}
+ {const sh=Math.min(BIPV.SNAKE_DIA,Math.floor((ru.scoins||{})[diaHoje()]||0)),sb=BIPV.snakeBest(ru);$("sTxt").textContent=`Recorde: ${sb}`;$("sTxt").title=`${sb} ${sb==1?"vagão":"vagões"}`;$("sLv").innerHTML=`hoje ${sh}/${BIPV.SNAKE_DIA} ${BIPV.COIN}`;$("sBar").style.width=sh/BIPV.SNAKE_DIA*100+"%"}
+ {const dh=Math.min(BIPV.DEF_DIA,Math.floor((ru.dcoins||{})[diaHoje()]||0));$("dTxt").textContent=`Recorde: ${BIPV.fmt(BIPV.defesaBest(ru))}`;$("dLv").innerHTML=`hoje ${dh}/${BIPV.DEF_DIA} ${BIPV.COIN}`;$("dBar").style.width=dh/BIPV.DEF_DIA*100+"%"}
  $("myCode").textContent=makeCode(st);
  $("codeBox").hidden=!!p.cloud;$("cloudBox").hidden=!p.cloud;$("foot").hidden=!NUVEM.on;
  if(p.cloud){$("cloudTurma").textContent="☁ Turma "+p.cloud.turma.nome;if(p.cloud.expired)setSync("Entre de novo para salvar",true)}
@@ -697,12 +732,13 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  if(d.cat=="cenario")$("lojaIc").innerHTML=`<img class="pc" src="${CENA.postal(d.id)}" alt="">`;else BIPV.ICON.item(d.id,l.look,u=>{$("lojaIc").innerHTML=`<img src="${u}" alt="">`});
  document.querySelectorAll("[data-pose]").forEach(el=>BIPV.ICON.pose(el.dataset.pose,l.look,u=>{el.innerHTML=`<img src="${u}" alt="">`}));}
 /* Botão principal: continua o último jogo aberto (ou começa pelo Robô) */
-function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.id)}catch(e){}return g=="academia"||g=="runner"||g=="snake"?g:"robo"}
+function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.id)}catch(e){}return g=="academia"||g=="runner"||g=="snake"||g=="defesa"?g:"robo"}
 const diaHoje=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const runSave=id=>ls.get(BIPV.runKey(id),null)||{};
 function drawPlay(p,st){const g=lastGame(p),b=$("bPlay");b.dataset.open=g;
  if(g=="runner"){b.querySelector("b").textContent="▶ CORRER";$("playSub").textContent=`Bip Runner · recorde ${BIPV.fmt((runSave(p.id).best||{}).tabuada||0)}`;return}
  if(g=="snake"){b.querySelector("b").textContent="▶ JOGAR";$("playSub").textContent=`Bip Snake · recorde ${BIPV.snakeBest(runSave(p.id))} vagões`;return}
+ if(g=="defesa"){b.querySelector("b").textContent="▶ DEFENDER";$("playSub").textContent=`Bip Defesa · recorde ${BIPV.fmt(BIPV.defesaBest(runSave(p.id)))} pontos`;return}
  const novo=g=="robo"?!st.rDone:!st.aDone;b.querySelector("b").textContent=novo?"▶ COMEÇAR":"▶ CONTINUAR";
  $("playSub").textContent=g=="robo"?`Robô Programador · fase ${Math.min(st.rDone+1,ROBO.length)}`:`Academia do Bip · aula ${Math.min(st.aDone+1,ACAD.length)}`}
 /* Bipcoins na tela (com uma animação quando o valor sobe) */
@@ -764,7 +800,7 @@ function heroHTML(l,saldo){const d=BIPV.destaque(),own=owns(l,d.id);
  return `<div class="lj-hero"><div class="lj-hero-art">${art}</div><div class="lj-hero-tx"><span class="kick">★ Destaque do dia · Lendário</span><h3>${d.n}</h3>
   <div class="lj-hero-act">${own?`<span class="tag on">✓ Já é seu</span>`:`<span class="price big${saldo<d.p?" lack":""}">${BIPV.COIN}${BIPV.fmt(d.p)}</span>`}<button class="btn buy" data-id="${d.id}">${own?"Ver no Bip":"Experimentar"}</button></div>
   <small>Todo dia um item lendário diferente aparece aqui.</small></div></div>`}
-const EMPTY={posso:"Nada desta seção cabe nas suas Bipcoins ainda. Passe fases no Robô, faça aulas na Academia, corra no Bip Runner ou jogue o Bip Snake para ganhar mais.",meus:"Você ainda não tem itens desta seção."};
+const EMPTY={posso:"Nada desta seção cabe nas suas Bipcoins ainda. Passe fases no Robô, faça aulas na Academia, corra no Bip Runner ou jogue o Bip Snake e o Bip Defesa para ganhar mais.",meus:"Você ainda não tem itens desta seção."};
 function vitrineHTML(l,saldo){const cen=BIPV.ITEMS.filter(i=>i.cat=="cenario"&&i.p>0);
  const pode=BIPV.ITEMS.filter(i=>!owns(l,i.id)&&i.p<=saldo&&i.cat!="cenario").sort((a,b)=>b.p-a.p).slice(0,8);
  return heroHTML(l,saldo)+
@@ -806,7 +842,7 @@ function preview(quiet){const {l}=shopState(),prev=Object.assign({},l.look);let 
  else if(shopSel){const it=BIPV.BYID[shopSel];prev[it.cat]=it.id;cena=it.cat=="cenario";const hat=BIPV.BYID[prev.cabeca];if(it.cat=="antena"&&hat&&hat.hide)prev.cabeca=null}
  LOBBY.frame(cena?"cena":"perto");LOBBY.look(prev);if(!quiet)LOBBY.gesture(cena?"acenar":["acenar","girar","forca","dancar"][Math.floor(Math.random()*4)])}
 function drawSel(){const {l,saldo}=shopState(),el=$("sel"),q=id=>document.getElementById(id),F=BIPV.fmt,C=BIPV.COIN;
- const ganhar=`Passe fases no Robô Programador (até 25 por fase), conclua aulas na Academia (${BIPV.POR_AULA} por aula), corra no Bip Runner ou jogue o Bip Snake.`;
+ const ganhar=`Passe fases no Robô Programador (até 25 por fase), conclua aulas na Academia (${BIPV.POR_AULA} por aula), corra no Bip Runner ou jogue o Bip Snake e o Bip Defesa.`;
  if(!shopSel){el.innerHTML=`<div class="nm"><b>Escolha um item</b><span class="hint2">Ele aparece no seu Bip antes de você comprar.</span></div>`;return}
  const k=BIPV.KIT[shopSel];let act="",msg="",head;
  if(k){const kp=BIPV.kitPreco(k,l.owned);head=`<b>Conjunto ${k.n}</b><span class="rar" style="--rc:#d0428f">${k.itens.length} peças · 15% off</span>`;

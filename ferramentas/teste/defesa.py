@@ -21,7 +21,9 @@ async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(args=['--ignore-gpu-blocklist','--use-gl=angle','--use-angle=swiftshader'])
         c,P,errs=await ctx(b)
-        await P.goto(B+'/defesa.html');await P.wait_for_timeout(1500);await P.screenshot(path=OUT+'d-menu.png')
+        await P.goto(B+'/');await P.evaluate("localStorage.setItem('bipsite-profiles',JSON.stringify([{id:'t1',name:'Ana',color:'#f00'}]));localStorage.setItem('bipsite-cur','t1');localStorage.setItem('bipsite-runner:t1',JSON.stringify({v:1,best:{tabuada:500,snakemisto:12},runs:3,coins:{'2026-01-01':40},scoins:{'2026-01-01':12},sruns:2}))")
+        await P.goto(B+'/defesa.html#p-t1');await P.wait_for_timeout(1500);await P.screenshot(path=OUT+'d-menu.png')
+        check('tela inicial mostra recorde e Bipcoins de hoje',await P.inner_text('#rBest')=='0' and await P.inner_text('#rCoins')=='0/60')
         await P.click('#bGo');await P.wait_for_timeout(2000)
         check('começa planejando a onda 1, com ÷2 e Obelisco liberados',await P.evaluate("state=='plan'&&liberadas().has('d2')&&liberadas().has('cp')&&!liberadas().has('d3')"))
         check('prévia mostra os números da onda',('16' in await P.inner_text('#prev')))
@@ -51,6 +53,8 @@ async def main():
         await P.wait_for_timeout(7000);await P.screenshot(path=OUT+'d-onda.png')
         await P.wait_for_function("state=='plan'&&wi==1||state=='end'",timeout=90000)
         check('onda 1 vencida: vem a onda 2 com a Tesla (÷3)',await P.evaluate("wi==1&&liberadas().has('d3')"),await P.evaluate("[state,wi,vidas]"))
+        rec=await P.evaluate("JSON.parse(localStorage.getItem('bipsite-runner:t1'))")
+        check('onda vencida: 5 Bipcoins e recorde de 100 pontos, sem apagar Runner e Snake',sum(rec['dcoins'].values())==5 and rec['best'].get('defesa')==100 and rec.get('druns')==1 and rec['best'].get('tabuada')==500 and rec['best'].get('snakemisto')==12 and rec.get('sruns')==2,rec)
         check('Bugs destruídos dão energia',await P.evaluate("kills")>=5,await P.evaluate("kills"))
         check('regras das torres',await P.evaluate("pode('d2',36)&&!pode('d2',35)&&pode('d5',35)&&pode('cp',7)&&!pode('cp',9)&&!pode('d3',1)"))
         # Tesla pula em vários Bugs e o Morteiro acerta em área
@@ -77,6 +81,10 @@ async def main():
         check('tentar de novo volta à mesma onda com as torres de antes',await P.evaluate(f"state=='plan'&&wi=={w0}&&towers.length==2&&towers.find(t=>t.pad==0).nv==2"))
         # vitória
         await P.evaluate("wi=ONDAS.length-1;prepOnda();vidas=10;state='wave';fila=[];bugs=[]");await P.wait_for_selector('#sEnd:not([hidden])',timeout=5000)
+        rec=await P.evaluate("JSON.parse(localStorage.getItem('bipsite-runner:t1'))")
+        check('vitória: recorde 800 + 25 por vida e +20 Bipcoins (limite de 60 por dia)',rec['best']['defesa']==1050 and sum(rec['dcoins'].values())<=60 and await P.evaluate("hojeCoins()")==min(60,await P.evaluate("REC.dcoins[dia()]")),rec)
+        check('Bipcoins do Defesa entram no saldo',await P.evaluate("BIPV.ganhos(null,null,JSON.parse(localStorage.getItem('bipsite-runner:t1')))")==100+40+12+sum(rec['dcoins'].values()))
+        check('fim mostra pontos e novo recorde',('1.050' in await P.inner_text('#ePts')) and 'novo recorde' in await P.inner_text('#ePtsL'))
         check('última onda vencida: vitória com estrelas',('Vitória' in await P.inner_text('#eT')) and '★' in await P.inner_text('#eStars'))
         # o Bug Rei da última onda é vencível: 2520 só tem fatores 2,3,5,7
         check('todos os números das ondas são vencíveis com 2, 3, 5, 7 e primos',await P.evaluate("ONDAS.every(o=>o.bugs.every(([t,n])=>{let m=n;for(const d of [2,3,5,7])while(m%d==0&&m>d)m/=d;return m==1||primo(m)}))"))

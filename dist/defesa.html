@@ -182,6 +182,8 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
    <b style="--tc:#ffd24a">Primo</b><span><b style="all:unset;color:#fff">Obelisco</b>: destrói Bugs com número primo</span>
   </div>
   <p style="margin:0">A ordem importa: o Bug passa primeiro pelas torres perto da entrada. Veja a prévia da onda e planeje sem pressa.</p>
+  <div class="rec"><div><b id="rBest">0</b><span>seu recorde (pontos)</span></div><div><b id="rCoins">0/60</b><span>Bipcoins hoje</span></div></div>
+  <div id="turmaRec" hidden><div class="lbl"><svg class="trf" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 3h14v8a7 7 0 0 1-14 0z" fill="#ffd24a" stroke="#a87000" stroke-width="2"/><path d="M9 6H4v2a5 5 0 0 0 5 5M23 6h5v2a5 5 0 0 1-5 5" fill="none" stroke="#a87000" stroke-width="2"/><path d="M14 18h4v5h-4z" fill="#e9a500"/><rect x="9" y="23" width="14" height="5" rx="1.5" fill="#5a3a00"/><path d="M12.5 6v5" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg> Melhores defesas da turma</div><ol class="trec" id="trec"></ol></div>
   <p class="giro">Gire o celular para jogar deitado.</p>
   <div class="row"><button class="btn go" id="bGo">▶ Jogar</button><a class="back" href="./" id="bBack">← Voltar ao Mundo do Bip</a></div>
  </div>
@@ -196,7 +198,8 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
  <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="eT">
   <div><div class="lbl" id="eSub">Fim de jogo</div><h2 id="eT" class="big">Vitória!</h2></div>
   <div class="stars" id="eStars" style="font-size:2.2rem;color:#ffd24a;letter-spacing:4px"></div>
-  <div class="rec"><div><b id="eKill">0</b><span>Bugs destruídos</span></div><div><b id="eOnda">0</b><span>ondas vencidas</span></div><div><b id="eVid">0</b><span>vidas da base</span></div></div>
+  <div class="rec"><div><b id="ePts">0</b><span id="ePtsL">pontos</span></div><div><b id="eKill">0</b><span>Bugs destruídos</span></div><div><b id="eOnda">0</b><span>ondas vencidas</span></div><div><b id="eVid">0</b><span>vidas da base</span></div></div>
+  <p id="eGanho" style="margin:0;font-weight:700"></p>
   <div id="eRev"><div class="lbl">Bugs que passaram (e como vencê-los)</div><div class="facts" id="eFacts"></div></div>
   <div class="row"><button class="btn go" id="bAgain">↻ Tentar esta onda de novo</button><button class="btn" id="bNovo">Recomeçar do início</button><a class="back" href="./" id="bBack2">← Mundo do Bip</a></div>
  </div>
@@ -213,7 +216,7 @@ const BONUS=100,POR_AULA=50,POR_FASE=10,POR_ESTRELA=5;
 const ls=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 /* quanto o aluno já ganhou: sempre calculado a partir do progresso (não dá para duplicar) */
 function ganhos(robo,acad,run){let c=BONUS;const st=(robo&&robo.stars)||{};for(const k in st){const s=+st[k]||0;if(s>0)c+=POR_FASE+POR_ESTRELA*Math.min(3,s)}
- c+=((acad&&acad.done)||[]).length*POR_AULA;return c+ganhosRunner(run)+ganhosSnake(run)}
+ c+=((acad&&acad.done)||[]).length*POR_AULA;return c+ganhosRunner(run)+ganhosSnake(run)+ganhosDefesa(run)}
 /* Bip Runner: o jogo guarda quanto rendeu em cada dia; cada dia vale no máximo RUN_DIA */
 const RUN_DIA=60,runKey=pid=>"bipsite-runner:"+pid;
 function ganhosRunner(run){let c=0;const m=(run&&run.coins)||{};for(const k in m)c+=Math.max(0,Math.min(RUN_DIA,Math.floor(+m[k]||0)));return c}
@@ -221,6 +224,10 @@ function ganhosRunner(run){let c=0;const m=(run&&run.coins)||{};for(const k in m
 const SNAKE_DIA=60;
 function ganhosSnake(run){let c=0;const m=(run&&run.scoins)||{};for(const k in m)c+=Math.max(0,Math.min(SNAKE_DIA,Math.floor(+m[k]||0)));return c}
 const snakeBest=run=>{const b=(run&&run.best)||{};return Math.max(+b.snakemisto||0,+b.snakeregras||0,+b.snakecontas||0)};
+/* Bip Defesa: também na chave do Runner; recorde em best.defesa (pontos), Bipcoins do dia em dcoins, no máximo DEF_DIA */
+const DEF_DIA=60;
+function ganhosDefesa(run){let c=0;const m=(run&&run.dcoins)||{};for(const k in m)c+=Math.max(0,Math.min(DEF_DIA,Math.floor(+m[k]||0)));return c}
+const defesaBest=run=>+(((run&&run.best)||{}).defesa)||0;
 const lojaKey=pid=>"bipsite-loja:"+pid;
 /* loja: itens comprados, visual escolhido e o desconto de cada conjunto comprado (kits) */
 function loja(pid){const l=ls(lojaKey(pid))||{};return {owned:Array.isArray(l.owned)?l.owned:[],look:Object.assign({},DEFAULT,l.look||{}),kits:(l.kits&&typeof l.kits=="object")?l.kits:{},t:l.t||0}}
@@ -561,7 +568,7 @@ const ICON=(()=>{const SZ=160;let R=null,scene,cam,P,arc,props,ok=null;const cac
   if(fila.length)requestAnimationFrame(proximo);else rodando=false}
  return {item:(id,look,cb)=>pedir("i:"+id,look,l=>fazItem(id,l),cb),pose:(n,look,cb)=>pedir("p:"+n,look,l=>fazPose(n,l),cb),ok:()=>init()}})();
 
-return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
+return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
  faceTex,eyePreview,buildBody,dress,tick,setMood,glowTex,face2d,patTex,ICON}})();
 </script>
 <script>window.BIP_CFG={"url": "https://plxnximnaphzcfoazbpk.supabase.co", "key": "sb_publishable_wUTEKu_akkP0lR2uDm44vQ_i2rrtHPn"};</script>
@@ -617,6 +624,29 @@ const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a);
 let PID=(location.hash.match(/^#p-([\w-]+)/)||[])[1]||null;if(!PID)try{PID=localStorage.getItem("bipsite-cur")}catch(e){}
 const LOOK=PID?BIPV.loja(PID).look:Object.assign({},BIPV.DEFAULT);
+/* ---------- recorde e Bipcoins: guardados junto com o Bip Runner (mesma chave) ----------
+   best.defesa = pontos (100 por onda vencida + 25 por vida da base na vitória), druns = partidas,
+   dcoins = Bipcoins de cada dia (5 por onda vencida + 20 na vitória, no máximo DEF_DIA por dia) */
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const RKEY=BIPV.runKey(PID||"anon");
+const REC=Object.assign({v:1,best:{},runs:0,coins:{},err:{},tot:{},druns:0,dcoins:{}},ls.get(RKEY)||{});REC.best=REC.best||{};REC.dcoins=REC.dcoins||{};
+const dia=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const hojeCoins=()=>Math.min(BIPV.DEF_DIA,Math.floor(REC.dcoins[dia()]||0));
+function salvar(){/* relê o que o Runner ou o Snake possam ter salvo e junta, para um jogo não apagar o outro */
+ const o=ls.get(RKEY)||{};const R2=Object.assign({},o,{best:Object.assign({},o.best||{},{defesa:Math.max(+(o.best||{}).defesa||0,+REC.best.defesa||0)}),dcoins:Object.assign({},o.dcoins||{},REC.dcoins),druns:Math.max(o.druns||0,REC.druns||0),t:Date.now()});
+ if(!R2.v)R2.v=1;ls.set(RKEY,R2)}
+let ganhoJogo=0,novoRec=false;
+function darCoins(n){const antes=hojeCoins(),add=Math.max(0,Math.min(n,BIPV.DEF_DIA-antes));if(add){REC.dcoins[dia()]=antes+add;ganhoJogo+=add}return add}
+function registrar(pts){if(pts>(+REC.best.defesa||0)){REC.best.defesa=pts;novoRec=true}salvar()}
+function drawRec(){$("rBest").textContent=(+REC.best.defesa||0).toLocaleString("pt-BR");$("rCoins").textContent=`${hojeCoins()}/${BIPV.DEF_DIA}`;turmaRec()}
+let recPend=false;
+async function turmaRec(){if(recPend||typeof NUVEM=="undefined"||!NUVEM.on||!PID)return;let p=null;try{p=(JSON.parse(localStorage.getItem("bipsite-profiles"))||[]).find(q=>q.id==PID)}catch(e){}
+ if(!p||!p.cloud||!p.cloud.token)return;recPend=true;
+ try{const L=await NUVEM.rpc("aluno_recordes",{p_token:p.cloud.token,p_trilha:"defesa"});
+  if(Array.isArray(L)&&L.length){$("trec").innerHTML=L.map((r,i)=>`<li class="${r.eu?"eu":""}"><span class="md m${i+1}">${i+1}</span><span>${esc(r.apelido)}${r.eu?" (você)":""}</span><span>${(+r.pontos).toLocaleString("pt-BR")} pts</span></li>`).join("");$("turmaRec").hidden=false}
+  else $("turmaRec").hidden=true}
+ catch(e){}finally{recPend=false}}
 const INFRAME=window.parent!==window;
 function voltar(e){if(INFRAME){e&&e.preventDefault();window.parent.postMessage({bip:"menu"},"*")}}
 $("bBack").onclick=voltar;$("bBack2").onclick=voltar;
@@ -803,7 +833,7 @@ let state="menu",wi=0,en=EN0,vidas=VIDAS,kills=0,vel=1,last=performance.now(),tA
 let towers=[],bugs=[],fila=[],tSpawn=0,shots=[],escaparam=[],snap=null,menuPad=null;
 const liberadas=()=>new Set(ONDAS.slice(0,wi+1).flatMap(o=>o.libera));
 const towerAt=i=>towers.find(t=>t.pad==i);
-function novoJogo(){wi=0;en=EN0;vidas=VIDAS;kills=0;escaparam=[];towers.forEach(t=>dispose(t.G));towers=[];prepOnda()}
+function novoJogo(){REC.druns=(REC.druns||0)+1;ganhoJogo=0;novoRec=false;salvar();wi=0;en=EN0;vidas=VIDAS;kills=0;escaparam=[];towers.forEach(t=>dispose(t.G));towers=[];prepOnda()}
 function prepOnda(){state="plan";bugs.forEach(b=>dispose(b.G));bugs=[];shots.forEach(s=>dispose(s.o));shots=[];
  let t=0;fila=ONDAS[wi].bugs.map(([tipo,n])=>{const q={tipo,n,t};t+=tipo=="v"?.8:tipo=="t"?2.2:tipo=="r"?3:1.35;return q});tSpawn=0;
  snap={towers:towers.map(k=>({pad:k.pad,tipo:k.tipo,nv:k.nv})),en,vidas,kills};
@@ -888,13 +918,15 @@ function step(dt){tSpawn+=dt;while(fila.length&&fila[0].t<=tSpawn)spawn(fila.shi
  for(const t of towers){t.cd-=dt;if(t.cd>0)continue;if(disparar(t))t.cd=TIPOS[t.tipo].cad[t.nv-1]}
  voos(dt);bugs=bugs.filter(b=>!b.dead);
  if(!fila.length&&!bugs.length&&!shots.length)venceuOnda()}
-function venceuOnda(){if(wi>=ONDAS.length-1){fim(true);return}const bonus=30+wi*8;en+=bonus;wi++;toast(`Onda vencida! <small style="color:#5ef0e0">+⚡${bonus}</small>`,"ok");SFX.lv();prepOnda()}
+function venceuOnda(){darCoins(5);if(wi>=ONDAS.length-1){darCoins(20);registrar(ONDAS.length*100+vidas*25);fim(true);return}registrar((wi+1)*100);const bonus=30+wi*8;en+=bonus;wi++;toast(`Onda vencida! <small style="color:#5ef0e0">+⚡${bonus}</small>`,"ok");SFX.lv();prepOnda()}
 function perdeu(){state="over";setTimeout(()=>fim(false),900)}
 function fim(ok){state="end";$("hud").hidden=true;fecharMenu();
  $("eSub").textContent=ok?"Você defendeu a base do Bip!":"A base caiu…";$("eT").textContent=ok?"Vitória!":`Onda ${wi+1}`;
  const st=ok?(vidas>=9?3:vidas>=5?2:1):0;$("eStars").innerHTML=ok?"★".repeat(st)+`<span style="opacity:.25">${"★".repeat(3-st)}</span>`:"";
  $("eKill").textContent=kills;$("eOnda").textContent=ok?ONDAS.length:wi;$("eVid").textContent=Math.max(0,vidas);
  const u=[...new Map(escaparam.map(b=>[b.n0,b])).values()];$("eRev").hidden=!u.length;$("eFacts").innerHTML=u.slice(0,12).map(b=>`<span>${fatTxt(b.n0)}</span>`).join("");
+ const pts=ok?ONDAS.length*100+vidas*25:wi*100;$("ePts").textContent=pts.toLocaleString("pt-BR");$("ePtsL").textContent=novoRec?"pontos · novo recorde!":"pontos";
+ $("eGanho").innerHTML=ganhoJogo?`Você ganhou <b style="color:#ffd24a">${ganhoJogo} Bipcoins</b> nesta partida.`:hojeCoins()>=BIPV.DEF_DIA?"Você já ganhou todos os Bipcoins do Bip Defesa hoje. Volte amanhã!":"";drawRec();
  $("bAgain").hidden=ok;$("sEnd").hidden=false;(ok?$("bNovo"):$("bAgain")).focus();if(ok)SFX.lv()}
 function tentarDeNovo(){towers.forEach(t=>dispose(t.G));towers=[];snap.towers.forEach(k=>{construir(k.pad,k.tipo,true);if(k.nv>1)melhorar(towers[towers.length-1],true)});
  en=snap.en;vidas=snap.vidas;kills=snap.kills;prepOnda()}
@@ -911,7 +943,7 @@ $("bVel").onclick=()=>{vel=vel==1?2:1;$("bVel").textContent=vel+"×"};
 let antesPausa=null;
 function pausar(v){if(v&&(state=="wave"||state=="plan")){antesPausa=state;state="pause";$("sPause").hidden=false;$("bResume").focus()}else if(!v&&state=="pause"){state=antesPausa;$("sPause").hidden=true;last=performance.now()}}
 $("bPause").onclick=()=>pausar(true);$("bResume").onclick=()=>pausar(false);
-$("bQuit").onclick=()=>{state="menu";$("sPause").hidden=true;$("hud").hidden=true;bugs.forEach(b=>dispose(b.G));bugs=[];towers.forEach(t=>dispose(t.G));towers=[];shots.forEach(s=>dispose(s.o));shots=[];padsVisiveis();$("sStart").hidden=false};
+$("bQuit").onclick=()=>{drawRec();state="menu";$("sPause").hidden=true;$("hud").hidden=true;bugs.forEach(b=>dispose(b.G));bugs=[];towers.forEach(t=>dispose(t.G));towers=[];shots.forEach(s=>dispose(s.o));shots=[];padsVisiveis();$("sStart").hidden=false};
 document.addEventListener("keydown",e=>{const k=e.key.toLowerCase();if(k=="escape"&&menuPad!=null){fecharMenu();return}if(k=="p"||k=="escape"){state=="pause"?pausar(false):pausar(true);return}if(k==" "&&state=="plan"){e.preventDefault();chamarOnda()}});
 document.addEventListener("visibilitychange",()=>{if(document.hidden)pausar(true)});
 
@@ -930,11 +962,12 @@ function loop(now){requestAnimationFrame(loop);const raw=(now-last)/1000,dt=Math
   if(f.t>=f.max){dispose(f.o);fx.splice(i,1)}}
  P.arms[1].rotation.set(0,0,-.14+(state=="menu"?2.6+Math.sin(t*10)*.3:0));P.inner.position.y=Math.sin(t*2.4)*.03;BIPV.tick(P,t,dt);
  shake=Math.max(0,shake-dt);const kx=shake?rnd(-.12,.12):0;
- if(state=="menu"){cam.clearViewOffset();const wide=innerWidth>760,[bx,bz]=PATH[PATH.length-1];cam.position.lerp(new THREE.Vector3(bx+3.3,1.6,bz+1.6),Math.min(1,dt*3));cam.lookAt(bx+.2,.9,bz+1.2+(wide?1.5:0))}
+ if(state=="menu"){cam.clearViewOffset();const wide=innerWidth>760,[bx,bz]=PATH[PATH.length-1];cam.position.lerp(new THREE.Vector3(bx+5.6,2.5,bz+2.2),Math.min(1,dt*3));cam.lookAt(bx+.2,.9,bz+1.2+(wide?2.4:0))}
  else{cam.setViewOffset(innerWidth,innerHeight,0,vY,innerWidth,innerHeight);cam.position.lerp(new THREE.Vector3(camGame.x+kx,camGame.y,camGame.z),Math.min(1,dt*4));cam.lookAt(camLook.x+kx*.3,0,camLook.z)}
  /* o menu circular acompanha o lugar de construção */
  if(menuPad!=null){const [x,z]=PADS[menuPad],[sx,sy]=screenOf(new THREE.Vector3(x,.4,z));$("ring").style.left=sx+"px";$("ring").style.top=sy+"px"}
  R.render(scene,cam)}
+drawRec();
 if(init()){requestAnimationFrame(loop)}else{document.body.insertAdjacentHTML("beforeend",'<p style="position:fixed;bottom:16px;left:16px;z-index:9">Seu navegador não conseguiu abrir o 3D. Tente atualizar a página.</p>')}
 </script>
 
