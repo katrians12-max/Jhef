@@ -52,10 +52,11 @@ async def main():
         check('errou a conta: vem outra conta com números em outros lugares',await P.evaluate("tokens.length==4")and (await P.evaluate("S.q.txt")!=q1 or await P.evaluate("tokens.map(t=>t.c+','+t.r).join(' ')")!=pos1))
         check('erro de conta vai para a lista do professor',await P.evaluate("Object.keys(REC.err).length")>=1)
         # pausa
-        await P.keyboard.press('p');await P.wait_for_timeout(200)
+        qa=await P.evaluate("S.q.txt");await P.keyboard.press('p');await P.wait_for_timeout(200)
         check('na pausa os números e a pergunta somem',await P.evaluate("tokens.every(t=>!t.G.visible)&&$('q').classList.contains('hide')"))
         await P.keyboard.press('p');check('ao voltar: contagem 3, 2, 1',await P.evaluate("state")=='count')
         await P.wait_for_timeout(2400);check('volta com números novos',await P.evaluate("state=='run'&&tokens.length==4&&tokens.every(t=>t.G.visible)"))
+        check('na volta da pausa a conta é a MESMA (não dá para pular)',await P.evaluate("S.q.txt")==qa and await P.evaluate("tokens.filter(t=>t.ok).length==1&&tokens.find(t=>t.ok).v==S.q.c"),(qa,await P.evaluate("S.q.txt")))
         # batida na parede
         await P.evaluate("window.__parado=0;S.lives=3;drawLives();body=[[11,6],[10,6],[9,6]];prev=body.map(p=>p.slice());dir=[1,0];queue=[]");await P.wait_for_timeout(2400)
         check('bater na parede tira 1 vida e o trem vira sozinho',await P.evaluate("S.lives")==2 and await P.evaluate("state")=='run' and await P.evaluate("dir[0]")==0,await P.evaluate("[S.lives,state,dir]"))

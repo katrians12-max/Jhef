@@ -149,7 +149,7 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 </section>
 
 <section class="scr center" id="sPause" hidden>
- <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="pT"><h2 id="pT">Pausado</h2><p>Na pausa os números somem. Quando você voltar, eles aparecem em <b>outros lugares</b> (e a conta muda), e a sequência recomeça do zero.</p>
+ <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="pT"><h2 id="pT">Pausado</h2><p>Na pausa os números somem. Quando você voltar, eles aparecem em <b>outros lugares</b> (a conta continua a mesma), e a sequência recomeça do zero.</p>
   <div class="row"><button class="btn go" id="bResume">▶ Continuar</button><button class="btn" id="bQuit">Sair do jogo</button></div></div>
 </section>
 
@@ -391,9 +391,9 @@ function end(){state="end";$("hud").hidden=true;turn=1;
  $("eT").textContent=`${S.ok} ${S.ok==1?"vagão":"vagões"}`;$("eNew").hidden=!novo;$("eBad").textContent=S.bad;$("eCombo").textContent=S.best;$("eLv").textContent=S.phase+1;
  const uniq=[...new Set(S.erros)];$("eRev").hidden=!uniq.length;$("eFacts").innerHTML=uniq.slice(0,10).map(e=>`<span>${e}</span>`).join("");
  BIPV.setMood(P,novo?"festa":"feliz");$("sEnd").hidden=false;$("bAgain").focus();drawRec()}
-/* pausa: os números e a regra somem; na volta eles mudam de lugar (e a conta muda) e a sequência recomeça */
+/* pausa: os números e a regra somem; na volta eles mudam de lugar, mas a conta é a MESMA (não dá para pausar e pular conta difícil) e a sequência recomeça */
 function pause(v){if(v&&state=="run"){state="pause";$("q").classList.add("hide");tokens.forEach(t=>t.G.visible=false);$("sPause").hidden=false;$("bResume").focus()}
- else if(!v&&state=="pause"){$("sPause").hidden=true;tokens.forEach(t=>dispose(t.G));tokens=[];if(S.kind=="conta"){S.q=pergunta(contaLv());drawQ()}if(S.combo){S.combo=0;drawScore()}
+ else if(!v&&state=="pause"){$("sPause").hidden=true;tokens.forEach(t=>dispose(t.G));tokens=[];if(S.combo){S.combo=0;drawScore()}
   state="count";let n=3;const tick=()=>{if(state!="count")return;$("cd").innerHTML=n?`<span>${n}</span>`:`<span>JÁ!</span>`;n?SFX.cd():SFX.go();if(n--)setTimeout(tick,600);else setTimeout(()=>{$("cd").innerHTML="";$("q").classList.remove("hide");fillTokens();state="run";acc=0;last=performance.now()},350)};tick()}}
 /* direção: até 2 viradas guardadas; não deixa voltar para trás */
 function steer(d){if(state!="run"&&state!="count"&&state!="stun")return;const lastD=queue.length?queue[queue.length-1]:dir;if(d[0]==lastD[0]&&d[1]==lastD[1])return;if(d[0]==-lastD[0]&&d[1]==-lastD[1])return;if(queue.length<2){queue.push(d);SFX.turn()}}
