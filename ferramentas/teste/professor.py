@@ -39,6 +39,7 @@ async def main():
                 ee={'7 × 8':{'n':2,'r':{'54':1,'63':1}},'6 × 9':{'n':1,'r':{'56':1}}} if ap in ('Theo','Bia','Enzo','Malu') else {'8 × 7':{'n':1,'r':{'54':1}}}
                 run={'v':1,'best':{'tabuada':nf*11+na},'runs':nf//4,'coins':{'2026-11-17':60,'2026-11-18':25},'err':ee,'tot':{'tabuada':{'ok':nf*3,'bad':4}},'t':1}
                 if ap!='Ana7':run['best']['definf']=nf*100000+nf*37;run['druns']=2
+                if ap!='Ana7':run['best']['bomber']=nf*100000+nf*11;run['bruns']=3;run['bmeta']={'est':nf}
             for jogo,d in [('robo',robo),('academia',acad),('loja',loja),('runner',run)]:
                 if d is None:continue
                 if jogo=='loja' and not itens:continue
@@ -51,6 +52,8 @@ async def main():
         await P.click('[data-crit="coins"]');t=await P.inner_text('#rankBox');check('ranking por Bipcoins ganhos','Ana7' in t)
         await P.click('[data-crit="run"]');t=await P.inner_text('#rankBox')
         check('ranking do Bip Runner (Ana7 tem o maior recorde)','Ana7' in t and '454 pontos' in t,t[:200])
+        await P.click('[data-crit="bomber"]');t=await P.inner_text('#rankBox')
+        check('ranking do Bip Bomber por arena','arena ' in t and ' pts' in t,t[:200])
         await P.click('[data-crit="defesa"]');t=await P.inner_text('#rankBox')
         check('ranking do Bip Defesa por onda','onda ' in t and ' pts' in t and 'Ana7' not in t.split('Ainda')[0],t[:200])
         await P.click('[data-crit="est"]');await P.click('[data-crit="ativ"]')
@@ -74,6 +77,7 @@ async def main():
         check('planilha baixada com 14 alunos e colunas',txt.count('\n')==14 and txt.startswith('Posição;Apelido') and 'Ana7' in txt.split('\n')[1],txt[:200])
         check('planilha tem colunas do Runner','Recorde no Bip Runner' in txt.split('\n')[0])
         check('planilha tem colunas do Bip Defesa','Bip Defesa: onda alcançada' in txt.split('\n')[0])
+        check('planilha tem colunas do Bip Bomber','Bip Bomber: arenas vencidas' in txt.split('\n')[0])
         tok=db(f"insert into sessoes(aluno_id) select id from alunos where apelido='Lia' and turma_id='{tid}' returning token").split('\n')[0]
         rec=await P.evaluate(f"fetch('/rest/v1/rpc/aluno_recordes',{{method:'POST',headers:{{apikey:'chave-teste','Content-Type':'application/json'}},body:JSON.stringify({{p_token:'{tok}',p_trilha:'tabuada'}})}}).then(r=>r.json())")
         rd=await P.evaluate(f"fetch('/rest/v1/rpc/aluno_recordes',{{method:'POST',headers:{{apikey:'chave-teste','Content-Type':'application/json'}},body:JSON.stringify({{p_token:'{tok}',p_trilha:'definf'}})}}).then(r=>r.json())")

@@ -20,7 +20,10 @@ async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(args=['--ignore-gpu-blocklist','--use-gl=angle','--use-angle=swiftshader'])
         c,P,errs=await ctx(b)
-        await P.goto(B+'/bomber.html');await P.wait_for_timeout(1500);await P.screenshot(path=OUT+'b-menu.png')
+        await P.goto(B+'/');await P.evaluate("localStorage.setItem('bipsite-profiles',JSON.stringify([{id:'t1',name:'Ana',color:'#f00'}]));localStorage.setItem('bipsite-cur','t1');localStorage.setItem('bipsite-runner:t1',JSON.stringify({v:1,best:{tabuada:500},runs:3}));localStorage.setItem('bipsite-bomber:t1',JSON.stringify({best:200123,estrelas:9,conq:{a3:1},tot:{arenaMax:2},partidas:4}))")
+        await P.goto(B+'/bomber.html#p-t1');await P.wait_for_timeout(1500);await P.screenshot(path=OUT+'b-menu.png')
+        r=await P.evaluate("(()=>{const o=JSON.parse(localStorage.getItem('bipsite-runner:t1'));return [o.best.bomber,o.bmeta.est,o.bmeta.conq.a3,o.bruns,localStorage.getItem('bipsite-bomber:t1'),o.best.tabuada]})()")
+        check('quem jogou o protótipo não perde nada: recorde, estrelas e conquistas migram',r==[200123,9,1,4,None,500],r)
         await P.click('#bGo');await P.wait_for_timeout(800)
         r=await P.evaluate("({pr:primosDa(arena),est:estoque,ini:[caixa[1][1],caixa[1][2],caixa[2][1]].every(x=>!x),portal:caixa.flat().filter(x=>x&&x.esconde=='portal').length,rob:robos.map(rb=>rb.c+rb.r),pilar:G[2][2]})")
         check('arena 1: bombas 2 e 3, começo livre, um portal escondido, pilares fixos',r['pr']==[2,3] and r['ini'] and r['portal']==1 and r['pilar']==1,r)
@@ -81,7 +84,9 @@ async def main():
         check('explodir o portal acorda um robô e fecha o portal',await P.evaluate("robos.length==1&&!portal.aberto"))
         await P.evaluate("robos.forEach(rb=>dispose(rb.G));robos=[];atualizaPortal();P.x=3;P.y=1;"+roda(.1))
         r=await P.evaluate("({arena,concluidas,pr:primosDa(arena),rec:DEC(REC.best).arena,e5:estoque[5]})")
-        check('entrar no portal aberto: arena 2, chega a bomba 5, recorde salvo',r['arena']==2 and r['concluidas']==1 and 5 in r['pr'] and r['rec']==1 and r['e5']>=2,r)
+        check('entrar no portal aberto: arena 2, chega a bomba 5, recorde salvo',r['arena']==2 and r['concluidas']==1 and 5 in r['pr'] and r['rec']==2 and r['e5']>=2,r)
+        r=await P.evaluate("(()=>{const o=JSON.parse(localStorage.getItem(BIPV.runKey(PID||'anon')));return {b:BIPV.bomberDec(o.best.bomber).arena,c:Object.values(o.bcoins||{})[0],run:o.best.tabuada,g:BIPV.ganhosBomber(o)}})()")
+        check('oficial: recorde e Bipcoins na chave do Runner (vai para a nuvem), sem apagar o Runner',r['b']==2 and r['c']>=5 and r['run']==500 and r['g']>=5,r)
         # --- carga de emergência: nunca fica sem saída
         await P.evaluate(LIMPA+";estoque={2:0,3:0,5:0};invul=99;window.R4=novoRobo('v',9,9,25);R4.tc=9;R4.tr=9;R4.vel=0;"+roda(4.6))
         check('sem munição útil: carga de emergência com a bomba que serve (25 → 5)',await P.evaluate("estoque[5]==2&&sel==5"),await P.evaluate("estoque"))
@@ -110,7 +115,7 @@ async def main():
         check('escolher a carta aplica a melhoria e começa a próxima arena',n==3 and await P.evaluate(f"nivel('{k}')==1&&state=='play'&&arena==4"),[n,k])
         # --- conquista libera carta nova
         await P.evaluate("REC.tot.comboMax=3;checaConq()")
-        check('conquista Combo triplo libera a carta Fogo perfurante',await P.evaluate("REC.conq.combo3==1&&JSON.parse(localStorage.getItem(RKEY)).conq.combo3==1"))
+        check('conquista Combo triplo libera a carta Fogo perfurante',await P.evaluate("REC.conq.combo3==1&&JSON.parse(localStorage.getItem(RKEY)).bmeta.conq.combo3==1"))
         # --- chute e ímã
         await P.evaluate(LIMPA+";cartas={chute:1,ima:1};estoque[2]=3;sel=2;P.x=1;P.y=1;invul=99;colocar();P.x=1;P.y=3;posBip();bombas[0].saindo=false;bombas[0].c=1;bombas[0].r=4;bombas[0].t=9;dirIn=[0,1];"+roda(.6)+";dirIn=[0,0]")
         check('com a carta Chute, andar contra a bomba chuta ela pelo corredor',await P.evaluate("bombas[0].r>5"),await P.evaluate("[bombas[0].c,bombas[0].r]"))

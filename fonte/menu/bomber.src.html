@@ -156,7 +156,8 @@ body:not(.toque) .bdet{display:none}
 .carta kbd{position:absolute;top:6px;left:8px;font-size:.7rem}
 /* metas e conquistas */
 .prox{margin:0;padding:8px 12px;border-radius:12px;background:rgba(94,240,224,.1);border:1px solid rgba(94,240,224,.35);font-size:.9rem;color:#dff}
-.prox:empty{display:none}.prox span{color:var(--muted)}
+.prox:empty{display:none}
+.coinl{margin:0;font-size:.85rem;color:var(--muted)}.coinl b{color:#ffd24a}.prox span{color:var(--muted)}
 .erec{margin:0;font-weight:700;font-size:1.05rem}.erec:empty{display:none}
 .econq{display:flex;flex-wrap:wrap;gap:6px}.econq span{padding:5px 10px;border-radius:10px;background:rgba(255,210,74,.15);border:1px solid rgba(255,210,74,.5);font-weight:700;font-size:.85rem}
 .conq summary{cursor:pointer;font-weight:700;color:var(--muted)}
@@ -202,7 +203,7 @@ body:not(.toque) .bdet{display:none}
 
 <section class="scr" id="sStart">
  <div class="card glass">
-  <div class="brandrow"><!--LOGO--><span class="proto">PROTÓTIPO</span></div>
+  <div class="brandrow"><!--LOGO--></div>
   <div><h1>Bip Bomber</h1><p>Coloque bombas, fuja da explosão e limpe a arena dos robôs. Cada bomba tem um <b>número</b>: ela só destrói caixas e robôs cujo número é <b>múltiplo</b> dela.</p></div>
   <div class="legend">
    <b style="--tc:#3ce8ff">12</b><span>bomba <b style="all:unset;color:#3ce8ff">2</b> ou <b style="all:unset;color:#2fd47a">3</b> servem; a <b style="all:unset;color:#ff9a3c">5</b> não (e é gasta à toa)</span>
@@ -211,7 +212,9 @@ body:not(.toque) .bdet{display:none}
   </div>
   <p style="margin:0">A cruz laranja mostra onde a bomba vai explodir. A explosão machuca o Bip, qualquer que seja o número!</p>
   <div class="rec"><div><b id="rBest">—</b><span id="rBestS">seu recorde</span></div><div><b id="rEst">0</b><span>estrelas</span></div><div><b id="rConq">0/12</b><span>conquistas</span></div></div>
+  <p class="coinl">Bipcoins hoje: <b id="rCoins">0/60</b> · 5 por arena vencida e +2 por estrela</p>
   <p class="prox" id="rProx"></p>
+  <div id="turmaRec" hidden><div class="lbl">🏆 Quem foi mais longe na turma</div><ol class="trec" id="trec"></ol></div>
   <details class="conq"><summary>Ver conquistas e cartas</summary><ul id="listaConq"></ul></details>
   <p class="giro">Gire o celular para jogar deitado.</p>
   <div class="row"><button class="btn go" id="bGo">▶ Jogar</button><a class="back" href="./" id="bBack">← Voltar ao Mundo do Bip</a></div>
@@ -232,6 +235,7 @@ body:not(.toque) .bdet{display:none}
   <div><div class="lbl" id="eSub">Fim de jogo</div><h2 id="eT" class="big" style="font-size:clamp(2.2rem,6vw,3.2rem)">Arena 1</h2></div>
   <div class="rec"><div><b id="ePts">0</b><span id="ePtsL">pontos</span></div><div><b id="eRob">0</b><span>robôs</span></div><div><b id="eCx">0</b><span>caixas</span></div></div>
   <p class="erec" id="eRec"></p>
+  <p id="eGanho" style="margin:0;font-weight:700"></p>
   <p id="eEst" style="margin:0;font-weight:800;color:#ffd24a"></p>
   <div class="econq" id="eConq" hidden></div>
   <p id="eErro" style="margin:0;font-weight:700"></p>
@@ -259,14 +263,32 @@ const nf=n=>Math.floor(n).toLocaleString("pt-BR");
 const primo=n=>{if(n<2)return false;for(let i=2;i*i<=n;i++)if(n%i==0)return false;return true};
 function fatora(n){const f=[];let m=n;for(let p=2;p*p<=m;p++)while(m%p==0){f.push(p);m/=p}if(m>1)f.push(m);return f}
 
-/* ---------- progresso que fica (neste aparelho, no protótipo): recorde, estrelas, conquistas ---------- */
-const RKEY="bipsite-bomber:"+(PID||"anon");
-let REC={best:0,estrelas:0,conq:{},tot:{},partidas:0};try{const o=JSON.parse(localStorage.getItem(RKEY));if(o)REC=Object.assign(REC,o)}catch(e){}
-REC.conq=REC.conq||{};REC.tot=REC.tot||{};REC.estrelas=REC.estrelas||0;
+/* ---------- progresso que fica: guardado junto com o Bip Runner (mesma chave), por isso vai para a nuvem da turma ----------
+   best.bomber = arenas vencidas × 100000 + pontos · bruns = partidas · bcoins = Bipcoins do dia · bmeta = estrelas, conquistas e totais */
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const esc=x=>String(x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const RKEY=BIPV.runKey(PID||"anon"),VELHA="bipsite-bomber:"+(PID||"anon");
 const ENC=(a,p)=>a*100000+Math.min(99999,Math.max(0,Math.floor(p))),DEC=v=>({arena:Math.floor((+v||0)/100000),pts:(+v||0)%100000});
-let novoRec=false,bestIni=0,novasConq=[],estrelasJogo=0,avisouRec=false;
-function salvaREC(){try{localStorage.setItem(RKEY,JSON.stringify(REC))}catch(e){}}
+let REC={best:0,estrelas:0,conq:{},tot:{},partidas:0,bcoins:{}};
+function salvaREC(){const o=ls.get(RKEY)||{},m=o.bmeta||{},tot=Object.assign({},m.tot||{});for(const k in REC.tot)tot[k]=Math.max(+tot[k]||0,REC.tot[k]);
+ const R2=Object.assign({},o,{best:Object.assign({},o.best||{},{bomber:Math.max(+(o.best||{}).bomber||0,REC.best)}),
+  bmeta:{est:Math.max(+m.est||0,REC.estrelas),conq:Object.assign({},m.conq||{},REC.conq),tot},bruns:Math.max(+o.bruns||0,REC.partidas),bcoins:Object.assign({},o.bcoins||{},REC.bcoins),t:Date.now()});
+ if(!R2.v)R2.v=1;ls.set(RKEY,R2)}
+{const o=ls.get(RKEY)||{},m=o.bmeta||{};REC.best=+(o.best||{}).bomber||0;REC.estrelas=+m.est||0;REC.conq=Object.assign({},m.conq||{});REC.tot=Object.assign({},m.tot||{});REC.partidas=+o.bruns||0;REC.bcoins=Object.assign({},o.bcoins||{});
+ /* quem jogou o protótipo neste aparelho não perde o que já conquistou */
+ const v=ls.get(VELHA);if(v){REC.best=Math.max(REC.best,+v.best||0);REC.estrelas=Math.max(REC.estrelas,+v.estrelas||0);Object.assign(REC.conq,v.conq||{});for(const k in v.tot||{})REC.tot[k]=Math.max(REC.tot[k]||0,+v.tot[k]||0);REC.partidas=Math.max(REC.partidas,+v.partidas||0);salvaREC();try{localStorage.removeItem(VELHA)}catch(e){}}}
+let novoRec=false,bestIni=0,novasConq=[],estrelasJogo=0,avisouRec=false,ganhoJogo=0;
 function registrar(){const v=ENC(concluidas,pts);if(v>REC.best){REC.best=v;novoRec=true}salvaREC()}
+const dia=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const hojeCoins=()=>Math.min(BIPV.BOMB_DIA,Math.floor(REC.bcoins[dia()]||0));
+function darCoins(n){const antes=hojeCoins(),add=Math.max(0,Math.min(n,BIPV.BOMB_DIA-antes));if(add){REC.bcoins[dia()]=antes+add;ganhoJogo+=add}return add}
+/* ranking da turma (só quando o perfil é da turma e tem internet) */
+let recPend=false;
+async function turmaRec(){if(recPend||typeof NUVEM=="undefined"||!NUVEM.on||!PID)return;let p=null;try{p=(JSON.parse(localStorage.getItem("bipsite-profiles"))||[]).find(q=>q.id==PID)}catch(e){}
+ if(!p||!p.cloud||!p.cloud.token)return;recPend=true;
+ try{const L=await NUVEM.rpc("aluno_recordes",{p_token:p.cloud.token,p_trilha:"bomber"});
+  if(Array.isArray(L)&&L.length){$("trec").innerHTML=L.map((r,i)=>{const d=DEC(r.pontos);return `<li class="${r.eu?"eu":""}"><span class="md m${i+1}">${i+1}</span><span>${esc(r.apelido)}${r.eu?" (você)":""}</span><span>arena ${d.arena} · ${nf(d.pts)} pts</span></li>`}).join("");$("turmaRec").hidden=false}
+  else $("turmaRec").hidden=true}catch(e){}finally{recPend=false}}
 const T_=k=>REC.tot[k]||0,soma=(k,n=1)=>{REC.tot[k]=(REC.tot[k]||0)+n},maxTot=(k,v)=>{if(v>(REC.tot[k]||0))REC.tot[k]=v};
 
 /* ---------- cartas de melhoria: escolhe 1 de 3 a cada 2 arenas ---------- */
@@ -335,7 +357,7 @@ function alternaCombinar(){if(!podeCompor())return;combinando=!combinando;drawAr
 
 function drawRec(){const d=DEC(REC.best);$("rBest").textContent=REC.best?`Arena ${d.arena}`:"—";$("rBestS").textContent=REC.best?`recorde · ${nf(d.pts)} pts`:"seu recorde";
  $("rEst").textContent=REC.estrelas;$("rConq").textContent=`${CONQ.filter(c=>REC.conq[c.id]).length}/${CONQ.length}`;
- const pc=proximaConq();$("rProx").innerHTML=pc?`🎯 Próxima meta: <b>${pc.c.n}</b>: ${pc.c.d} <span>(${nf(pc.v)}/${nf(pc.c.alvo)})</span>`:"🏅 Todas as conquistas liberadas!";$("listaConq").innerHTML=htmlConq()}
+ const pc=proximaConq();$("rProx").innerHTML=pc?`🎯 Próxima meta: <b>${pc.c.n}</b>: ${pc.c.d} <span>(${nf(pc.v)}/${nf(pc.c.alvo)})</span>`:"🏅 Todas as conquistas liberadas!";$("listaConq").innerHTML=htmlConq();$("rCoins").textContent=`${hojeCoins()}/${BIPV.BOMB_DIA}`;turmaRec()}
 /* ---------- regras ---------- */
 const W=15,H=11,FUSE=2.4,CHAMA=.55,CAP=6,DIRS=[[1,0],[-1,0],[0,1],[0,-1]];
 const TIPO={2:{cor:0x3ce8ff,css:"#3ce8ff",alc:2},3:{cor:0x2fd47a,css:"#2fd47a",alc:2},5:{cor:0xff9a3c,css:"#ff9a3c",alc:3},7:{cor:0xc07aff,css:"#c07aff",alc:3}};
@@ -610,7 +632,7 @@ function step(dt){
 function venceArena(){concluidas++;mis.fim=true;mis.guardou=totalBombas()>=6;
  const est=1+mis.ids.filter(k=>MISSAO[k].st(mis)=="ok").length;drawMissoes();
  if(!mis.desp)soma("limpas");if(est==3)soma("tres");REC.estrelas+=est;estrelasJogo+=est;maxTot("arenaMax",concluidas);
- const bonus=300*arena+100*(est-1);pts+=bonus;registrar();SFX.lv();
+ const bonus=300*arena+100*(est-1);pts+=bonus;darCoins(5+2*(est-1));registrar();SFX.lv();
  const rec=bestIni>0&&concluidas>bestIni&&!avisouRec;if(rec)avisouRec=true;
  toast(`${rec?"🏆 NOVO RECORDE!<br>":""}Arena ${arena}: ${"★".repeat(est)}${"☆".repeat(3-est)}<small style="color:#ffd24a">+${bonus} pts</small>`,"ok",true);checaConq();
  arena++;if(arena%3==1&&vidas<5)vidas++;
@@ -629,10 +651,11 @@ function fim(){state="end";$("hud").hidden=true;$("eT").textContent=concluidas?`
  const falta=bestIni-concluidas;$("eRec").innerHTML=novoRec&&concluidas>bestIni?`<span class="newrec">🏆 Novo recorde!</span>`:bestIni&&falta>=0?(falta==0?`Igualou o seu recorde de <b>${bestIni}</b> ${bestIni==1?"arena":"arenas"}! Mais uma e ele é seu.`:`Faltou <b>${falta}</b> ${falta==1?"arena":"arenas"} para o seu recorde (${bestIni}).`):"";
  $("eEst").textContent=`★ ${estrelasJogo} ${estrelasJogo==1?"estrela":"estrelas"} nesta partida · ${REC.estrelas} no total`;
  $("eConq").innerHTML=novasConq.map(c=>`<span>🏅 ${c.n}${c.lib?` → carta <b>${CARTAS[c.lib].n}</b>`:""}</span>`).join("");$("eConq").hidden=!novasConq.length;
+ $("eGanho").innerHTML=ganhoJogo?`Você ganhou <b style="color:#ffd24a">${ganhoJogo} Bipcoins</b> nesta partida.`:hojeCoins()>=BIPV.BOMB_DIA?"Você já ganhou todos os Bipcoins do Bip Bomber hoje. O recorde continua valendo!":"";
  const pc=proximaConq();$("eProx").innerHTML=pc?`Próxima conquista: <b>${pc.c.n}</b>: ${pc.c.d} (${nf(pc.v)}/${nf(pc.c.alvo)})${pc.c.lib?`, libera a carta <b>${CARTAS[pc.c.lib].n}</b>`:""}`:"Você liberou todas as conquistas!";
  drawRec();$("sEnd").hidden=false;$("bNovo").focus()}
 function novoJogo(){arena=1;concluidas=0;pts=0;vidas=3;estoque={};sel=2;cap=1;fogo=0;patins=0;escudo=false;stats={rob:0,cx:0,erro:0};novoRec=false;visto=REC.partidas>2?new Set(["ini"]):new Set();
- cartas={};combinando=false;novasConq=[];estrelasJogo=0;avisouRec=false;bestIni=DEC(REC.best).arena;REC.partidas=(REC.partidas||0)+1;salvaREC();["sCarta"].forEach(id=>$(id).hidden=true);
+ cartas={};combinando=false;novasConq=[];ganhoJogo=0;estrelasJogo=0;avisouRec=false;bestIni=DEC(REC.best).arena;REC.partidas=(REC.partidas||0)+1;salvaREC();["sCarta"].forEach(id=>$(id).hidden=true);
  ["sStart","sEnd","sPause"].forEach(id=>$(id).hidden=true);$("hud").hidden=false;state="play";montarArena(1)}
 
 /* ---------- zona de perigo (cruz laranja) ---------- */

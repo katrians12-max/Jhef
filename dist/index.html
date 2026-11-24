@@ -349,16 +349,18 @@ body.full .foot{padding:0 16px 30px}
 .minis{display:flex;flex-direction:column;gap:6px;flex:none;min-width:0}
 .minis .mh{font-family:var(--display);font-weight:800;font-size:.95rem;color:#fff;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;text-shadow:0 2px 8px rgba(0,0,0,.5)}
 .minis .mh small{font-family:var(--body,inherit);font-weight:600;font-size:.72rem;color:rgba(255,255,255,.7)}
-.minis .mrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.saguao .minis .game.mini{flex-direction:column}
-.saguao .minis .game.mini .art{width:100%;height:62px;min-height:0;flex:none}
-.saguao .minis .game.mini .bd{padding:7px 8px 9px;gap:3px}
+.minis .mrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.saguao .minis .game.mini{flex-direction:row;align-items:stretch}
+.saguao .minis .game.mini .art{width:62px;height:auto;min-height:0;flex:none}
+.saguao .minis .game.mini .bd{padding:6px 8px 7px;gap:2px;min-width:0;flex:1}
 .saguao .minis .game.mini h3{font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .saguao .minis .game.mini .eyebrow{display:block;font-size:.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .saguao .minis .game.mini .prog .row{flex-direction:column;align-items:flex-start;gap:0;font-size:.7rem;line-height:1.3}.saguao .minis .game.mini .prog .row span{white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .saguao .minis .game.mini .prog .bar{display:block;height:5px;margin-top:3px}
 .saguao .minis .game.mini .go{width:100%;padding:3px 6px;font-size:.84rem;margin-top:4px}
-@media (max-height:780px) and (min-width:900px){.saguao .minis .game.mini .eyebrow{display:none}.saguao .minis .game.mini .art{height:52px}.minis .mh small{display:none}}
+.saguao .minis .game.mini .eyebrow{display:none}.saguao .minis .game.mini .prog .row span+span{font-size:.66rem}
+.saguao .minis .game.mini .art .novo{top:3px;right:3px;font-size:.58rem;padding:1px 5px}
+@media (max-height:780px) and (min-width:900px){.minis .mh small{display:none}.saguao .minis .game.mini .prog .bar{display:none}}
 /* celular e tablet em pé: o Bip em cima, e os cartões numa faixa escura logo abaixo (zona do polegar) */
 @media (max-width:899px){
  .stage{min-height:440px}
@@ -528,7 +530,7 @@ body.full .foot{padding:0 16px 30px}
         <button class="btn main go" data-open="snake" id="sGo">Jogar</button></div>
       </article>
      <article class="game mini">
-       <div class="art" aria-hidden="true"><span class="novo">Novo!</span><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice">
+       <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice">
  <defs><linearGradient id="dfSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd06a"/><stop offset="1" stop-color="#4fa83f"/></linearGradient>
  <filter id="dfGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter></defs>
  <rect width="400" height="170" fill="url(#dfSky)"/>
@@ -543,6 +545,22 @@ body.full .foot{padding:0 16px 30px}
        <div class="bd"><span class="eyebrow">Fatoração</span><h3>Bip Defesa</h3><p>Defenda a base dos Bugs com torres e contas. Quanto mais longe, melhor!</p>
         <div class="prog"><div class="row"><span id="dTxt">Recorde: —</span><span id="dLv"></span></div><div class="bar"><i id="dBar" style="background:linear-gradient(90deg,#2fd47a,#ffd24a)"></i></div></div>
         <button class="btn main go" data-open="defesa" id="dGo">Jogar</button></div>
+      </article>
+     <article class="game mini">
+       <div class="art" aria-hidden="true"><span class="novo">Novo!</span><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice">
+ <defs><radialGradient id="bbG" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#ffe07a"/><stop offset=".45" stop-color="#ff9a3c"/><stop offset="1" stop-color="#ff5a3c" stop-opacity="0"/></radialGradient></defs>
+ <rect width="400" height="170" fill="#27315c"/>
+ <g fill="#2c376a" stroke="rgba(94,240,224,.15)" stroke-width="2"><rect x="100" y="10" width="46" height="46"/><rect x="254" y="10" width="46" height="46"/><rect x="100" y="114" width="46" height="46"/><rect x="254" y="114" width="46" height="46"/></g>
+ <g fill="#8e9cc4"><rect x="104" y="14" width="38" height="38" rx="4"/><rect x="258" y="14" width="38" height="38" rx="4"/><rect x="104" y="118" width="38" height="38" rx="4"/><rect x="258" y="118" width="38" height="38" rx="4"/></g>
+ <path d="M200 85H130M200 85H270M200 85V20M200 85V150" stroke="url(#bbG)" stroke-width="34" stroke-linecap="round" opacity=".9"/>
+ <circle cx="200" cy="85" r="52" fill="url(#bbG)"/>
+ <g><rect x="292" y="62" width="46" height="46" rx="5" fill="#b07338" stroke="#6b3f17" stroke-width="4"/><rect x="298" y="74" width="34" height="22" rx="5" fill="#fff4dc"/><text x="315" y="91" font-family="Baloo 2,system-ui,sans-serif" font-weight="800" font-size="17" fill="#3a2208" text-anchor="middle">12</text></g>
+ <g><circle cx="200" cy="88" r="24" fill="#15182a"/><circle cx="200" cy="88" r="24" fill="none" stroke="#2fd47a" stroke-width="5"/><path d="M212 66q8-10 16-6" stroke="#c8a060" stroke-width="3" fill="none"/><circle cx="229" cy="60" r="5" fill="#ffd24a"/>
+  <text x="200" y="96" font-family="Baloo 2,system-ui,sans-serif" font-weight="800" font-size="22" fill="#2fd47a" text-anchor="middle">3</text></g>
+</svg></div>
+       <div class="bd"><span class="eyebrow">Múltiplos e fatores</span><h3>Bip Bomber</h3><p>Exploda caixas com a bomba certa e junte fatores.</p>
+        <div class="prog"><div class="row"><span id="bTxt">Recorde: —</span><span id="bLv"></span></div><div class="bar"><i id="bBar" style="background:linear-gradient(90deg,#ff9a3c,#ffd24a)"></i></div></div>
+        <button class="btn main go" data-open="bomber" id="bGo">Jogar</button></div>
       </article>
      </div></div>
      <button class="btn play" id="bPlay" data-open="robo"><b>▶ CONTINUAR</b><small id="playSub">Robô Programador</small></button>
@@ -598,7 +616,7 @@ const BONUS=100,POR_AULA=50,POR_FASE=10,POR_ESTRELA=5;
 const ls=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 /* quanto o aluno já ganhou: sempre calculado a partir do progresso (não dá para duplicar) */
 function ganhos(robo,acad,run){let c=BONUS;const st=(robo&&robo.stars)||{};for(const k in st){const s=+st[k]||0;if(s>0)c+=POR_FASE+POR_ESTRELA*Math.min(3,s)}
- c+=((acad&&acad.done)||[]).length*POR_AULA;return c+ganhosRunner(run)+ganhosSnake(run)+ganhosDefesa(run)}
+ c+=((acad&&acad.done)||[]).length*POR_AULA;return c+ganhosRunner(run)+ganhosSnake(run)+ganhosDefesa(run)+ganhosBomber(run)}
 /* Bip Runner: o jogo guarda quanto rendeu em cada dia; cada dia vale no máximo RUN_DIA */
 const RUN_DIA=60,runKey=pid=>"bipsite-runner:"+pid;
 function ganhosRunner(run){let c=0;const m=(run&&run.coins)||{};for(const k in m)c+=Math.max(0,Math.min(RUN_DIA,Math.floor(+m[k]||0)));return c}
@@ -612,6 +630,12 @@ const DEF_DIA=60;
 function ganhosDefesa(run){let c=0;const m=(run&&run.dcoins)||{};for(const k in m)c+=Math.max(0,Math.min(DEF_DIA,Math.floor(+m[k]||0)));return c}
 const defesaBest=run=>+(((run&&run.best)||{}).definf)||0;
 const defesaDec=v=>({onda:Math.floor((+v||0)/100000),pts:(+v||0)%100000});
+/* Bip Bomber: também na chave do Runner. Recorde em best.bomber = arenas vencidas × 100000 + pontos;
+   bruns = partidas, bcoins = Bipcoins do dia (no máximo BOMB_DIA), bmeta = estrelas, conquistas e totais */
+const BOMB_DIA=60;
+function ganhosBomber(run){let c=0;const m=(run&&run.bcoins)||{};for(const k in m)c+=Math.max(0,Math.min(BOMB_DIA,Math.floor(+m[k]||0)));return c}
+const bomberBest=run=>+(((run&&run.best)||{}).bomber)||0;
+const bomberDec=v=>({arena:Math.floor((+v||0)/100000),pts:(+v||0)%100000});
 const lojaKey=pid=>"bipsite-loja:"+pid;
 /* loja: itens comprados, visual escolhido e o desconto de cada conjunto comprado (kits) */
 function loja(pid){const l=ls(lojaKey(pid))||{};return {owned:Array.isArray(l.owned)?l.owned:[],look:Object.assign({},DEFAULT,l.look||{}),kits:(l.kits&&typeof l.kits=="object")?l.kits:{},t:l.t||0}}
@@ -952,7 +976,7 @@ const ICON=(()=>{const SZ=160;let R=null,scene,cam,P,arc,props,ok=null;const cac
   if(fila.length)requestAnimationFrame(proximo);else rodando=false}
  return {item:(id,look,cb)=>pedir("i:"+id,look,l=>fazItem(id,l),cb),pose:(n,look,cb)=>pedir("p:"+n,look,l=>fazPose(n,l),cb),ok:()=>init()}})();
 
-return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
+return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,BOMB_DIA,ganhosBomber,bomberBest,bomberDec,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
  faceTex,eyePreview,buildBody,dress,tick,setMood,glowTex,face2d,patTex,ICON}})();
 </script>
 <script>/* =====================================================================
@@ -1531,7 +1555,9 @@ const KEYS={robo:id=>"robo4:"+id,academia:id=>"academia-bip-3d-v1:"+id,loja:id=>
 function mergeRunner(a,b){if(!a)return b;if(!b)return a;const mx=(x,y)=>{const o={...(y||{})};for(const k in x||{})o[k]=Math.max(+o[k]||0,+x[k]||0);return o};
  const err={...(b.err||{})};for(const k in a.err||{}){const e=a.err[k],f=err[k]||{n:0,r:{}};err[k]={n:Math.max(e.n||0,f.n||0),r:mx(e.r,f.r)}}
  const tot={};for(const k of new Set([...Object.keys(a.tot||{}),...Object.keys(b.tot||{})]))tot[k]=mx((a.tot||{})[k],(b.tot||{})[k]);
- return {v:1,best:mx(a.best,b.best),runs:Math.max(a.runs||0,b.runs||0),coins:mx(a.coins,b.coins),err,tot,sruns:Math.max(a.sruns||0,b.sruns||0),scoins:mx(a.scoins,b.scoins),druns:Math.max(a.druns||0,b.druns||0),dcoins:mx(a.dcoins,b.dcoins),t:Math.max(a.t||0,b.t||0)}}
+ return {v:1,best:mx(a.best,b.best),runs:Math.max(a.runs||0,b.runs||0),coins:mx(a.coins,b.coins),err,tot,sruns:Math.max(a.sruns||0,b.sruns||0),scoins:mx(a.scoins,b.scoins),druns:Math.max(a.druns||0,b.druns||0),dcoins:mx(a.dcoins,b.dcoins),bruns:Math.max(a.bruns||0,b.bruns||0),bcoins:mx(a.bcoins,b.bcoins),bmeta:mergeBmeta(a.bmeta,b.bmeta),t:Math.max(a.t||0,b.t||0)}}
+/* Bip Bomber: estrelas e totais pelo maior; conquistas somam */
+function mergeBmeta(a,b){if(!a)return b;if(!b)return a;const tot={...(a.tot||{})};for(const k in b.tot||{})tot[k]=Math.max(+tot[k]||0,+b.tot[k]||0);return {est:Math.max(+a.est||0,+b.est||0),conq:{...(a.conq||{}),...(b.conq||{})},tot}}
 /* loja: junta os itens comprados nos dois lugares; o visual é o mais recente */
 function mergeLoja(a,b){if(!a)return b;if(!b)return a;const n=(a.t||0)>=(b.t||0)?a:b,kits={...(a.kits||{})};for(const k in b.kits||{})kits[k]=Math.max(+kits[k]||0,+b.kits[k]||0);
  return {owned:[...new Set([...(a.owned||[]),...(b.owned||[])])],look:n.look||{},kits,t:Math.max(a.t||0,b.t||0)}}
@@ -1615,6 +1641,7 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  $("uTxt").textContent=`Recorde: ${BIPV.fmt((ru.best||{}).tabuada||0)}`;$("uLv").innerHTML=`hoje ${hoje}/${BIPV.RUN_DIA} ${BIPV.COIN}`;$("uBar").style.width=hoje/BIPV.RUN_DIA*100+"%";
  {const sh=Math.min(BIPV.SNAKE_DIA,Math.floor((ru.scoins||{})[diaHoje()]||0)),sb=BIPV.snakeBest(ru);$("sTxt").textContent=`Recorde: ${sb}`;$("sTxt").title=`${sb} ${sb==1?"vagão":"vagões"}`;$("sLv").innerHTML=`hoje ${sh}/${BIPV.SNAKE_DIA} ${BIPV.COIN}`;$("sBar").style.width=sh/BIPV.SNAKE_DIA*100+"%"}
  {const dh=Math.min(BIPV.DEF_DIA,Math.floor((ru.dcoins||{})[diaHoje()]||0));{const d=BIPV.defesaDec(BIPV.defesaBest(ru));$("dTxt").textContent=d.onda?`Recorde: onda ${d.onda}`:"Recorde: —";$("dTxt").title=`${BIPV.fmt(d.pts)} pontos`}$("dLv").innerHTML=`hoje ${dh}/${BIPV.DEF_DIA} ${BIPV.COIN}`;$("dBar").style.width=dh/BIPV.DEF_DIA*100+"%"}
+ {const bh=Math.min(BIPV.BOMB_DIA,Math.floor((ru.bcoins||{})[diaHoje()]||0)),d=BIPV.bomberDec(BIPV.bomberBest(ru));$("bTxt").textContent=d.arena?`Recorde: arena ${d.arena}`:"Recorde: —";$("bTxt").title=`${BIPV.fmt(d.pts)} pontos`;$("bLv").innerHTML=`hoje ${bh}/${BIPV.BOMB_DIA} ${BIPV.COIN}`;$("bBar").style.width=bh/BIPV.BOMB_DIA*100+"%"}
  $("myCode").textContent=makeCode(st);
  $("codeBox").hidden=!!p.cloud;$("cloudBox").hidden=!p.cloud;$("foot").hidden=!NUVEM.on;
  if(p.cloud){$("cloudTurma").textContent="☁ Turma "+p.cloud.turma.nome;if(p.cloud.expired)setSync("Entre de novo para salvar",true)}
@@ -1627,12 +1654,13 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  if(d.cat=="cenario")$("lojaIc").innerHTML=`<img class="pc" src="${CENA.postal(d.id)}" alt="">`;else BIPV.ICON.item(d.id,l.look,u=>{$("lojaIc").innerHTML=`<img src="${u}" alt="">`});
  document.querySelectorAll("[data-pose]").forEach(el=>BIPV.ICON.pose(el.dataset.pose,l.look,u=>{el.innerHTML=`<img src="${u}" alt="">`}));}
 /* Botão principal: continua o último jogo aberto (ou começa pelo Robô) */
-function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.id)}catch(e){}return g=="academia"||g=="runner"||g=="snake"||g=="defesa"?g:"robo"}
+function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.id)}catch(e){}return g=="academia"||g=="runner"||g=="snake"||g=="defesa"||g=="bomber"?g:"robo"}
 const diaHoje=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const runSave=id=>ls.get(BIPV.runKey(id),null)||{};
 function drawPlay(p,st){const g=lastGame(p),b=$("bPlay");b.dataset.open=g;
  if(g=="runner"){b.querySelector("b").textContent="▶ CORRER";$("playSub").textContent=`Bip Runner · recorde ${BIPV.fmt((runSave(p.id).best||{}).tabuada||0)}`;return}
  if(g=="snake"){b.querySelector("b").textContent="▶ JOGAR";$("playSub").textContent=`Bip Snake · recorde ${BIPV.snakeBest(runSave(p.id))} vagões`;return}
+ if(g=="bomber"){b.querySelector("b").textContent="▶ EXPLODIR";{const d=BIPV.bomberDec(BIPV.bomberBest(runSave(p.id)));$("playSub").textContent=d.arena?`Bip Bomber · recorde: arena ${d.arena}`:"Bip Bomber"}return}
  if(g=="defesa"){b.querySelector("b").textContent="▶ DEFENDER";{const d=BIPV.defesaDec(BIPV.defesaBest(runSave(p.id)));$("playSub").textContent=d.onda?`Bip Defesa · recorde: onda ${d.onda}`:"Bip Defesa"}return}
  const novo=g=="robo"?!st.rDone:!st.aDone;b.querySelector("b").textContent=novo?"▶ COMEÇAR":"▶ CONTINUAR";
  $("playSub").textContent=g=="robo"?`Robô Programador · fase ${Math.min(st.rDone+1,ROBO.length)}`:`Academia do Bip · aula ${Math.min(st.aDone+1,ACAD.length)}`}
@@ -1695,7 +1723,7 @@ function heroHTML(l,saldo){const d=BIPV.destaque(),own=owns(l,d.id);
  return `<div class="lj-hero"><div class="lj-hero-art">${art}</div><div class="lj-hero-tx"><span class="kick">★ Destaque do dia · Lendário</span><h3>${d.n}</h3>
   <div class="lj-hero-act">${own?`<span class="tag on">✓ Já é seu</span>`:`<span class="price big${saldo<d.p?" lack":""}">${BIPV.COIN}${BIPV.fmt(d.p)}</span>`}<button class="btn buy" data-id="${d.id}">${own?"Ver no Bip":"Experimentar"}</button></div>
   <small>Todo dia um item lendário diferente aparece aqui.</small></div></div>`}
-const EMPTY={posso:"Nada desta seção cabe nas suas Bipcoins ainda. Passe fases no Robô, faça aulas na Academia, corra no Bip Runner ou jogue o Bip Snake e o Bip Defesa para ganhar mais.",meus:"Você ainda não tem itens desta seção."};
+const EMPTY={posso:"Nada desta seção cabe nas suas Bipcoins ainda. Passe fases no Robô, faça aulas na Academia, jogue os Jogos rápidos (Runner, Snake, Defesa e Bomber) para ganhar mais.",meus:"Você ainda não tem itens desta seção."};
 function vitrineHTML(l,saldo){const cen=BIPV.ITEMS.filter(i=>i.cat=="cenario"&&i.p>0);
  const pode=BIPV.ITEMS.filter(i=>!owns(l,i.id)&&i.p<=saldo&&i.cat!="cenario").sort((a,b)=>b.p-a.p).slice(0,8);
  return heroHTML(l,saldo)+
@@ -1737,7 +1765,7 @@ function preview(quiet){const {l}=shopState(),prev=Object.assign({},l.look);let 
  else if(shopSel){const it=BIPV.BYID[shopSel];prev[it.cat]=it.id;cena=it.cat=="cenario";const hat=BIPV.BYID[prev.cabeca];if(it.cat=="antena"&&hat&&hat.hide)prev.cabeca=null}
  LOBBY.frame(cena?"cena":"perto");LOBBY.look(prev);if(!quiet)LOBBY.gesture(cena?"acenar":["acenar","girar","forca","dancar"][Math.floor(Math.random()*4)])}
 function drawSel(){const {l,saldo}=shopState(),el=$("sel"),q=id=>document.getElementById(id),F=BIPV.fmt,C=BIPV.COIN;
- const ganhar=`Passe fases no Robô Programador (até 25 por fase), conclua aulas na Academia (${BIPV.POR_AULA} por aula), corra no Bip Runner ou jogue o Bip Snake e o Bip Defesa.`;
+ const ganhar=`Passe fases no Robô Programador (até 25 por fase), conclua aulas na Academia (${BIPV.POR_AULA} por aula), jogue os Jogos rápidos (Runner, Snake, Defesa e Bomber).`;
  if(!shopSel){el.innerHTML=`<div class="nm"><b>Escolha um item</b><span class="hint2">Ele aparece no seu Bip antes de você comprar.</span></div>`;return}
  const k=BIPV.KIT[shopSel];let act="",msg="",head;
  if(k){const kp=BIPV.kitPreco(k,l.owned);head=`<b>Conjunto ${k.n}</b><span class="rar" style="--rc:#d0428f">${k.itens.length} peças · 15% off</span>`;
