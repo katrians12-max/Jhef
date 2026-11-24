@@ -1,0 +1,111 @@
+"""Testa o Bip Bomber (protótipo): regras de divisibilidade, fichas de fatores, robôs, portal, emergência, controles e celular."""
+import asyncio,sys
+from playwright.async_api import async_playwright
+B='http://localhost:8767';OUT=sys.argv[1] if len(sys.argv)>1 else '/tmp/'
+THREE=open('/tmp/claude-0/-home-claude/45cd848e-0f4f-57b8-918c-4bd4556fe55d/scratchpad/lib/three.min.js').read()
+ok=[];bad=[]
+def check(n,c,i=''):(ok if c else bad).append(n);print(('  ✓ ' if c else '  ✗ ')+n+(' — '+str(i) if i and not c else ''))
+async def ctx(b,w=1366,h=768,mobile=False):
+    c=await b.new_context(viewport={'width':w,'height':h},is_mobile=mobile,has_touch=mobile)
+    async def rt(r):
+        u=r.request.url
+        if 'three.min.js' in u:await r.fulfill(body=THREE,content_type='application/javascript')
+        elif u.startswith(B):await r.continue_()
+        else:await r.abort()
+    await c.route('**/*',rt);pg=await c.new_page();pg.set_default_timeout(10000);errs=[];pg.on('pageerror',lambda e:errs.append(str(e)));return c,pg,errs
+# arena vazia para testar cada regra isolada (sem robôs, sem caixas)
+LIMPA="""(()=>{for(let r=0;r<H;r++)for(let c=0;c<W;c++)if(caixa[r][c])tiraCaixa(c,r);robos.forEach(rb=>dispose(rb.G));robos=[];[...bombas,...fichas,...poderes].forEach(o=>dispose(o.G));bombas=[];fichas=[];poderes=[];chamas.forEach(f=>dispose(f.G));chamas=[];if(portal)dispose(portal.G);portal=null;invul=0;P.x=1;P.y=1;posBip()})()"""
+def roda(seg):return f"(()=>{{for(let i=0;i<{int(seg*30)};i++){{if(state!='play')break;step(1/30)}}}})()"
+async def main():
+    async with async_playwright() as p:
+        b=await p.chromium.launch(args=['--ignore-gpu-blocklist','--use-gl=angle','--use-angle=swiftshader'])
+        c,P,errs=await ctx(b)
+        await P.goto(B+'/bomber.html');await P.wait_for_timeout(1500);await P.screenshot(path=OUT+'b-menu.png')
+        await P.click('#bGo');await P.wait_for_timeout(800)
+        r=await P.evaluate("({pr:primosDa(arena),est:estoque,ini:[caixa[1][1],caixa[1][2],caixa[2][1]].every(x=>!x),portal:caixa.flat().filter(x=>x&&x.esconde=='portal').length,rob:robos.map(rb=>rb.c+rb.r),pilar:G[2][2]})")
+        check('arena 1: bombas 2 e 3, começo livre, um portal escondido, pilares fixos',r['pr']==[2,3] and r['ini'] and r['portal']==1 and r['pilar']==1,r)
+        check('robôs nascem longe do Bip',all(d>=8 for d in r['rob']) and len(r['rob'])>=2,r)
+        await P.evaluate(LIMPA)
+        # --- regra: múltiplo destrói; não múltiplo segura o fogo e gasta a bomba
+        await P.evaluate("poeCaixa(3,1,12);sel=5;estoque[5]=1;P.x=1;P.y=1;colocar();bombas[0].c=1;bombas[0].alc=3;explodir(bombas[0])")
+        check('bomba 5 não destrói 12 (bomba gasta, erro contado)',await P.evaluate("!!caixa[1][3]&&stats.erro==1&&estoque[5]==0"))
+        await P.evaluate("tiraCaixa(3,1);poeCaixa(3,1,30);sel=2;estoque[2]=3;colocar();explodir(bombas[0])")
+        r=await P.evaluate("({cx:caixa[1][3],fichas:fichas.map(f=>[f.p,f.c,f.r]),est:estoque[2]})")
+        check('bomba 2 destrói 30 e solta fichas 3 e 5 (30 ÷ 2 = 15 = 3 × 5)',r['cx'] is None and sorted(f[0] for f in r['fichas'])==[3,5],r)
+        await P.evaluate("P.x=3;P.y=1;invul=5;"+roda(.2).replace("(()=>{","(()=>{")+";")
+        r=await P.evaluate("({est:{...estoque},fichas:fichas.length})")
+        check('passar por cima pega as fichas (vira bomba no estoque)',r['est']['3']==4 and r['est'].get('5')==1 and r['fichas']==0,r)
+        # --- o fogo para na primeira caixa e não passa por pilar
+        await P.evaluate(LIMPA+";poeCaixa(4,1,6);poeCaixa(5,1,6)")
+        r=await P.evaluate("(()=>{const b={c:3,r:1,d:2,alc:3};const x=raio(b);return [x.cells.length,x.toques,raio({c:1,r:1,d:2,alc:3}).cells.some(([c,r])=>c==2&&r==2)]})()")
+        check('explosão para na primeira caixa de cada lado e não atravessa pilar',r[1]==[[4,1]] and r[2]==False,r)
+        # --- robôs
+        await P.evaluate(LIMPA+";window.R1=novoRobo('v',5,1,6);window.R2=novoRobo('v',1,5,10);R1.tc=5;R2.tc=1;estoque[3]=5;sel=3;P.x=3;P.y=1;colocar();bombas[0].c=3;bombas[0].r=3;bombas[0].alc=5")
+        await P.evaluate("bombas[0].c=5;bombas[0].r=3;explodir(bombas[0])")
+        r=await P.evaluate("[R1.vivo,R2.vivo,stats.rob,fichas.map(f=>f.p)]")
+        check('robô 6 cai com bomba 3 e solta ficha 2 (6 ÷ 3 = 2)',r[0]==False and r[2]==1 and r[3]==[2],r)
+        await P.evaluate("estoque[3]=2;sel=3;P.x=1;P.y=3;invul=9;colocar();explodir(bombas[0])")
+        check('robô 10 resiste à bomba 3',await P.evaluate("R2.vivo&&R2.n==10"))
+        await P.evaluate(LIMPA+";window.B1=novoRobo('b',3,3,12);B1.tc=3;B1.tr=3;estoque[2]=9;estoque[3]=9;invul=99")
+        await P.evaluate("sel=2;P.x=3;P.y=1;colocar();explodir(bombas[0])");n1=await P.evaluate("B1.n")
+        await P.evaluate("sel=2;colocar();explodir(bombas[0])");n2=await P.evaluate("B1.n")
+        await P.evaluate("sel=3;colocar();explodir(bombas[0])")
+        check('Blindado 12: bomba 2 divide (6), de novo (3), bomba 3 derruba',n1==6 and n2==3 and await P.evaluate("!B1.vivo"),[n1,n2])
+        # --- reação em cadeia
+        await P.evaluate(LIMPA+";cap=3;estoque[2]=9;sel=2;P.x=1;P.y=3;colocar();P.x=1;P.y=5;colocar();P.x=1;P.y=9;invul=99")
+        await P.evaluate("explodir(bombas[0]);"+roda(.2))
+        check('reação em cadeia: uma bomba no fogo da outra explode junto',await P.evaluate("bombas.length==0"))
+        # --- o fogo machuca o Bip qualquer que seja o número
+        await P.evaluate(LIMPA+";vidas=3;invul=0;estoque[3]=3;sel=3;P.x=1;P.y=1;colocar();explodir(bombas[0])")
+        await P.evaluate(roda(.1))
+        check('fogo da própria bomba tira vida do Bip',await P.evaluate("vidas==2"))
+        await P.evaluate(LIMPA+";window.R3=novoRobo('v',1,1,6);R3.tc=1;R3.tr=1;"+roda(.05))
+        check('encostar em robô tira vida',await P.evaluate("vidas==1"))
+        # --- só uma bomba por vez no começo
+        await P.evaluate(LIMPA+";cap=1;estoque[2]=5;sel=2;P.x=1;P.y=1;colocar();P.x=3;P.y=1;colocar()")
+        check('capacidade: só 1 bomba por vez no começo',await P.evaluate("bombas.length==1"))
+        # --- movimento: anda, não atravessa pilar, sai da bomba mas não volta para ela
+        await P.evaluate(LIMPA+";bombas.forEach(b=>dispose(b.G));bombas=[];P.x=1;P.y=1;invul=99")
+        await P.keyboard.down('ArrowRight');await P.wait_for_timeout(700);await P.keyboard.up('ArrowRight')
+        x=await P.evaluate("P.x");check('setas movem o Bip',x>1.5,x)
+        await P.evaluate("P.x=2;P.y=1;dirIn=[0,1];"+roda(.5)+";dirIn=[0,0]")
+        check('não atravessa pilar (2,2)',await P.evaluate("P.y==1"),await P.evaluate("[P.x,P.y]"))
+        await P.evaluate("P.x=1.25;P.y=1;dirIn=[0,1];"+roda(.4)+";dirIn=[0,0]")
+        check('ajuda na esquina: desliza para o corredor e desce',await P.evaluate("P.x==1&&P.y>1.3"),await P.evaluate("[P.x,P.y]"))
+        await P.evaluate("P.x=1;P.y=1;estoque[2]=3;sel=2;colocar();dirIn=[1,0];"+roda(.45)+";dirIn=[-1,0];"+roda(.6)+";dirIn=[0,0]")
+        check('sai de cima da bomba e não consegue voltar para ela',await P.evaluate("P.x>=1.9"),await P.evaluate("[P.x,P.y]"))
+        # --- portal: escondido, explodir acorda robô, abre sem robôs, leva para a próxima arena
+        await P.evaluate(LIMPA+";poeCaixa(3,1,4);caixa[1][3].esconde='portal';estoque[2]=5;sel=2;P.x=1;P.y=1;invul=99;colocar();explodir(bombas[0])")
+        check('portal aparece quando a caixa dele quebra; abre sem robôs',await P.evaluate("portal&&portal.aberto"))
+        await P.evaluate("colocar();explodir(bombas[0])")
+        check('explodir o portal acorda um robô e fecha o portal',await P.evaluate("robos.length==1&&!portal.aberto"))
+        await P.evaluate("robos.forEach(rb=>dispose(rb.G));robos=[];atualizaPortal();P.x=3;P.y=1;"+roda(.1))
+        r=await P.evaluate("({arena,concluidas,pr:primosDa(arena),rec:DEC(REC.best).arena,e5:estoque[5]})")
+        check('entrar no portal aberto: arena 2, chega a bomba 5, recorde salvo',r['arena']==2 and r['concluidas']==1 and 5 in r['pr'] and r['rec']==1 and r['e5']>=2,r)
+        # --- carga de emergência: nunca fica sem saída
+        await P.evaluate(LIMPA+";estoque={2:0,3:0,5:0};invul=99;window.R4=novoRobo('v',9,9,25);R4.tc=9;R4.tr=9;R4.vel=0;"+roda(4.6))
+        check('sem munição útil: carga de emergência com a bomba que serve (25 → 5)',await P.evaluate("estoque[5]==2&&sel==5"),await P.evaluate("estoque"))
+        await P.screenshot(path=OUT+'b-jogo.png')
+        # --- fim de jogo e recomeço
+        await P.evaluate("vidas=1;invul=0;P.x=R4.c;P.y=R4.r;R4.tc=R4.c;R4.tr=R4.r;"+roda(.1))
+        await P.wait_for_selector('#sEnd:not([hidden])',timeout=6000);await P.screenshot(path=OUT+'b-fim.png')
+        check('fim de jogo mostra arenas vencidas e pontos',('1 arena vencida' in await P.inner_text('#eT')))
+        await P.click('#bNovo');await P.wait_for_timeout(300)
+        check('jogar de novo começa na arena 1',await P.evaluate("arena==1&&vidas==3&&state=='play'"))
+        check('sem erros (computador)',not errs,errs[:3]);await c.close()
+        # --- celular deitado: joystick e botão de bomba
+        c,P,errs=await ctx(b,844,390,True)
+        await P.goto(B+'/bomber.html');await P.wait_for_timeout(1000);await P.click('#bGo');await P.wait_for_timeout(1500)
+        await P.evaluate(LIMPA+";invul=99")
+        vis=await P.is_visible('#joy') and await P.is_visible('#bBomba')
+        box=await P.evaluate("(()=>{const j=$('joy').getBoundingClientRect();return [j.left+j.width/2,j.top+j.height/2]})()")
+        await P.mouse.move(box[0],box[1]);await P.mouse.down();await P.mouse.move(box[0]+50,box[1],steps=4);await P.wait_for_timeout(600);await P.mouse.up()
+        x=await P.evaluate("P.x")
+        await P.tap('#bBomba');n=await P.evaluate("bombas.length")
+        await P.screenshot(path=OUT+'b-cel.png')
+        check('celular: joystick move o Bip e o botão coloca bomba',vis and x>1.3 and n==1,[vis,x,n])
+        check('celular: sem rolagem lateral',await P.evaluate("document.documentElement.scrollWidth")<=844)
+        check('sem erros (celular)',not errs,errs[:3]);await c.close()
+        await b.close()
+    print(f'\n{len(ok)} ok, {len(bad)} com problema',bad)
+asyncio.run(main())
