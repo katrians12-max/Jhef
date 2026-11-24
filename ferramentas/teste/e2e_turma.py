@@ -78,6 +78,7 @@ async def main():
         await M.reload();await M.wait_for_timeout(1200)
         check('celular pede PIN de novo depois da troca',await M.is_visible('#fTurma') and await M.input_value('#tApe')=='Ana7',await M.inner_text('#errTurma'))
         await M.fill('#tPin','5678');await M.click('#bTurmaOk');await M.wait_for_selector('#scrMenu:not([hidden])',timeout=12000);check('entra com PIN novo',True)
+        await M.wait_for_function("$('syncTxt').textContent.includes('Salvo')",timeout=8000);await M.wait_for_timeout(800)
         print('PROFESSOR FECHA A AULA')
         await P.click('#bAula');await P.wait_for_timeout(500)
         check('professor fecha a aula','Turma fechada' in await P.inner_text('#aula'))

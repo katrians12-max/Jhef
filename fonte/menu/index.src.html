@@ -327,6 +327,16 @@ body.full .foot{padding:0 16px 30px}
 @media (max-height:780px) and (min-width:900px){.saguao .game .eyebrow{display:none}.saguao .game .art{min-height:80px}.saguao .game .go{padding:2px 12px}.shopcard p{display:none}.saguao .game .bd{gap:3px}}
 @media (max-height:700px) and (min-width:900px){.saguao .game .prog .bar{display:none}.saguao .game .bd{padding:7px 12px}.btn.play small{display:none}.btn.play{padding:7px 18px 9px}.saguao .game .art{min-height:82px}.saguao .game .eyebrow{display:none}.saguao .prog .row{font-size:.78rem}.shopcard p{display:none}}
 /* jogos rápidos: três cartões pequenos lado a lado */
+.game{position:relative}
+.game.davez{box-shadow:0 0 0 2px #ffd24a,0 0 18px rgba(255,210,74,.35)}
+.game .vez{position:absolute;z-index:2;bottom:5px;left:50%;transform:translateX(-50%);padding:1px 7px;border-radius:99px;background:#ffd24a;color:#2a1a00;font-family:var(--display);font-weight:800;font-size:.64rem;box-shadow:0 2px 6px rgba(0,0,0,.35);white-space:nowrap}
+.game .desc{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px 14px;text-align:center;background:rgba(8,10,28,.84);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);color:#fff;border-radius:inherit}
+.game .desc b{font-family:var(--display);font-size:1.05rem}
+.game .desc span{font-size:.8rem;line-height:1.25;color:rgba(255,255,255,.85);max-width:30ch}
+.game.mini .desc{gap:3px;padding:6px 10px}.game.mini .desc b{font-size:.92rem}.game.mini .desc span{font-size:.74rem}
+.game .desc span b{font-size:inherit}
+.game .desc .bar{width:min(180px,80%);height:7px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+.game .desc .bar i{display:block;height:100%;background:#ffd24a;border-radius:inherit}
 .game .art .novo{position:absolute;z-index:1;top:5px;right:5px;padding:1px 7px;border-radius:99px;background:var(--run);color:#fff;font-family:var(--display);font-weight:800;font-size:.66rem;box-shadow:0 2px 6px rgba(0,0,0,.35)}
 .minis{display:flex;flex-direction:column;gap:6px;flex:none;min-width:0}
 .minis .mh{font-family:var(--display);font-weight:800;font-size:.95rem;color:#fff;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;text-shadow:0 2px 8px rgba(0,0,0,.5)}
@@ -639,7 +649,7 @@ $("profiles").addEventListener("click",e=>{const b=e.target.closest("button");if
  if(b.dataset.rm){pending=b.dataset.rm;return drawWho()}
  if(b.dataset.keep!=null){pending=null;return drawWho()}
  if(b.dataset.del){const p=profiles.find(q=>q.id==b.dataset.del);if(p&&p.cloud)NUVEM.rpc("aluno_sair",{p_token:p.cloud.token}).catch(()=>{});forget(b.dataset.del);pending=null;drawWho()}});
-function forget(id){profiles=profiles.filter(p=>p.id!=id);saveProfiles();try{localStorage.removeItem("robo4:"+id);localStorage.removeItem("academia-bip-3d-v1:"+id);localStorage.removeItem("bipsite-loja:"+id);localStorage.removeItem("bipsite-ultimo:"+id);localStorage.removeItem(BIPV.runKey(id))}catch(e){}}
+function forget(id){profiles=profiles.filter(p=>p.id!=id);saveProfiles();try{localStorage.removeItem("robo4:"+id);localStorage.removeItem("academia-bip-3d-v1:"+id);localStorage.removeItem("bipsite-loja:"+id);localStorage.removeItem("bipsite-ultimo:"+id);localStorage.removeItem(BIPV.runKey(id));localStorage.removeItem(BIPV.tempoKey(id))}catch(e){}}
 let pick=COLORS[0][1];
 $("colors").innerHTML=COLORS.map(([n,c],i)=>`<button type="button" style="background:${c}" data-c="${c}" aria-label="${n}" aria-pressed="${i==0}"></button>`).join("");
 $("colors2").innerHTML=$("colors").innerHTML;
@@ -684,7 +694,8 @@ function absorb(p,remote){/* junta o que está na nuvem com o que está neste co
  const r=mergeRobo(roboSave(p.id),remote.robo||null),a=mergeAcad(acadSave(p.id),remote.academia||null);
  if(r)ls.set(KEYS.robo(p.id),r);if(a)ls.set(KEYS.academia(p.id),a);
  const l=mergeLoja(ls.get(KEYS.loja(p.id),null),remote.loja||null);if(l)ls.set(KEYS.loja(p.id),l);
- const u=mergeRunner(ls.get(KEYS.runner(p.id),null),remote.runner||null);if(u)ls.set(KEYS.runner(p.id),u)}
+ const u=mergeRunner(ls.get(KEYS.runner(p.id),null),remote.runner||null);if(u)ls.set(KEYS.runner(p.id),u);
+ const tp=BIPV.mergeTempo(ls.get(BIPV.tempoKey(p.id),null),(remote.runner||{}).tempo||null);if(tp)ls.set(BIPV.tempoKey(p.id),tp)}
 function cloudLogin(res){const id=cid(res.aluno_id);let p=profiles.find(q=>q.id==id);
  const c={token:res.token,turma:res.turma,apelido:res.apelido,vista:Date.now()};
  if(p){p.name=res.apelido;p.color=res.cor;p.cloud=c}else{p={id,name:res.apelido,color:res.cor,cloud:c};profiles.push(p)}
@@ -711,7 +722,8 @@ $("fTurmaNova").onsubmit=e=>{e.preventDefault();const err=$("errNova");err.textC
 let pushed={},syncState="ok";
 function setSync(t,bad){syncState=bad?"erro":"ok";const el=$("syncTxt");if(el){el.textContent=t;el.classList.toggle("off",!!bad)}}
 async function push(p,keepalive){if(!p||!p.cloud||!NUVEM.on)return;
- for(const jogo of ["robo","academia","loja","runner"]){const d=ls.get(KEYS[jogo](p.id),null);if(!d)continue;const s=JSON.stringify(d);if(pushed[p.id+jogo]===s)continue;
+ for(const jogo of ["robo","academia","loja","runner"]){let d=ls.get(KEYS[jogo](p.id),null);
+  if(jogo=="runner"){const tp=ls.get(BIPV.tempoKey(p.id),null);if(tp)d=Object.assign({v:1,best:{}},d||{},{tempo:tp})}if(!d)continue;const s=JSON.stringify(d);if(pushed[p.id+jogo]===s)continue;
   try{await NUVEM.rpc("aluno_salvar",{p_token:p.cloud.token,p_jogo:jogo,p_dados:d},null,keepalive);pushed[p.id+jogo]=s;
    setSync("✓ Salvo às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}))}
   catch(x){if(x.code=="jogo_invalido"||x.code=="dados_invalidos")continue;  /* banco ainda sem a parte da loja: guarda só neste computador */
@@ -728,8 +740,8 @@ async function pull(p){/* ao escolher o perfil: busca o que está na nuvem */
 function aviso(html){const a=$("avisoTurma");a.innerHTML=html;a.hidden=false}
 function turmaFechada(p,jogando){p.cloud.vista=0;saveProfiles();
  /* apaga deste aparelho o que não chegou ao banco: o progresso da turma volta inteiro na próxima aula, e nada feito com a turma fechada é aproveitado */
- for(const jogo in KEYS)try{localStorage.removeItem(KEYS[jogo](p.id))}catch(e){}pushed={};
- if(!$("play").hidden){$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";LOBBY.pause(false)}
+ for(const jogo in KEYS)try{localStorage.removeItem(KEYS[jogo](p.id))}catch(e){}try{localStorage.removeItem(BIPV.tempoKey(p.id))}catch(e){}pushed={};
+ if(!$("play").hidden){jogoAberto=null;$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";LOBBY.pause(false)}
  cur=null;try{localStorage.removeItem("bipsite-cur")}catch(e){}drawWho();
  aviso(jogando?`A aula terminou: o professor fechou a turma <b>${esc(p.cloud.turma.nome)}</b>. O que você fez na aula ficou salvo e volta na próxima aula. Para continuar jogando agora, use o modo normal (crie seu perfil abaixo), que não conta para a turma.`
   :`A turma <b>${esc(p.cloud.turma.nome)}</b> está fechada agora. Ela abre quando o professor começar a aula. Enquanto isso, você pode jogar no modo normal: crie seu perfil abaixo (ele não conta para a turma).`)}
@@ -760,7 +772,7 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  $("codeBox").hidden=!!p.cloud;$("cloudBox").hidden=!p.cloud;$("foot").hidden=!NUVEM.on;
  if(p.cloud){$("cloudTurma").textContent="☁ Turma "+p.cloud.turma.nome;if(p.cloud.expired)setSync("Entre de novo para salvar",true)}
  $("meSub").textContent=p.cloud?"Turma "+p.cloud.turma.nome:"Toque no Bip ou arraste para girar";
- drawPlay(p,st);
+ eqAvalia(p);drawPlay(p,st);drawEq();
  drawCoins(p);const l=BIPV.loja(p.id);
  if(LOBBY.mount($("st3d"))){$("stFallback").hidden=true;LOBBY.look(l.look)}else{$("stFallback").hidden=false;$("stFallback").innerHTML=BIPV.face2d(l.look)}
  const d=BIPV.destaque();$("lojaDest").textContent="★ "+d.n.toUpperCase();
@@ -771,7 +783,7 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
 function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.id)}catch(e){}return g=="academia"||g=="runner"||g=="snake"||g=="defesa"||g=="bomber"?g:"robo"}
 const diaHoje=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const runSave=id=>ls.get(BIPV.runKey(id),null)||{};
-function drawPlay(p,st){const g=lastGame(p),b=$("bPlay");b.dataset.open=g;
+function drawPlay(p,st){let g=lastGame(p);const b=$("bPlay");if(EQ&&EQ.bloq[g])g=EQ.vez[0]||BIPV.JOGOS.find(x=>!EQ.bloq[x]);b.dataset.open=g;
  if(g=="runner"){b.querySelector("b").textContent="▶ CORRER";$("playSub").textContent=`Bip Runner · recorde ${BIPV.fmt((runSave(p.id).best||{}).tabuada||0)}`;return}
  if(g=="snake"){b.querySelector("b").textContent="▶ JOGAR";$("playSub").textContent=`Bip Snake · recorde ${BIPV.snakeBest(runSave(p.id))} vagões`;return}
  if(g=="bomber"){b.querySelector("b").textContent="▶ EXPLODIR";{const d=BIPV.bomberDec(BIPV.bomberBest(runSave(p.id)));$("playSub").textContent=d.arena?`Bip Bomber · recorde: arena ${d.arena}`:"Bip Bomber"}return}
@@ -790,9 +802,39 @@ $("bCopy").onclick=()=>{const t=$("myCode").textContent;const done=()=>{$("bCopy
  try{navigator.clipboard.writeText(t).then(done,()=>sel())}catch(e){sel()}
  function sel(){const r=document.createRange();r.selectNodeContents($("myCode"));const s=getSelection();s.removeAllRanges();s.addRange(r)}};
 
+/* ============ Equilíbrio do Bip (só no modo turma, automático) ============
+   Conta os minutos em que o aluno está mesmo jogando (sem mexer por 60 s, para de contar).
+   Jogo com mais de 35% do tempo da semana descansa até o aluno jogar 6 min nos jogos que menos joga;
+   os 2 menos jogados são os "jogos da vez" e dão +1 Bipcoin por minuto (até 20 por dia). */
+const GO={robo:"rGo",academia:"aGo",runner:"uGo",snake:"sGo",defesa:"dGo",bomber:"bGo"};
+const tempoGet=id=>{const t=ls.get(BIPV.tempoKey(id),null)||{};t.d=t.d||{};t.vez=t.vez||{};t.eq=t.eq||{};t.eq.bloq=t.eq.bloq||{};t.eq.cred=t.eq.cred||{};return t};
+function tempoSet(id,tp){const lim=new Date();lim.setDate(lim.getDate()-14);const k0=BIPV.diaDe(lim);for(const k in tp.d)if(k<k0)delete tp.d[k];ls.set(BIPV.tempoKey(id),tp)}
+let EQ=null,jogoAberto=null,ultimoToque=0;
+function eqAvalia(p){if(!p||!p.cloud)return EQ=null;const tp=tempoGet(p.id),eq=tp.eq;let E=BIPV.equilibrio(tp),mud=0;
+ for(const g of BIPV.JOGOS){const parte=E.T?E.t[g]/E.T:0;
+  if(eq.bloq[g]&&parte<=BIPV.EQ_LIM){delete eq.bloq[g];mud=1}
+  else if(E.ativo&&!eq.bloq[g]&&!eq.cred[g]&&parte>BIPV.EQ_LIM){eq.bloq[g]={falta:BIPV.EQ_DESC};mud=1}}
+ if(E.vez.length&&!(eq.vd&&eq.vd.dia==diaHoje())){eq.vd={dia:diaHoje(),g:E.vez};mud=1}
+ if(mud){eq.t=Date.now();tempoSet(p.id,tp);E=BIPV.equilibrio(tp)}return EQ=E}
+function contaTempo(p,g,s){if(!p||!p.cloud||!BIPV.JOGOS.includes(g))return;const tp=tempoGet(p.id),eq=tp.eq,dia=diaHoje(),E=BIPV.equilibrio(tp);
+ tp.d[dia]=tp.d[dia]||{};tp.d[dia][g]=(+tp.d[dia][g]||0)+s;
+ if(E.vez.includes(g))tp.vez[dia]=(+tp.vez[dia]||0)+s;
+ if(eq.cred[g]){eq.cred[g]-=s;if(eq.cred[g]<=0)delete eq.cred[g]}
+ if(!eq.bloq[g]&&(E.vez.includes(g)||E.t[g]<E.media))for(const b in eq.bloq){eq.bloq[b].falta-=s;if(eq.bloq[b].falta<=0){delete eq.bloq[b];eq.cred[b]=BIPV.EQ_CRED}}
+ eq.t=Date.now();tempoSet(p.id,tp)}
+function drawEq(){document.querySelectorAll(".game .vez,.game .desc").forEach(e=>e.remove());document.querySelectorAll(".game.davez").forEach(e=>e.classList.remove("davez"));
+ for(const g in GO)$(GO[g]).disabled=false;const E=EQ;if(!E)return;
+ const card=g=>$(GO[g]).closest(".game");
+ for(const g of E.vez){const c=card(g);c.classList.add("davez");c.querySelector(".art").insertAdjacentHTML("beforeend",`<span class="vez" title="Jogo da vez de hoje: ganhe 1 Bipcoin por minuto jogando (até ${BIPV.VEZ_DIA} por dia)">★ +1/min</span>`)}
+ for(const g in E.bloq){const f=Math.max(0,E.bloq[g].falta||0),min=Math.max(1,Math.ceil(f/60));$(GO[g]).disabled=true;
+  card(g).insertAdjacentHTML("beforeend",`<div class="desc" role="status"><b>💤 ${BIPV.NOME_JOGO[g].replace(/^Bip /,"")} descansando</b><span>Jogue mais <b>${min} min</b> nos jogos ★ para liberar.</span><div class="bar"><i style="width:${(1-f/BIPV.EQ_DESC)*100}%"></i></div></div>`)}}
+$("frame").addEventListener("load",()=>{try{const w=$("frame").contentWindow;const t=()=>{ultimoToque=Date.now()};
+ ["keydown","pointerdown","pointermove","touchstart","wheel"].forEach(ev=>w.addEventListener(ev,t,{passive:true,capture:true}));t()}catch(e){}});
+setInterval(()=>{if(!jogoAberto||$("play").hidden||document.visibilityState=="hidden"||Date.now()-ultimoToque>60000)return;contaTempo(curP(),jogoAberto,5)},5000);
+
 /* ---- abrir e fechar os jogos ---- */
-document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{if(!cur)return;LOBBY.pause(true);try{localStorage.setItem("bipsite-ultimo:"+cur,b.dataset.open)}catch(e){}$("frame").src=b.dataset.open+".html#p-"+cur;$("play").hidden=false;document.body.style.overflow="hidden"});
-function closeGame(){$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";LOBBY.pause(false);drawMenu();push(curP());
+document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{if(!cur||(EQ&&EQ.bloq[b.dataset.open]))return;jogoAberto=b.dataset.open;ultimoToque=Date.now();LOBBY.pause(true);try{localStorage.setItem("bipsite-ultimo:"+cur,b.dataset.open)}catch(e){}$("frame").src=b.dataset.open+".html#p-"+cur;$("play").hidden=false;document.body.style.overflow="hidden"});
+function closeGame(){jogoAberto=null;$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";LOBBY.pause(false);drawMenu();push(curP());
  if(lastCoins!=null)setTimeout(()=>LOBBY.gesture("comemorar"),400)}
 
 /* ============ Loja ============ */
