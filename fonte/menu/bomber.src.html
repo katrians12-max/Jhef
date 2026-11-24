@@ -136,6 +136,36 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 .legend{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;margin:0;font-size:.9rem;color:var(--muted)}
 .legend b{font-family:var(--display);font-size:1rem;text-align:center;min-width:58px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.08);color:var(--tc)}
 #sPause{background:rgba(7,10,26,.9)}
+/* missões da arena */
+.missoes{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:calc(max(12px,env(safe-area-inset-top,0px)) + 62px);margin:0;padding:8px 12px;list-style:none;font-size:.82rem;line-height:1.5;max-width:min(270px,30vw);pointer-events:none}
+.missoes li{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.missoes li.ok{color:#ffd24a;font-weight:700}.missoes li.x{color:#ff8a8a;text-decoration:line-through}
+/* bomba composta */
+.arsenal button.x{border-style:dashed}.arsenal button.x.on{background:rgba(255,210,74,.18);box-shadow:0 0 0 3px #ffd24a;animation:pisca 1s ease infinite}
+.arsenal button.x span{font-size:.66rem}
+.arsenal button.x.on b,.arsenal button.x.on span{color:#ffd24a}
+.toast small{display:block;font-size:.5em;margin-top:4px}
+@keyframes pisca{50%{box-shadow:0 0 0 3px rgba(255,210,74,.3)}}
+.bdet{position:absolute;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 120px);width:64px;height:64px;border-radius:50%;border:2px solid #fff;background:rgba(10,14,36,.85);font-size:1.6rem}
+body:not(.toque) .bdet{display:none}
+/* cartas de melhoria */
+.cwide{width:min(720px,100%)}
+.cartas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.carta{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px 14px;border-radius:18px;border:2px solid rgba(255,210,74,.6);background:linear-gradient(180deg,rgba(255,210,74,.14),rgba(10,14,36,.9));color:#fff;text-align:center;transition:transform .15s}
+.carta:hover,.carta:focus-visible{transform:translateY(-4px) scale(1.03);border-color:#ffd24a;outline:none;box-shadow:0 0 24px rgba(255,210,74,.35)}
+.carta i{font-style:normal;font-size:2.4rem;line-height:1}.carta b{font-family:var(--display);font-size:1.2rem}.carta span{font-size:.85rem;color:var(--muted);line-height:1.3}.carta em{font-style:normal;font-size:.75rem;font-weight:800;color:#5ef0e0}
+.carta kbd{position:absolute;top:6px;left:8px;font-size:.7rem}
+/* metas e conquistas */
+.prox{margin:0;padding:8px 12px;border-radius:12px;background:rgba(94,240,224,.1);border:1px solid rgba(94,240,224,.35);font-size:.9rem;color:#dff}
+.prox:empty{display:none}.prox span{color:var(--muted)}
+.erec{margin:0;font-weight:700;font-size:1.05rem}.erec:empty{display:none}
+.econq{display:flex;flex-wrap:wrap;gap:6px}.econq span{padding:5px 10px;border-radius:10px;background:rgba(255,210,74,.15);border:1px solid rgba(255,210,74,.5);font-weight:700;font-size:.85rem}
+.conq summary{cursor:pointer;font-weight:700;color:var(--muted)}
+.conq ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:34vh;overflow:auto}
+.conq li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.05);font-size:.82rem}
+.conq li b{grid-column:1/-1}.conq li span{color:var(--muted)}.conq li i{color:#ffd24a;font-style:normal}.conq li.ok{background:rgba(255,210,74,.12)}
+.conq li em{grid-column:1;height:6px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;align-self:center}.conq li em i{display:block;height:100%;background:linear-gradient(90deg,#5ef0e0,#ffd24a)}
+.conq li small{color:var(--muted)}
+@media (max-width:640px){.cartas{grid-template-columns:1fr}.carta{flex-direction:row;text-align:left;padding:10px}.carta i{font-size:1.8rem}}
 .giro{display:none}
 @media (orientation:portrait) and (max-width:760px){.giro{display:block;color:#ffd24a;font-weight:700;margin:0}}
 @media (max-width:900px){.dica{font-size:.85rem}.dica .bf{display:none}}
@@ -143,6 +173,9 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
  .joy{width:120px;height:120px}.joy i{width:50px;height:50px;margin:-25px 0 0 -25px}.bbomb{width:88px;height:88px}.toque .arsenal{right:calc(max(18px,env(safe-area-inset-right,0px)) + 98px)}
  .toque .dica{top:calc(max(8px,env(safe-area-inset-top,0px)) + 40px);max-width:40vw}.dica{font-size:.74rem;padding:6px 10px}}
 @media (max-width:480px){.stat small{display:none}.stat{padding:5px 9px}}
+@media (max-height:520px){.missoes{font-size:.68rem;padding:4px 8px;top:calc(max(8px,env(safe-area-inset-top,0px)) + 40px);line-height:1.35}.cartas{gap:8px}.carta{padding:8px}.carta i{font-size:1.6rem}.bdet{width:52px;height:52px;bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 96px)}}
+.toque .missoes{top:auto;bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 160px);left:max(18px,env(safe-area-inset-left,0px));right:auto}
+@media (max-height:520px){.toque .missoes{bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 128px)}}
 </style>
 <canvas id="cv" aria-hidden="true"></canvas>
 <div class="flash" id="flash"></div>
@@ -153,13 +186,16 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
   <div class="stat glass"><small>Arena</small><span id="arena">1</span></div>
   <div class="stat glass"><span class="rb" aria-hidden="true">🤖</span><span id="robos">0</span><small>robôs</small></div>
   <div class="stat glass"><span class="pt" id="pts">0</span><small>pts</small></div>
-  <div class="stat glass" id="poderes" title="Poderes do Bip"><span class="pw" id="pw"></span></div>
+  <div class="stat glass" title="Seu recorde de arenas"><span aria-hidden="true">🏆</span><span id="hRec">—</span><small>recorde</small></div>
+  <div class="stat glass" id="poderes" title="Poderes e cartas do Bip"><span class="pw" id="pw"></span></div>
   <span class="sp"></span>
   <button class="ib" id="bPause" aria-label="Pausar">⏸</button>
  </div>
  <div class="toast" id="toast" aria-live="assertive"></div>
  <div class="dica glass" id="dica" aria-live="polite" role="button" tabindex="0" title="Toque para esconder ou mostrar a dica"><span class="bf" aria-hidden="true"><i></i></span><span id="dicaT"></span><b class="dmin">💡 Dica</b></div>
+ <ul class="missoes glass" id="missoes" aria-label="Missões da arena"></ul>
  <div class="arsenal glass" id="arsenal" role="group" aria-label="Escolha a bomba"></div>
+ <button class="bdet" id="bDet" aria-label="Detonar bomba" hidden>📡</button>
  <div class="joy" id="joy" aria-hidden="true"><i id="joyK"></i></div>
  <button class="bbomb" id="bBomba" aria-label="Colocar bomba"><b>💣</b><span id="bbN">2</span></button>
 </div>
@@ -174,7 +210,9 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
    <b style="--tc:#55ffad">portal</b><span>está escondido numa caixa; abre quando todos os robôs caírem</span>
   </div>
   <p style="margin:0">A cruz laranja mostra onde a bomba vai explodir. A explosão machuca o Bip, qualquer que seja o número!</p>
-  <div class="rec"><div><b id="rBest">—</b><span id="rBestS">seu recorde</span></div><div><b id="rPts">0</b><span>pontos do recorde</span></div></div>
+  <div class="rec"><div><b id="rBest">—</b><span id="rBestS">seu recorde</span></div><div><b id="rEst">0</b><span>estrelas</span></div><div><b id="rConq">0/12</b><span>conquistas</span></div></div>
+  <p class="prox" id="rProx"></p>
+  <details class="conq"><summary>Ver conquistas e cartas</summary><ul id="listaConq"></ul></details>
   <p class="giro">Gire o celular para jogar deitado.</p>
   <div class="row"><button class="btn go" id="bGo">▶ Jogar</button><a class="back" href="./" id="bBack">← Voltar ao Mundo do Bip</a></div>
  </div>
@@ -182,15 +220,23 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 
 <section class="scr center" id="sPause" hidden>
  <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="pT"><h2 id="pT">Pausado</h2><p>Quando voltar, as bombas continuam de onde estavam.</p>
-  <div class="row"><button class="btn go" id="bResume">▶ Continuar</button><button class="btn" id="bQuit">Desistir</button></div></div>
+  <div class="row"><button class="btn go" id="bResume">▶ Continuar</button><button class="btn" id="bRestart">↻ Recomeçar</button><button class="btn" id="bQuit">Desistir</button></div></div>
+</section>
+
+<section class="scr center" id="sCarta" hidden>
+ <div class="card glass cwide" role="dialog" aria-modal="true" aria-labelledby="cT"><div><div class="lbl">Arena vencida!</div><h2 id="cT">Escolha uma melhoria</h2></div><div class="cartas" id="cartas"></div><p style="margin:0;font-size:.85rem">Conquistas liberam cartas novas. Teclas 1, 2 e 3 também escolhem.</p></div>
 </section>
 
 <section class="scr" id="sEnd" hidden>
  <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="eT">
-  <div><div class="lbl" id="eSub">Fim de jogo</div><h2 id="eT" class="big">Arena 1</h2></div>
+  <div><div class="lbl" id="eSub">Fim de jogo</div><h2 id="eT" class="big" style="font-size:clamp(2.2rem,6vw,3.2rem)">Arena 1</h2></div>
   <div class="rec"><div><b id="ePts">0</b><span id="ePtsL">pontos</span></div><div><b id="eRob">0</b><span>robôs</span></div><div><b id="eCx">0</b><span>caixas</span></div></div>
+  <p class="erec" id="eRec"></p>
+  <p id="eEst" style="margin:0;font-weight:800;color:#ffd24a"></p>
+  <div class="econq" id="eConq" hidden></div>
   <p id="eErro" style="margin:0;font-weight:700"></p>
-  <div class="row"><button class="btn go" id="bNovo">▶ Jogar de novo</button><a class="back" href="./" id="bBack2">← Mundo do Bip</a></div>
+  <p class="prox" id="eProx"></p>
+  <div class="row"><button class="btn go" id="bNovo">▶ Jogar de novo <kbd>R</kbd></button><a class="back" href="./" id="bBack2">← Mundo do Bip</a></div>
  </div>
 </section>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -213,14 +259,83 @@ const nf=n=>Math.floor(n).toLocaleString("pt-BR");
 const primo=n=>{if(n<2)return false;for(let i=2;i*i<=n;i++)if(n%i==0)return false;return true};
 function fatora(n){const f=[];let m=n;for(let p=2;p*p<=m;p++)while(m%p==0){f.push(p);m/=p}if(m>1)f.push(m);return f}
 
-/* ---------- recorde (protótipo: só neste aparelho) ---------- */
+/* ---------- progresso que fica (neste aparelho, no protótipo): recorde, estrelas, conquistas ---------- */
 const RKEY="bipsite-bomber:"+(PID||"anon");
-let REC={best:0};try{REC=Object.assign(REC,JSON.parse(localStorage.getItem(RKEY))||{})}catch(e){}
+let REC={best:0,estrelas:0,conq:{},tot:{},partidas:0};try{const o=JSON.parse(localStorage.getItem(RKEY));if(o)REC=Object.assign(REC,o)}catch(e){}
+REC.conq=REC.conq||{};REC.tot=REC.tot||{};REC.estrelas=REC.estrelas||0;
 const ENC=(a,p)=>a*100000+Math.min(99999,Math.max(0,Math.floor(p))),DEC=v=>({arena:Math.floor((+v||0)/100000),pts:(+v||0)%100000});
-let novoRec=false;
-function registrar(){const v=ENC(concluidas,pts);if(v>REC.best){REC.best=v;novoRec=true;try{localStorage.setItem(RKEY,JSON.stringify(REC))}catch(e){}}}
-function drawRec(){const d=DEC(REC.best);$("rBest").textContent=REC.best?`Arena ${d.arena}`:"—";$("rBestS").textContent=REC.best?"arenas vencidas (recorde)":"seu recorde";$("rPts").textContent=nf(d.pts)}
+let novoRec=false,bestIni=0,novasConq=[],estrelasJogo=0,avisouRec=false;
+function salvaREC(){try{localStorage.setItem(RKEY,JSON.stringify(REC))}catch(e){}}
+function registrar(){const v=ENC(concluidas,pts);if(v>REC.best){REC.best=v;novoRec=true}salvaREC()}
+const T_=k=>REC.tot[k]||0,soma=(k,n=1)=>{REC.tot[k]=(REC.tot[k]||0)+n},maxTot=(k,v)=>{if(v>(REC.tot[k]||0))REC.tot[k]=v};
 
+/* ---------- cartas de melhoria: escolhe 1 de 3 a cada 2 arenas ---------- */
+const CARTAS={
+ bomba:{n:"Bomba extra",d:"+1 bomba ao mesmo tempo",max:3,ic:"💣"},
+ fogo:{n:"Fogo +1",d:"a explosão alcança 1 casa a mais",max:3,ic:"🔥"},
+ patins:{n:"Patins",d:"o Bip anda mais rápido",max:2,ic:"⚡"},
+ escudo:{n:"Escudo",d:"aguenta 1 golpe em cada arena",max:1,ic:"🛡️"},
+ coracao:{n:"Coração",d:"+1 vida agora",max:9,ic:"❤️"},
+ ima:{n:"Ímã",d:"as fichas vêm até você",max:1,ic:"🧲"},
+ pavio:{n:"Pavio curto",d:"suas bombas explodem mais rápido",max:1,ic:"⏱️"},
+ chute:{n:"Chute",d:"ande contra uma bomba para chutá-la pelo corredor",max:1,ic:"👟",req:"a3"},
+ perfura:{n:"Fogo perfurante",d:"o fogo atravessa as caixas que destrói",max:1,ic:"🎯",req:"combo3"},
+ tontura:{n:"Tontura longa",d:"robô atingido pela bomba errada fica tonto 4 s",max:1,ic:"💫",req:"blind"},
+ recicla:{n:"Reciclagem",d:"1 em cada 3 caixas devolve a bomba usada",max:1,ic:"♻️",req:"comp10"},
+ detona:{n:"Detonador",d:"tecla Z (ou botão 📡): explode sua bomba na hora",max:1,ic:"📡",req:"limpo3"},
+ mapa:{n:"Mapa",d:"mostra em qual caixa está o portal",max:1,ic:"🗺️",req:"est30"}};
+let cartas={};const nivel=id=>cartas[id]||0;
+
+/* ---------- conquistas: sempre existe uma próxima meta, e várias liberam cartas novas ---------- */
+const CONQ=[
+ {id:"a3",n:"Explorador",d:"Vencer a arena 3",alvo:3,v:()=>T_("arenaMax"),lib:"chute"},
+ {id:"combo3",n:"Combo triplo",d:"Acertar 3 alvos com uma só bomba",alvo:3,v:()=>T_("comboMax"),lib:"perfura"},
+ {id:"blind",n:"Quebra-escudo",d:"Derrubar um robô Blindado",alvo:1,v:()=>T_("blind"),lib:"tontura"},
+ {id:"comp10",n:"Químico dos números",d:"Usar 10 bombas compostas",alvo:10,v:()=>T_("comp"),lib:"recicla"},
+ {id:"limpo3",n:"Sem desperdício",d:"Vencer 3 arenas sem gastar bomba à toa",alvo:3,v:()=>T_("limpas"),lib:"detona"},
+ {id:"est30",n:"Colecionador",d:"Juntar 30 estrelas",alvo:30,v:()=>REC.estrelas,lib:"mapa"},
+ {id:"guard",n:"Caçador de Guardião",d:"Derrubar um Guardião (arena 5)",alvo:1,v:()=>T_("guard")},
+ {id:"combo5",n:"Combo ×5",d:"Acertar 5 alvos com uma só bomba",alvo:5,v:()=>T_("comboMax")},
+ {id:"fichas150",n:"Fatorador",d:"Pegar 150 fichas de fatores",alvo:150,v:()=>T_("fichas")},
+ {id:"cx300",n:"Demolidor",d:"Destruir 300 caixas",alvo:300,v:()=>T_("cx")},
+ {id:"tres10",n:"Perfeccionista",d:"Fazer 3 estrelas em 10 arenas",alvo:10,v:()=>T_("tres")},
+ {id:"a10",n:"Mestre dos Fatores",d:"Vencer a arena 10",alvo:10,v:()=>T_("arenaMax")}];
+function checaConq(){for(const c of CONQ){if(REC.conq[c.id]||c.v()<c.alvo)continue;REC.conq[c.id]=1;novasConq.push(c);salvaREC();
+  toast(`🏅 ${c.n}!${c.lib?`<small style="color:#ffd24a">Carta nova liberada: ${CARTAS[c.lib].n}</small>`:""}`,"lv",true);SFX.combo()}}
+function proximaConq(){return CONQ.filter(c=>!REC.conq[c.id]).map(c=>({c,v:Math.min(c.alvo,c.v()),f:Math.min(1,c.v()/c.alvo)})).sort((a,b)=>b.f-a.f)[0]}
+function htmlConq(){return CONQ.map(c=>{const v=Math.min(c.alvo,c.v()),ok=REC.conq[c.id];return `<li class="${ok?"ok":""}"><b>${ok?"🏅":"🔒"} ${c.n}</b><span>${c.d}${c.lib?` · libera <i>${CARTAS[c.lib].n}</i>`:""}</span><em><i style="width:${v/c.alvo*100}%"></i></em><small>${nf(v)}/${nf(c.alvo)}</small></li>`}).join("")}
+
+/* ---------- missões da arena: vencer = 1 estrela; duas missões valem mais 2 ---------- */
+const MISSAO={
+ limpo:{t:()=>"Nenhuma bomba à toa",st:m=>m.desp?"x":m.fim?"ok":""},
+ combo3:{t:m=>`Combo de 3 alvos (melhor: ${m.combo})`,st:m=>m.combo>=3?"ok":""},
+ rapido:{t:m=>`Vencer em ${m.lim} s (${Math.max(0,Math.ceil(m.lim-m.t))} s)`,st:m=>m.t>m.lim?"x":m.fim?"ok":""},
+ intocavel:{t:()=>"Sem levar dano",st:m=>m.dano?"x":m.fim?"ok":""},
+ fichas:{t:m=>`Pegar 6 fichas (${Math.min(6,m.fichas)}/6)`,st:m=>m.fichas>=6?"ok":""},
+ composta:{t:()=>"Acertar algo com bomba composta",st:m=>m.comp?"ok":""},
+ guardar:{t:m=>`Terminar com 6 bombas (${totalBombas()})`,st:m=>m.fim&&m.guardou?"ok":""}};
+let mis={};
+const totalBombas=()=>primosDa(arena).reduce((s,p)=>s+(estoque[p]||0),0);
+function sorteiaMissoes(a,nRob){const pool=["limpo","combo3","rapido","intocavel","fichas","guardar"].concat(a>=3?["composta","composta"]:[]);const L=[];
+ while(L.length<2){const k=pick(pool);if(!L.includes(k))L.push(k)}
+ mis={ids:L,desp:0,combo:0,dano:0,fichas:0,comp:0,t:0,lim:55+nRob*12,fim:false,guardou:false};drawMissoes()}
+function drawMissoes(){if(!mis.ids)return;const lin=[`<li class="ok">★ Vencer a arena</li>`].concat(mis.ids.map(k=>{const s=MISSAO[k].st(mis);return `<li class="${s}">${s=="ok"?"★":s=="x"?"✗":"☆"} ${MISSAO[k].t(mis)}</li>`}));
+ $("missoes").innerHTML=lin.join("")}
+
+/* ---------- bombas compostas: juntar fichas de primos diferentes (2 × 3 = bomba 6) ---------- */
+let combinando=false;
+const fatDist=d=>[...new Set(fatora(d))];
+function tipoDe(d){if(TIPO[d])return TIPO[d];const fs=fatDist(d);return {cor:0xffd24a,css:"#ffd24a",alc:1+Math.max(...fs.map(p=>TIPO[p].alc)),comp:fs}}
+const estoqueDe=d=>TIPO[d]?(estoque[d]||0):Math.min(...fatDist(d).map(p=>estoque[p]||0));
+const podeCompor=()=>arena>=3;
+function escolhePrimo(p){if(!primosDa(arena).includes(p))return;
+ if(combinando&&podeCompor()){const fs=fatDist(sel);if(fs.includes(p)){const r=fs.filter(x=>x!=p);sel=r.length?r.reduce((a,b)=>a*b,1):p}else if(fs.length<3)sel=sel*p;if(fatDist(sel).length>=2)combinando=false}
+ else sel=p;drawArsenal()}
+function alternaCombinar(){if(!podeCompor())return;combinando=!combinando;drawArsenal()}
+
+function drawRec(){const d=DEC(REC.best);$("rBest").textContent=REC.best?`Arena ${d.arena}`:"—";$("rBestS").textContent=REC.best?`recorde · ${nf(d.pts)} pts`:"seu recorde";
+ $("rEst").textContent=REC.estrelas;$("rConq").textContent=`${CONQ.filter(c=>REC.conq[c.id]).length}/${CONQ.length}`;
+ const pc=proximaConq();$("rProx").innerHTML=pc?`🎯 Próxima meta: <b>${pc.c.n}</b>: ${pc.c.d} <span>(${nf(pc.v)}/${nf(pc.c.alvo)})</span>`:"🏅 Todas as conquistas liberadas!";$("listaConq").innerHTML=htmlConq()}
 /* ---------- regras ---------- */
 const W=15,H=11,FUSE=2.4,CHAMA=.55,CAP=6,DIRS=[[1,0],[-1,0],[0,1],[0,-1]];
 const TIPO={2:{cor:0x3ce8ff,css:"#3ce8ff",alc:2},3:{cor:0x2fd47a,css:"#2fd47a",alc:2},5:{cor:0xff9a3c,css:"#ff9a3c",alc:3},7:{cor:0xc07aff,css:"#c07aff",alc:3}};
@@ -312,7 +427,8 @@ function montarArena(a){
  const lista=[];for(let r=1;r<H-1;r++)for(let c=1;c<W-1;c++)if(caixa[r][c])lista.push([c,r]);
  /* portal escondido numa caixa longe do começo; poderes em outras caixas */
  const longe=lista.filter(([c,r])=>c+r>=9);const [pc,pr2]=pick(longe.length?longe:lista);caixa[pr2][pc].esconde="portal";
- const nPod=a==1?2:rint(1,2);for(let i=0;i<nPod;i++){const L=lista.filter(([c,r])=>!caixa[r][c].esconde);if(!L.length)break;const [c,r]=pick(L);caixa[r][c].esconde=pick(a==1?["bomba","fogo"]:["bomba","fogo","fogo","patins","escudo","bomba"])}
+ if(nivel("mapa")){const g=glow(0x55ffad,.9,1.6);g.position.y=.9;caixa[pr2][pc].G.add(g)}
+ const nPod=1;for(let i=0;i<nPod;i++){const L=lista.filter(([c,r])=>!caixa[r][c].esconde);if(!L.length)break;const [c,r]=pick(L);caixa[r][c].esconde=pick(a==1?["bomba","fogo"]:["bomba","fogo","fogo","patins","escudo","bomba"])}
  /* robôs: longe do começo, em casas livres (abre espaço se precisar) */
  const nR=Math.min(9,2+Math.floor(a*.8));let livres=[];for(let r=1;r<H-1;r++)for(let c=1;c<W-1;c++)if(!G[r][c]&&c+r>=8)livres.push([c,r]);
  livres.sort(()=>Math.random()-.5);
@@ -320,7 +436,8 @@ function montarArena(a){
  if(a%5==0)tipos[0]="g";
  tipos.forEach(t=>{let pos=livres.find(([c,r])=>!caixa[r][c]&&!robos.some(o=>Math.abs(o.c-c)+Math.abs(o.r-r)<3));if(!pos){pos=livres.find(([c,r])=>caixa[r][c]&&!caixa[r][c].esconde&&!robos.some(o=>o.c==c&&o.r==r));if(!pos)return;tiraCaixa(pos[0],pos[1])}
   novoRobo(t,pos[0],pos[1],numRobo(t,a,pr))});
- P.x=1;P.y=1;invul=1.2;posBip();drawArsenal();drawHud();
+ if(nivel("escudo"))escudo=true;combinando=false;
+ P.x=1;P.y=1;invul=1.2;posBip();sorteiaMissoes(a,robos.length);drawArsenal();drawHud();
  dica(dicaDa(a))}
 function poeCaixa(c,r,n){const m=new THREE.Mesh(GEO.caixa,[MAT.madeira,MAT.madeira,new THREE.MeshStandardMaterial({map:tampaTex(n),roughness:.8}),MAT.madeira,MAT.madeira,MAT.madeira]);m.position.set(wx(c),.36,wz(r));m.castShadow=true;m.receiveShadow=true;lvlGroup.add(m);caixa[r][c]={n,G:m,treme:0}}
 function tiraCaixa(c,r){const cx=caixa[r][c];if(!cx)return;cx.G.material[2].dispose();lvlGroup.remove(cx.G);caixa[r][c]=null}
@@ -341,9 +458,10 @@ function Gr_rem(rb){const o=rb.bd;rb.G.remove(o);o.material.map.dispose();o.mate
 
 /* ---------- dicas (aparecem na primeira vez) ---------- */
 function dicaDa(a){const d=[],f=(k,h)=>{if(!visto.has(k)){visto.add(k);d.push(h)}};
- if(a==1)f("ini","Ande com as <b>setas</b> (ou WASD) e coloque a bomba com <b>Espaço</b>. Saia da <b>cruz laranja</b> antes de explodir! A bomba <b>2</b> destrói números pares; a <b>3</b>, múltiplos de 3.");
+ if(a==1)f("ini",(document.body.classList.contains("toque")?"Ande com o <b>joystick</b> e coloque a bomba com o <b>botão laranja</b>.":"Ande com as <b>setas</b> (ou WASD) e coloque a bomba com <b>Espaço</b>.")+" Saia da <b>cruz laranja</b> antes de explodir! A bomba <b>2</b> destrói números pares; a <b>3</b>, múltiplos de 3.");
  if(a==2)f("5","Chegou a bomba <b>5</b>: alcance maior. Múltiplos de 5 terminam em 0 ou 5.");
  if(robos.some(r=>r.tipo=="c"))f("c","<b>Caçador</b> (laranja): quando te vê na mesma linha ou coluna, vem atrás. Use isso: atraia-o para a explosão!");
+ if(a==3)f("comp","Agora existem <b>bombas compostas</b>! Toque em <b>×</b> (tecla X) e escolha dois primos: <b>2 × 3 = bomba 6</b>. Ela gasta uma ficha de cada, alcança mais longe e <b>atravessa</b> as caixas que destrói, mas só destrói <b>múltiplos de 6</b>.");
  if(a==4)f("7","Chegou a bomba <b>7</b>. E cuidado com o <b>Blindado</b> (bolha azul): cada explosão certa <b>divide</b> o número dele, até chegar a 1.");
  if(robos.some(r=>r.tipo=="m"))f("m","<b>Multiplicador</b> (verde): a cada poucos segundos o número dele <b>dobra</b>. Ataque logo!");
  if(robos.some(r=>r.tipo=="g"))f("g","<b>Guardião!</b> Número enorme: cada bomba certa divide o número dele. Ele chama reforços de tempos em tempos.");
@@ -354,22 +472,27 @@ function toast(html,cls,long){const t=$("toast");t.className="toast";void t.offs
 
 /* ---------- HUD ---------- */
 function drawHud(){$("vid").textContent=vidas;$("arena").textContent=arena;$("robos").textContent=robos.length;$("pts").textContent=nf(pts);
- $("pw").textContent=`💣${cap} 🔥+${fogo}${patins?" ⚡":""}${escudo?" 🛡":""}`}
-function drawArsenal(){const pr=primosDa(arena);$("arsenal").innerHTML=pr.map((p,i)=>`<button data-p="${p}" style="--bc:${TIPO[p].css}" aria-pressed="${p==sel}" class="${estoque[p]?"":"zero"}" aria-label="Bomba ${p}, ${estoque[p]||0} no estoque"><kbd>${i+1}</kbd><b>${p}</b><span>×${estoque[p]||0}</span></button>`).join("");$("bbN").textContent=`${sel} ×${estoque[sel]||0}`}
-$("arsenal").addEventListener("click",e=>{const b=e.target.closest("[data-p]");if(b){sel=+b.dataset.p;drawArsenal()}});
+ $("pw").textContent=`💣${cap} 🔥+${fogo}`+(escudo?" 🛡️":"")+Object.keys(cartas).filter(k=>!["bomba","fogo","coracao","escudo"].includes(k)).map(k=>" "+CARTAS[k].ic).join("");
+ const d=DEC(REC.best).arena;$("hRec").textContent=Math.max(d,concluidas)||"—";$("bDet").hidden=!nivel("detona");drawMissoes()}
+function drawArsenal(){const pr=primosDa(arena),comp=!TIPO[sel],fs=fatDist(sel);
+ let h=pr.map((p,i)=>`<button data-p="${p}" style="--bc:${TIPO[p].css}" aria-pressed="${comp?fs.includes(p):p==sel}" class="${estoque[p]?"":"zero"}" aria-label="Bomba ${p}, ${estoque[p]||0} no estoque"><kbd>${i+1}</kbd><b>${p}</b><span>×${estoque[p]||0}</span></button>`).join("");
+ if(podeCompor())h+=`<button data-x="1" class="x${combinando?" on":""}${comp&&!estoqueDe(sel)?" zero":""}" style="--bc:#ffd24a" aria-pressed="${comp}" aria-label="Bomba composta"><kbd>X</kbd>${comp?`<b>${sel}</b><span>${fs.join("×")} · ×${estoqueDe(sel)}</span>`:`<b>×</b><span>${combinando?"escolha 2":"juntar"}</span>`}</button>`;
+ $("arsenal").innerHTML=h;$("bbN").textContent=`${sel} ×${estoqueDe(sel)}`}
+$("arsenal").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.x)alternaCombinar();else if(b.dataset.p)escolhePrimo(+b.dataset.p)});
 function ganhou(p){drawArsenal();const b=$("arsenal").querySelector(`[data-p="${p}"]`);if(b){b.classList.remove("ganhou");void b.offsetWidth;b.classList.add("ganhou")}}
 
 /* ---------- bombas e explosões ---------- */
 function colocar(){if(state!="play")return;const c=Math.round(P.x),r=Math.round(P.y);
  if(bombaEm(c,r))return;if(bombas.length>=cap){toast(`Só ${cap} bomba${cap>1?"s":""} por vez`,"no");return}
- if(!estoque[sel]){const outro=primosDa(arena).find(p=>estoque[p]);toast(`Sem bombas ${sel}!<small>${outro?"Troque de bomba ou pegue fichas.":"Pegue as fichas que as caixas soltam."}</small>`,"no");return}
- estoque[sel]--;drawArsenal();const T=TIPO[sel],Gb=new THREE.Group();
+ if(!estoqueDe(sel)){const outro=primosDa(arena).find(p=>estoque[p]);toast(`Sem bombas ${sel}!<small>${!TIPO[sel]?"Falta ficha de algum fator.":outro?"Troque de bomba ou pegue fichas.":"Pegue as fichas que as caixas soltam."}</small>`,"no");return}
+ const T=tipoDe(sel);if(T.comp){T.comp.forEach(p=>estoque[p]--);soma("comp");checaConq()}else estoque[sel]--;drawArsenal();const Gb=new THREE.Group();
  const esf=new THREE.Mesh(new THREE.SphereGeometry(.3,20,16),M(0x15182a,{roughness:.25,metalness:.4}));esf.position.y=.3;esf.castShadow=true;Gb.add(esf);
  const an=new THREE.Mesh(new THREE.TorusGeometry(.3,.05,8,28),M(T.cor,{emissive:T.cor,emissiveIntensity:.6}));an.rotation.x=Math.PI/2;an.position.y=.3;Gb.add(an);
  const pav=glow(0xffb24d,.9,.5);pav.position.y=.68;Gb.add(pav);const nb=badge(sel,{bd:T.css,fg:T.css,k:.55});nb.position.y=1;Gb.add(nb);
- Gb.position.set(wx(c),0,wz(r));scene.add(Gb);bombas.push({c,r,d:sel,alc:T.alc+fogo,t:FUSE,G:Gb,esf,pav,saindo:true});SFX.poe()}
+ if(T.comp){const an2=an.clone();an2.rotation.x=0;an2.rotation.y=Math.PI/2;Gb.add(an2)}
+ const fuse=nivel("pavio")?1.7:FUSE;Gb.position.set(wx(c),0,wz(r));scene.add(Gb);bombas.push({c,r,d:sel,alc:T.alc+fogo,t:fuse,fuse,fura:!!T.comp||nivel("perfura")>0,G:Gb,esf,pav,saindo:true});SFX.poe()}
 /* raio da explosão: em cruz, para em pilar e na primeira caixa de cada direção */
-function raio(b){const cells=[[b.c,b.r]],toques=[];for(const [dc,dr] of DIRS)for(let k=1;k<=b.alc;k++){const c=b.c+dc*k,r=b.r+dr*k;if(G[r][c]==1)break;if(caixa[r][c]){toques.push([c,r]);break}cells.push([c,r])}return {cells,toques}}
+function raio(b){const cells=[[b.c,b.r]],toques=[];for(const [dc,dr] of DIRS)for(let k=1;k<=b.alc;k++){const c=b.c+dc*k,r=b.r+dr*k;if(G[r][c]==1)break;if(caixa[r][c]){toques.push([c,r]);if(b.fura&&caixa[r][c].n%b.d==0)continue;break}cells.push([c,r])}return {cells,toques}}
 function explodir(b){if(b.feita)return;b.feita=true;bombas.splice(bombas.indexOf(b),1);dispose(b.G);
  const {cells,toques}=raio(b),id=++expId;killsExp[id]=0;let alvos=0,errou=0;SFX.bum(b.d);shake=Math.max(shake,.25);
  for(const [c,r] of toques){const cx=caixa[r][c];
@@ -379,21 +502,23 @@ function explodir(b){if(b.feita)return;b.feita=true;bombas.splice(bombas.indexOf
   const ob=bombaEm(c,r);if(ob&&!ob.feita)ob.t=Math.min(ob.t,.08);
   if(portal&&portal.vis&&portal.c==c&&portal.r==r&&portal.exp!=id)acordaPortal()}
  for(const rb of [...robos])if(cells.some(([c,r])=>c==celR(rb)[0]&&r==celR(rb)[1]))if(atingir(rb,b.d,id))alvos++;
- if(errou&&!alvos)stats.erro++;
+ if(errou&&!alvos){stats.erro++;mis.desp++}
+ maxTot("comboMax",alvos);if(alvos>mis.combo)mis.combo=alvos;if(alvos&&!TIPO[b.d])mis.comp=1;
  if(alvos>=2){const bonus=40*alvos;pts+=bonus;toast(`COMBO ×${alvos}!<small style="color:#ffd24a">+${bonus} pts</small>`,"lv");SFX.combo()}
- drawHud()}
-function fogoVisual(c,r,d){const g=new THREE.Group(),col=TIPO[d].cor;
+ drawHud();checaConq()}
+function fogoVisual(c,r,d){const g=new THREE.Group(),col=tipoDe(d).cor;
  const core=new THREE.Mesh(new THREE.BoxGeometry(.9,.55,.9),new THREE.MeshBasicMaterial({color:0xffb347,transparent:true,opacity:.95,depthWrite:false}));core.position.y=.3;g.add(core);
  const gl=glow(0xffe07a,1,1.9),gl2=glow(col,.8,1.3);gl.position.y=.4;gl2.position.y=.5;g.add(gl,gl2);g.position.set(wx(c),0,wz(r));scene.add(g);return g}
-function quebraCaixa(c,r,d){const cx=caixa[r][c],n=cx.n,pos=new THREE.Vector3(wx(c),.6,wz(r));tiraCaixa(c,r);stats.cx++;pts+=10;burst(pos,0xc98a4b,12);
- soltaFatores(n,d,c,r);
+function quebraCaixa(c,r,d){const cx=caixa[r][c],n=cx.n,pos=new THREE.Vector3(wx(c),.6,wz(r));tiraCaixa(c,r);stats.cx++;soma("cx");pts+=10;burst(pos,0xc98a4b,12);
+ soltaFatores(n,d,c,r);if(nivel("recicla")&&Math.random()<1/3){poeFichas(fatDist(d),c,r,.35);floatTxt("♻ bomba de volta",pos.clone().setY(2),"#5ef08a")}
  if(cx.esconde=="portal"){portal=novoPortal(c,r);portal.exp=expId}else if(cx.esconde)novoPoder(cx.esconde,c,r)}
 /* o coração da economia: n ÷ d sobra; os fatores primos do que sobrou viram fichas de bomba */
 function soltaFatores(n,d,c,r){const q=n/d;if(q<2)return;const fs=fatora(q).filter(p=>TIPO[p]).slice(0,3);
- floatTxt(fs.length?`${n} ÷ ${d} = ${q}${fs.length>1?" = "+fs.join(" × "):""}`:`${n} ÷ ${d} = ${q}`,new THREE.Vector3(wx(c),1.5,wz(r)),TIPO[d].css);
- fs.forEach((p,i)=>{const Gf=new THREE.Group(),coin=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.06,20),M(0xffd24a,{metalness:.7,roughness:.25,emissive:0x664400,emissiveIntensity:.3}));coin.rotation.x=Math.PI/2;coin.position.y=.35;Gf.add(coin);
-  const s=badge("+"+p,{bd:TIPO[p].css,fg:TIPO[p].css,k:.5});s.position.y=.75;Gf.add(s);const off=fs.length>1?(i-(fs.length-1)/2)*.4:0;Gf.position.set(wx(c)+off,0,wz(r));scene.add(Gf);fichas.push({c,r,p,G:Gf,coin,t:15,ph:Math.random()*6})});
+ floatTxt(fs.length?`${n} ÷ ${d} = ${q}${fs.length>1?" = "+fs.join(" × "):""}`:`${n} ÷ ${d} = ${q}`,new THREE.Vector3(wx(c),1.5,wz(r)),tipoDe(d).css);
+ poeFichas(fs,c,r,0);
  if(fs.length&&!visto.has("ficha")){visto.add("ficha");dica(`Viu as fichas? <b>${n} ÷ ${d} = ${q}</b>${fs.length>1?" = <b>"+fs.join(" × ")+"</b>":""}. Os fatores do que sobrou viram <b>bombas novas</b>: passe por cima para pegar. Escolher bem qual bomba usar rende mais munição!`)}}
+function poeFichas(fs,c,r,dz){fs.forEach((p,i)=>{const Gf=new THREE.Group(),coin=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.06,20),M(0xffd24a,{metalness:.7,roughness:.25,emissive:0x664400,emissiveIntensity:.3}));coin.rotation.x=Math.PI/2;coin.position.y=.35;Gf.add(coin);
+  const s=badge("+"+p,{bd:TIPO[p].css,fg:TIPO[p].css,k:.5});s.position.y=.75;Gf.add(s);const off=fs.length>1?(i-(fs.length-1)/2)*.4:0;Gf.position.set(wx(c)+off,0,wz(r)+dz);scene.add(Gf);fichas.push({c,r,x:c+off,y:r+dz,p,G:Gf,coin,t:15,ph:Math.random()*6})})}
 function novoPoder(tipo,c,r){const D=PODER[tipo],Gp=new THREE.Group(),cubo=new THREE.Mesh(new THREE.BoxGeometry(.42,.42,.42),M(0xffffff,{emissive:new THREE.Color(D.cor),emissiveIntensity:.5}));cubo.position.y=.4;Gp.add(cubo);
  const s=badge(D.txt,{bd:D.cor,k:.55,w:300});s.position.y=.95;Gp.add(s);Gp.position.set(wx(c),0,wz(r));scene.add(Gp);poderes.push({tipo,c,r,G:Gp,cubo})}
 function novoPortal(c,r){const Gp=new THREE.Group(),anel=new THREE.Mesh(new THREE.TorusGeometry(.38,.07,10,32),M(0xff5a64,{emissive:0xff2a3a,emissiveIntensity:.6}));anel.position.y=.5;Gp.add(anel);
@@ -406,10 +531,10 @@ function acordaPortal(){if(portal.acorda>0||robos.length>=10)return;portal.acord
 const celR=rb=>rb.p<.5?[rb.c,rb.r]:[rb.tc,rb.tr];
 /* robô atingido: comum é destruído se o número é múltiplo; Blindado e Guardião têm o número DIVIDIDO */
 function atingir(rb,d,id){if(!rb.vivo||rb.ult==id||rb.invul>0)return false;rb.ult=id;const D=ROB[rb.tipo],pos=rb.G.position.clone().setY(1.6);
- if(rb.n%d!=0){rb.atord=1.6;floatTxt(`${rb.n} ÷ ${d} não dá: só tonteou`,pos,"#ff5a64");return false}
- if(D.divide){const a=rb.n;rb.n/=d;floatTxt(`${a} ÷ ${d} = ${rb.n}`,pos,TIPO[d].css);if(rb.n>1){setNumRobo(rb);SFX.div();return true}matarRobo(rb,id,1,1);return true}
+ if(rb.n%d!=0){rb.atord=nivel("tontura")?4:1.6;floatTxt(`${rb.n} ÷ ${d} não dá: só tonteou`,pos,"#ff5a64");return false}
+ if(D.divide){const a=rb.n;rb.n/=d;floatTxt(`${a} ÷ ${d} = ${rb.n}`,pos,tipoDe(d).css);if(rb.n>1){setNumRobo(rb);SFX.div();return true}matarRobo(rb,id,1,1);return true}
  matarRobo(rb,id,d,rb.n);return true}
-function matarRobo(rb,id,d,n){rb.vivo=false;robos.splice(robos.indexOf(rb),1);stats.rob++;killsExp[id]=(killsExp[id]||0)+1;const k=killsExp[id],ganho=ROB[rb.tipo].pts*Math.pow(2,k-1);pts+=ganho;
+function matarRobo(rb,id,d,n){rb.vivo=false;robos.splice(robos.indexOf(rb),1);stats.rob++;soma("rob");if(rb.tipo=="b")soma("blind");if(rb.tipo=="g")soma("guard");killsExp[id]=(killsExp[id]||0)+1;const k=killsExp[id],ganho=ROB[rb.tipo].pts*Math.pow(2,k-1);pts+=ganho;
  burst(rb.G.position.clone().setY(.6),ROB[rb.tipo].cor,26);floatTxt(`+${ganho}`,rb.G.position.clone().setY(2),"#ffd24a");dispose(rb.G);SFX.kill();
  if(d>1)soltaFatores(n,d,rb.c,rb.r);atualizaPortal();drawHud()}
 
@@ -418,6 +543,7 @@ const podeEntrar=(c,r)=>ehChao(c,r)&&!caixa[r][c]&&!(bombaEm(c,r)&&!bombaEm(c,r)
 let dirIn=[0,0];
 function mover(dt){const [dx,dy]=dirIn;if(!dx&&!dy){P.anda=0;return}const v=(3.1+patins*.9)*dt;P.anda=1;P.face=Math.atan2(dx,dy);
  if(dx){alinha("y","x",dx,v)}else alinha("x","y",dy,v);
+ if(nivel("chute")){const mc=Math.round(P.x),mr=Math.round(P.y),b=bombaEm(mc+dx,mr+dy);if(b&&!b.saindo&&!b.mov&&Math.abs(P.x-mc)<.12&&Math.abs(P.y-mr)<.12){b.mov=[dx,dy];b.movT=0;SFX.poe()}}
  bombas.forEach(b=>{if(b.saindo&&(Math.abs(P.x-b.c)>.85||Math.abs(P.y-b.r)>.85))b.saindo=false})}
 /* eixo principal "m" (para onde anda), eixo lateral "l" (precisa estar alinhado ao corredor) */
 function alinha(l,m,s,v){const cel=(a,b)=>m=="x"?[a,b]:[b,a];const cm=Math.round(P[m]);
@@ -428,7 +554,7 @@ function alinha(l,m,s,v){const cel=(a,b)=>m=="x"?[a,b]:[b,a];const cm=Math.round
  /* parede: só centraliza */
  const n=P[m]+s*v;P[m]=s>0?Math.min(n,cm):Math.max(n,cm)}
 function posBip(){BIP.g.position.set(wx(P.x),0,wz(P.y))}
-function machuca(porque){if(invul>0||state!="play")return;
+function machuca(porque){if(invul>0||state!="play")return;mis.dano++;
  if(escudo){escudo=false;invul=1.5;toast("O escudo te salvou!","ok");drawHud();return}
  vidas--;invul=2.6;stats.morte=stats.morte||{};stats.morte[porque]=(stats.morte[porque]||0)+1;shake=.5;SFX.dano();const f=$("flash");f.classList.add("on");setTimeout(()=>f.classList.remove("on"),80);drawHud();
  if(vidas<=0){state="over";registrar();setTimeout(fim,1100);return}
@@ -463,29 +589,54 @@ function confereMunicao(dt){const pr=primosDa(arena),total=pr.reduce((s,p)=>s+(e
 /* ---------- laço do jogo ---------- */
 function step(dt){
  invul=Math.max(0,invul-dt);mover(dt);posBip();
- for(const b of [...bombas]){b.t-=dt;const k=1+Math.sin((FUSE-b.t)*(b.t<.8?22:9))*.06;b.esf.scale.setScalar(k);b.pav.material.opacity=.5+Math.random()*.5;if(b.t<=0)explodir(b)}
+ mis.t+=dt;if(Math.floor(mis.t)!=Math.floor(mis.t-dt))drawMissoes();
+ for(const b of bombas)if(b.mov){b.movT+=dt;while(b.movT>=.11){b.movT-=.11;const nc=b.c+b.mov[0],nr=b.r+b.mov[1];
+   if(ehChao(nc,nr)&&!caixa[nr][nc]&&!bombaEm(nc,nr)&&!robos.some(rb=>{const [a,q]=celR(rb);return a==nc&&q==nr})&&!(Math.round(P.x)==nc&&Math.round(P.y)==nr)){b.c=nc;b.r=nr;b.G.position.set(wx(nc),0,wz(nr))}else{b.mov=null;break}}}
+ for(const b of [...bombas]){b.t-=dt;const k=1+Math.sin((b.fuse-b.t)*(b.t<.8?22:9))*.06;b.esf.scale.setScalar(k);b.pav.material.opacity=.5+Math.random()*.5;if(b.t<=0)explodir(b)}
  for(const f of [...chamas]){f.t-=dt;f.G.children[0].material.opacity=Math.max(0,f.t/CHAMA)*.85;f.G.children[1].material.opacity=Math.max(0,f.t/CHAMA);
   for(const rb of [...robos]){const [c,r]=celR(rb);if(c==f.c&&r==f.r)atingir(rb,f.d,f.id)}
   if(f.t<=0){dispose(f.G);chamas.splice(chamas.indexOf(f),1)}}
  const bc=Math.round(P.x),br=Math.round(P.y);if(chamas.some(f=>f.c==bc&&f.r==br))machuca("fogo");
  if(state!="play")return;
  passoRobos(dt);if(state!="play")return;
- for(const fi of [...fichas]){fi.t-=dt;if(fi.c==bc&&fi.r==br){fichas.splice(fichas.indexOf(fi),1);dispose(fi.G);if((estoque[fi.p]||0)<CAP){estoque[fi.p]=(estoque[fi.p]||0)+1;ganhou(fi.p)}else pts+=5;SFX.ficha();drawHud();continue}
+ for(const fi of [...fichas]){fi.t-=dt;let dd=Math.hypot(fi.x-P.x,fi.y-P.y);
+  if(nivel("ima")&&dd<2.8&&dd>.01){const v=Math.min(dd,6*dt);fi.x+=(P.x-fi.x)/dd*v;fi.y+=(P.y-fi.y)/dd*v;fi.G.position.x=wx(fi.x);fi.G.position.z=wz(fi.y);dd=Math.hypot(fi.x-P.x,fi.y-P.y)}
+  if(dd<.5){fichas.splice(fichas.indexOf(fi),1);dispose(fi.G);soma("fichas");mis.fichas++;if((estoque[fi.p]||0)<CAP){estoque[fi.p]=(estoque[fi.p]||0)+1;ganhou(fi.p)}else pts+=5;SFX.ficha();drawHud();continue}
   if(fi.t<=0){fichas.splice(fichas.indexOf(fi),1);dispose(fi.G)}else fi.G.visible=fi.t>3||Math.floor(fi.t*6)%2==0}
  for(const po of [...poderes])if(po.c==bc&&po.r==br){poderes.splice(poderes.indexOf(po),1);dispose(po.G);SFX.ficha();
   if(po.tipo=="bomba")cap=Math.min(4,cap+1);else if(po.tipo=="fogo")fogo=Math.min(3,fogo+1);else if(po.tipo=="patins")patins=1;else escudo=true;toast(PODER[po.tipo].txt+"!","ok");drawHud()}
  if(portal){portal.acorda=Math.max(0,portal.acorda-dt);if(portal.aberto&&portal.c==bc&&portal.r==br)venceArena()}
  confereMunicao(dt)}
-function venceArena(){concluidas++;const bonus=300*arena;pts+=bonus;registrar();SFX.lv();toast(`Arena ${arena} vencida!<small style="color:#ffd24a">+${bonus} pts</small>`,"ok",true);
- arena++;if(arena%3==1&&vidas<5){vidas++}montarArena(arena)}
+function venceArena(){concluidas++;mis.fim=true;mis.guardou=totalBombas()>=6;
+ const est=1+mis.ids.filter(k=>MISSAO[k].st(mis)=="ok").length;drawMissoes();
+ if(!mis.desp)soma("limpas");if(est==3)soma("tres");REC.estrelas+=est;estrelasJogo+=est;maxTot("arenaMax",concluidas);
+ const bonus=300*arena+100*(est-1);pts+=bonus;registrar();SFX.lv();
+ const rec=bestIni>0&&concluidas>bestIni&&!avisouRec;if(rec)avisouRec=true;
+ toast(`${rec?"🏆 NOVO RECORDE!<br>":""}Arena ${arena}: ${"★".repeat(est)}${"☆".repeat(3-est)}<small style="color:#ffd24a">+${bonus} pts</small>`,"ok",true);checaConq();
+ arena++;if(arena%3==1&&vidas<5)vidas++;
+ if(concluidas%2==0){state="carta";dirIn=[0,0];pilha.length=0;setTimeout(mostraCartas,1100)}else montarArena(arena)}
+function mostraCartas(){const ok=Object.keys(CARTAS).filter(k=>(!CARTAS[k].req||REC.conq[CARTAS[k].req])&&nivel(k)<CARTAS[k].max).sort(()=>Math.random()-.5).slice(0,3);
+ if(!ok.length){state="play";montarArena(arena);return}
+ $("cartas").innerHTML=ok.map((k,i)=>{const C=CARTAS[k];return `<button class="carta" data-c="${k}"><kbd>${i+1}</kbd><i aria-hidden="true">${C.ic}</i><b>${C.n}</b><span>${C.d}</span><em>${nivel(k)?`nível ${nivel(k)+1}`:C.req?"✨ nova!":"nova"}</em></button>`}).join("");
+ $("sCarta").hidden=false;const b=$("cartas").querySelector("button");b&&b.focus()}
+function escolheCarta(k){if(state!="carta"||!CARTAS[k])return;cartas[k]=nivel(k)+1;
+ if(k=="bomba")cap++;else if(k=="fogo")fogo++;else if(k=="patins")patins++;else if(k=="coracao")vidas++;else if(k=="escudo")escudo=true;
+ $("sCarta").hidden=true;state="play";montarArena(arena);toast(`${CARTAS[k].ic} ${CARTAS[k].n}!`,"ok");SFX.abre()}
+$("cartas").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(b)escolheCarta(b.dataset.c)});
 function fim(){state="end";$("hud").hidden=true;$("eT").textContent=concluidas?`${concluidas} ${concluidas==1?"arena vencida":"arenas vencidas"}`:"Arena 1";$("eSub").textContent=`Fim de jogo na arena ${arena}`;
  $("ePts").textContent=nf(pts);$("ePtsL").textContent=novoRec?"pontos · novo recorde!":"pontos";$("eRob").textContent=stats.rob;$("eCx").textContent=stats.cx;
- $("eErro").textContent=stats.erro?`Bombas desperdiçadas (só bateram em número que não era múltiplo): ${stats.erro}. Escolher a bomba certa poupa munição!`:"Nenhuma bomba gasta à toa. Mandou bem!";drawRec();$("sEnd").hidden=false;$("bNovo").focus()}
-function novoJogo(){arena=1;concluidas=0;pts=0;vidas=3;estoque={};sel=2;cap=1;fogo=0;patins=0;escudo=false;stats={rob:0,cx:0,erro:0};novoRec=false;visto=new Set();
+ $("eErro").textContent=stats.erro?`Bombas desperdiçadas (só bateram em número que não era múltiplo): ${stats.erro}. Escolher a bomba certa poupa munição!`:"Nenhuma bomba gasta à toa. Mandou bem!";
+ const falta=bestIni-concluidas;$("eRec").innerHTML=novoRec&&concluidas>bestIni?`<span class="newrec">🏆 Novo recorde!</span>`:bestIni&&falta>=0?(falta==0?`Igualou o seu recorde de <b>${bestIni}</b> ${bestIni==1?"arena":"arenas"}! Mais uma e ele é seu.`:`Faltou <b>${falta}</b> ${falta==1?"arena":"arenas"} para o seu recorde (${bestIni}).`):"";
+ $("eEst").textContent=`★ ${estrelasJogo} ${estrelasJogo==1?"estrela":"estrelas"} nesta partida · ${REC.estrelas} no total`;
+ $("eConq").innerHTML=novasConq.map(c=>`<span>🏅 ${c.n}${c.lib?` → carta <b>${CARTAS[c.lib].n}</b>`:""}</span>`).join("");$("eConq").hidden=!novasConq.length;
+ const pc=proximaConq();$("eProx").innerHTML=pc?`Próxima conquista: <b>${pc.c.n}</b>: ${pc.c.d} (${nf(pc.v)}/${nf(pc.c.alvo)})${pc.c.lib?`, libera a carta <b>${CARTAS[pc.c.lib].n}</b>`:""}`:"Você liberou todas as conquistas!";
+ drawRec();$("sEnd").hidden=false;$("bNovo").focus()}
+function novoJogo(){arena=1;concluidas=0;pts=0;vidas=3;estoque={};sel=2;cap=1;fogo=0;patins=0;escudo=false;stats={rob:0,cx:0,erro:0};novoRec=false;visto=REC.partidas>2?new Set(["ini"]):new Set();
+ cartas={};combinando=false;novasConq=[];estrelasJogo=0;avisouRec=false;bestIni=DEC(REC.best).arena;REC.partidas=(REC.partidas||0)+1;salvaREC();["sCarta"].forEach(id=>$(id).hidden=true);
  ["sStart","sEnd","sPause"].forEach(id=>$(id).hidden=true);$("hud").hidden=false;state="play";montarArena(1)}
 
 /* ---------- zona de perigo (cruz laranja) ---------- */
-function drawPerigo(t){let i=0;for(const b of bombas){const {cells}=raio(b),k=1-b.t/FUSE;for(const [c,r] of cells){if(i>=perigo.length)break;const z=perigo[i++];z.visible=true;z.position.x=wx(c);z.position.z=wz(r);z.material.opacity=.18+.32*k+Math.sin(t*12)*.06*k}}
+function drawPerigo(t){let i=0;for(const b of bombas){const {cells}=raio(b),k=1-b.t/b.fuse;for(const [c,r] of cells){if(i>=perigo.length)break;const z=perigo[i++];z.visible=true;z.position.x=wx(c);z.position.z=wz(r);z.material.opacity=.18+.32*k+Math.sin(t*12)*.06*k}}
  for(;i<perigo.length;i++)perigo[i].visible=false}
 
 /* ---------- som ---------- */
@@ -501,9 +652,14 @@ function dirDoTeclado(){const k=pilha[pilha.length-1];dirIn=k?TECLAS[k]:[0,0]}
 document.addEventListener("keydown",e=>{const k=e.key.toLowerCase();
  if(k in TECLAS){e.preventDefault();if(!pilha.includes(k))pilha.push(k);dirDoTeclado();return}
  if(e.repeat)return;
+ if(state=="carta"&&/^[1-3]$/.test(k)){const b=$("cartas").querySelectorAll("[data-c]")[+k-1];if(b)escolheCarta(b.dataset.c);return}
+ if(state=="end"&&(k=="r"||k=="enter")){e.preventDefault();novoJogo();return}
+ if(k=="r"&&state=="pause"){pausar(false);novoJogo();return}
  if(k==" "){e.preventDefault();colocar();return}
- const pr=primosDa(arena);if(/^[1-4]$/.test(k)&&pr[+k-1]){sel=pr[+k-1];drawArsenal();return}
- if(k=="q"||k=="e"){const i=pr.indexOf(sel);sel=pr[(i+(k=="e"?1:pr.length-1))%pr.length];drawArsenal();return}
+ if(k=="x"){alternaCombinar();return}
+ if(k=="z"){detonar();return}
+ const pr=primosDa(arena);if(/^[1-4]$/.test(k)&&pr[+k-1]){escolhePrimo(pr[+k-1]);return}
+ if(k=="q"||k=="e"){combinando=false;const i=Math.max(0,pr.indexOf(sel));sel=pr[(i+(k=="e"?1:pr.length-1))%pr.length];drawArsenal();return}
  if(k=="p"||k=="escape"){state=="pause"?pausar(false):pausar(true)}});
 document.addEventListener("keyup",e=>{const k=e.key.toLowerCase(),i=pilha.indexOf(k);if(i>=0){pilha.splice(i,1);dirDoTeclado()}});
 addEventListener("blur",()=>{pilha.length=0;dirIn=[0,0]});
@@ -516,6 +672,9 @@ addEventListener("touchstart",ativaToque,{passive:true,once:true});
  J.addEventListener("pointerdown",e=>{id=e.pointerId;J.setPointerCapture(id);upd(e)});J.addEventListener("pointermove",e=>{if(e.pointerId==id)upd(e)});
  const solta=e=>{if(e.pointerId!=id)return;id=null;K.style.transform="";dirIn=[0,0]};J.addEventListener("pointerup",solta);J.addEventListener("pointercancel",solta)}
 $("bBomba").addEventListener("pointerdown",e=>{e.preventDefault();colocar()});
+function detonar(){if(state!="play"||!nivel("detona")||!bombas.length)return;bombas[0].t=0}
+$("bDet").addEventListener("pointerdown",e=>{e.preventDefault();detonar()});
+$("bRestart").onclick=()=>{pausar(false);novoJogo()};
 let antesPausa=null;
 function pausar(v){if(v&&state=="play"){antesPausa=state;state="pause";$("sPause").hidden=false;$("bResume").focus()}else if(!v&&state=="pause"){state=antesPausa;$("sPause").hidden=true;last=performance.now()}}
 $("bPause").onclick=()=>pausar(true);$("bResume").onclick=()=>pausar(false);
