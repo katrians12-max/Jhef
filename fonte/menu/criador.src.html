@@ -1,0 +1,194 @@
+<title>Painel do criador · Mundo do Bip</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@600&display=swap">
+<style>
+/* Painel do criador: só abre para a conta que está na tabela "criadores" (o banco confere). */
+:root{
+ --bg:#e8edf4;--panel:#ffffff;--ink:#172536;--muted:#586779;--line:#c3cedc;--soft:#f0f4f9;--grid:#dde4ee;
+ --bip:#f2c230;--run:#ee5f2b;--rundk:#b9441c;--turn:#6b4fd8;--bar:#6b4fd8;--barhi:#4f35b8;--good:#1b9a52;--bad:#d23f45;--warn:#b86f00;
+ --display:"Baloo 2",system-ui,sans-serif;--body:"Atkinson Hyperlegible",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1520;--panel:#172130;--ink:#e8eef6;--muted:#9aa9bb;--line:#2c3a4d;--soft:#111a27;--grid:#243142;--bar:#9b84ff;--barhi:#c2b3ff;--turn:#a995ff;--good:#38c172;--bad:#ff6b70;--warn:#f0a53a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1520;--panel:#172130;--ink:#e8eef6;--muted:#9aa9bb;--line:#2c3a4d;--soft:#111a27;--grid:#243142;--bar:#9b84ff;--barhi:#c2b3ff;--turn:#a995ff;--good:#38c172;--bad:#ff6b70;--warn:#f0a53a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+ padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid var(--run);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.wrap{max-width:1140px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top .logo{color:var(--ink);line-height:0}.top .logo svg{width:170px;height:auto}
+.top .who{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.92rem}
+.badge{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--turn);border:1px solid currentColor;border-radius:99px;padding:2px 10px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:7px 14px;font-weight:700;text-decoration:none;color:var(--ink);font-size:.92rem}
+.btn.main{background:var(--run);border-color:var(--run);color:#fff;box-shadow:0 3px 0 var(--rundk)}
+.msg{text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.msg h2{font-size:1.6rem}.msg p{margin:0;color:var(--muted);max-width:52ch}
+.bar1{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bar1 h1{font-size:clamp(1.6rem,4vw,2.2rem)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:none;padding:7px 14px;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--turn);color:#fff}
+.upd{color:var(--muted);font-size:.85rem;margin-left:auto}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .k{font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-family:var(--display);font-weight:800;font-size:2.1rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:.85rem;color:var(--muted)}
+.kpi .s b{color:var(--ink)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.panel h2{font-size:1.25rem;margin-bottom:4px}
+.panel .hint{margin:0 0 12px;color:var(--muted);font-size:.88rem}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .gl{stroke:var(--grid);stroke-width:1}
+.chart .ax{fill:var(--muted);font-size:11px;font-family:var(--body)}
+.chart .b{fill:var(--bar)}.chart .hit:hover+.b,.chart .b.on{fill:var(--barhi)}
+.chart .hit{fill:transparent;cursor:default}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--panel);font-size:.82rem;padding:6px 10px;border-radius:10px;white-space:nowrap;transform:translate(-50%,calc(-100% - 8px));opacity:0;transition:opacity .1s}
+.tip.on{opacity:1}.tip b{display:block}
+.jg{display:flex;flex-direction:column;gap:10px}
+.jg .row{display:grid;grid-template-columns:minmax(0,9.5rem) minmax(0,1fr) auto;gap:10px;align-items:center}
+.jg .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jg .tr{height:14px;border-radius:0 4px 4px 0;background:var(--soft)}
+.jg .tr i{display:block;height:100%;background:var(--bar);border-radius:0 4px 4px 0;min-width:2px}
+.jg .vl{font-variant-numeric:tabular-nums;font-size:.88rem;color:var(--muted);text-align:right;white-space:nowrap}
+.jg .vl b{color:var(--ink)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.92rem}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr:last-child td{border-bottom:0}
+.sub{color:var(--muted);font-size:.82rem}
+.pill{display:inline-block;font-size:.78rem;font-weight:700;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.pill.on{border-color:var(--good);color:var(--good)}
+.feed{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.feed li{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--line)}
+.feed li:last-child{border-bottom:0}
+.feed .t{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:1px 8px;border-radius:99px;background:var(--soft);color:var(--muted);flex:none}
+.feed .t.p{color:var(--run)}
+.feed .q{margin-left:auto;color:var(--muted);font-size:.82rem;white-space:nowrap}
+.empty{color:var(--muted);text-align:center;padding:22px 10px;margin:0}
+.nota{color:var(--muted);font-size:.84rem;margin:0}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}.upd{margin-left:0;width:100%}}
+@media (max-width:420px){.kpi .v{font-size:1.7rem}.jg .row{grid-template-columns:minmax(0,1fr) auto}.jg .tr{grid-column:1/-1;order:3}}
+</style>
+<div class="wrap">
+ <header class="top"><a class="logo" href="./" aria-label="Mundo do Bip: voltar ao início"><!--LOGO--></a><span class="badge">Painel do criador</span>
+  <div class="who" id="who" hidden><span id="whoMail"></span><a class="btn" href="professor.html">← Área do professor</a></div></header>
+
+ <div class="panel msg" id="msg"><h2 id="msgT">Abrindo o painel…</h2><p id="msgP"></p><div id="msgA"></div></div>
+
+ <main id="painel" hidden style="display:flex;flex-direction:column;gap:16px">
+  <div class="bar1">
+   <h1>Como está o Mundo do Bip</h1>
+   <div class="seg" role="group" aria-label="Período">
+    <button data-d="1" aria-pressed="false">Hoje</button><button data-d="7" aria-pressed="false">7 dias</button><button data-d="30" aria-pressed="true">30 dias</button><button data-d="90" aria-pressed="false">90 dias</button>
+   </div>
+   <button class="btn" id="bAtu">↻ Atualizar</button>
+   <span class="upd" id="upd" aria-live="polite"></span>
+  </div>
+
+  <section class="kpis" id="kpis" aria-label="Números principais"></section>
+
+  <div class="grid2">
+   <section class="panel"><h2>Acessos por dia</h2><p class="hint">Aparelhos diferentes que abriram o site em cada dia.</p><div class="chart" id="chA"></div></section>
+   <section class="panel"><h2>Minutos jogados por dia</h2><p class="hint">Só conta enquanto alguém está mexendo no jogo.</p><div class="chart" id="chM"></div></section>
+  </div>
+
+  <div class="grid2">
+   <section class="panel"><h2>Jogos mais jogados</h2><p class="hint" id="jgHint"></p><div class="jg" id="jogos"></div></section>
+   <section class="panel"><h2>Cadastros recentes</h2><p class="hint">Novos alunos de turma e novos professores.</p><ul class="feed" id="feed"></ul></section>
+  </div>
+
+  <section class="panel"><h2>Professores</h2><p class="hint">Quem criou conta na Área do professor.</p><div class="tbl" id="tProf"></div></section>
+  <section class="panel"><h2>Turmas</h2><p class="hint">Todas as turmas criadas, da mais nova para a mais antiga.</p><div class="tbl" id="tTur"></div></section>
+
+  <p class="nota">Como é contado: cada navegador recebe um número sorteado e conta como 1 aparelho (não guardamos nome, apelido nem e-mail de quem joga no modo normal). Acessos e tempo de jogo começaram a ser contados quando este painel foi ligado; os cadastros de turma e de professor contam desde o começo.</p>
+ </main>
+</div>
+
+<script>/*BIPV*/</script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const nf=n=>Number(n||0).toLocaleString("pt-BR");
+const hm=s=>{const m=Math.round((+s||0)/60);if(m<60)return m+" min";const h=Math.floor(m/60);return h+" h"+(m%60?" "+(m%60)+" min":"")};
+const dm=d=>{const [y,m,dd]=String(d).slice(0,10).split("-");return dd+"/"+m};
+const DIAS_SEM=["dom","seg","ter","qua","qui","sex","sáb"];
+const diaLongo=d=>{const x=new Date(String(d).slice(0,10)+"T12:00:00");return DIAS_SEM[x.getDay()]+", "+dm(d)};
+function quando(ts){if(!ts)return "nunca";const s=(Date.now()-new Date(ts))/1000;
+ if(s<90)return "agora";if(s<3600)return "há "+Math.round(s/60)+" min";if(s<86400)return "há "+Math.round(s/3600)+" h";
+ const d=Math.round(s/86400);return d==1?"ontem":d<30?"há "+d+" dias":new Date(ts).toLocaleDateString("pt-BR")}
+let ses=ls.get("bipsite-prof"),dias=30,D=null,carregando=false,quandoAtu=0;
+
+function msg(t,p,acao){$("painel").hidden=true;$("msg").hidden=false;$("msgT").textContent=t;$("msgP").textContent=p||"";$("msgA").innerHTML=acao||""}
+async function token(){if(!ses||!ses.refresh_token)throw {code:"precisa_entrar"};
+ if(Date.now()>(ses.expires_at||0)-60000){let j;try{j=await NUVEM.auth("token?grant_type=refresh_token",{refresh_token:ses.refresh_token})}catch(e){throw {code:"precisa_entrar"}}
+  ses=Object.assign({},ses,{access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Date.now()+(j.expires_in||3600)*1000});ls.set("bipsite-prof",ses)}
+ return ses.access_token}
+async function carregar(){if(carregando)return;carregando=true;$("bAtu").disabled=true;
+ try{D=await NUVEM.rpc("criador_painel",{p_dias:dias},await token());quandoAtu=Date.now();desenhar()}
+ catch(e){D=null;
+  if(e.code=="sem_acesso")msg("Esta página é só do criador","O Mundo do Bip não reconheceu esta conta como criadora. Os números do site ficam fechados para as outras contas.",'<a class="btn" href="professor.html">← Voltar para a Área do professor</a>');
+  else if(e.code=="precisa_entrar"||e.code=="sem_permissao")msg("Entre primeiro","Abra a Área do professor e entre com a sua conta. Depois toque em “🛠 Painel do criador”.",'<a class="btn main" href="professor.html">Ir para a Área do professor</a>');
+  else msg("Não consegui carregar",erroBip(e),'<button class="btn main" id="bTenta">Tentar de novo</button>'),$("bTenta")&&($("bTenta").onclick=carregar)}
+ finally{carregando=false;$("bAtu").disabled=false}}
+
+function desenhar(){const T=D.totais;$("msg").hidden=true;$("painel").hidden=false;$("who").hidden=false;$("whoMail").textContent=ses.email||"";
+ const per=dias==1?"hoje":"em "+dias+" dias";
+ const kp=[
+  ["Aparelhos",dias==1?T.aparelhos_hoje:T.aparelhos_periodo,`${per} · <b>${nf(T.aparelhos_novos)}</b> novos`],
+  ["Perfis criados",T.perfis_normais,`no modo normal · em <b>${nf(T.aparelhos_total)}</b> aparelhos`],
+  ["Alunos em turmas",T.alunos,`<b>+${nf(T.alunos_novos)}</b> novos ${per}`],
+  ["Alunos ativos",T.alunos_7d,`nos últimos 7 dias · hoje: <b>${nf(T.alunos_hoje)}</b>`],
+  ["Professores",T.professores,`<b>+${nf(T.professores_novos)}</b> novos ${per}`],
+  ["Turmas",T.turmas,`<b>${nf(T.turmas_abertas)}</b> com aula aberta agora`],
+  ["Tempo jogado",null,`${per} · hoje: <b>${hm(T.segundos_hoje)}</b>`,hm(T.segundos_periodo)],
+  ["No celular",null,`dos aparelhos ${per}`,T.aparelhos_periodo?Math.round(T.celular_periodo/T.aparelhos_periodo*100)+"%":"—"]];
+ $("kpis").innerHTML=kp.map(([k,v,s,txt])=>`<div class="kpi"><span class="k">${k}</span><span class="v">${txt!=null?txt:nf(v)}</span><span class="s">${s}</span></div>`).join("");
+ barras($("chA"),D.por_dia.map(x=>({d:x.dia,v:x.aparelhos,t:`${nf(x.aparelhos)} aparelhos`+(x.novos?` · ${nf(x.novos)} novos`:"")+(x.com_turma?` · ${nf(x.com_turma)} com turma`:"")})));
+ barras($("chM"),D.por_dia.map(x=>({d:x.dia,v:x.minutos,t:hm(x.minutos*60)+" de jogo"})));
+ /* jogos */
+ const J=BIPV.JOGOS.map(g=>Object.assign({g},D.jogos[g]||{segundos:0,aparelhos:0,aberturas:0})).sort((a,b)=>b.segundos-a.segundos),mx=Math.max(1,...J.map(x=>x.segundos));
+ $("jgHint").textContent=`Tempo jogado ${per}, somando todos os aparelhos.`;
+ $("jogos").innerHTML=J.every(x=>!x.segundos&&!x.aberturas)?'<p class="empty">Ninguém jogou ainda neste período.</p>':J.map(x=>`<div class="row"><span class="nm">${BIPV.NOME_JOGO[x.g]}</span><span class="tr" title="${hm(x.segundos)}"><i style="width:${x.segundos/mx*100}%"></i></span><span class="vl"><b>${hm(x.segundos)}</b> · ${nf(x.aparelhos)} apar.</span></div>`).join("");
+ /* cadastros */
+ $("feed").innerHTML=D.cadastros.length?D.cadastros.slice(0,14).map(c=>`<li><span class="t ${c.tipo=="professor"?"p":""}">${c.tipo}</span><span><b>${esc(c.nome)}</b>${c.onde?` <span class="sub">· ${esc(c.onde)}</span>`:""}</span><span class="q">${quando(c.quando)}</span></li>`).join(""):'<li class="empty">Nenhum cadastro ainda.</li>';
+ /* tabelas */
+ $("tProf").innerHTML=D.professores.length?`<table><thead><tr><th>Professor</th><th>E-mail</th><th>Conta criada</th><th class="n">Turmas</th><th class="n">Alunos</th><th class="n">Ativos 7 dias</th><th>Último aluno</th></tr></thead><tbody>${
+  D.professores.map(p=>`<tr><td><b>${esc(p.nome||"(sem nome)")}</b></td><td>${esc(p.email||"")}</td><td>${new Date(p.criado_em).toLocaleDateString("pt-BR")}</td><td class="n">${nf(p.turmas)}${p.abertas?` <span class="pill on">${p.abertas} aberta${p.abertas>1?"s":""}</span>`:""}</td><td class="n">${nf(p.alunos)}</td><td class="n">${nf(p.ativos_7d)}</td><td>${quando(p.ultimo_aluno)}</td></tr>`).join("")}</tbody></table>`:'<p class="empty">Nenhum professor ainda.</p>';
+ $("tTur").innerHTML=D.turmas.length?`<table><thead><tr><th>Turma</th><th>Professor</th><th>Situação</th><th class="n">Alunos</th><th class="n">Ativos 7 dias</th><th>Último acesso</th><th>Criada</th></tr></thead><tbody>${
+  D.turmas.map(t=>`<tr><td><b>${esc(t.nome)}</b></td><td>${esc(t.professor||"")}</td><td>${t.aberta?'<span class="pill on">aula aberta</span>':t.ativa?'<span class="pill">fechada</span>':'<span class="pill">pausada</span>'}</td><td class="n">${nf(t.alunos)}</td><td class="n">${nf(t.ativos_7d)}</td><td>${quando(t.ultimo)}</td><td>${new Date(t.criado_em).toLocaleDateString("pt-BR")}</td></tr>`).join("")}</tbody></table>`:'<p class="empty">Nenhuma turma ainda.</p>';
+ atuTxt()}
+function atuTxt(){if(quandoAtu)$("upd").textContent="Atualizado "+quando(quandoAtu)+" · atualiza sozinho a cada minuto"}
+
+/* gráfico de barras simples (uma série), com dica ao passar o dedo/mouse */
+function barras(el,P){const W=560,H=200,l=34,r=6,t=10,b=24,iw=W-l-r,ih=H-t-b,n=P.length,mx=Math.max(...P.map(p=>p.v),0);
+ const nice=m=>{if(m<=4)return 4;const e=Math.pow(10,Math.floor(Math.log10(m/4)));for(const k of [1,2,5,10])if(e*k*4>=m)return e*k*4;return e*40};
+ const top=nice(mx),ticks=[0,1,2,3,4].map(i=>top*i/4);
+ const bw=iw/n,g=Math.min(2,bw*.2),y=v=>t+ih-(v/top)*ih,cada=Math.max(1,Math.ceil(n/7));
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(el.previousElementSibling.previousElementSibling.textContent)}">`;
+ ticks.forEach(v=>{s+=`<line class="gl" x1="${l}" x2="${W-r}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${l-6}" y="${y(v)+4}" text-anchor="end">${nf(Math.round(v))}</text>`});
+ P.forEach((p,i)=>{const x=l+i*bw+g/2,w=Math.max(1,bw-g),h=(p.v/top)*ih,R=Math.min(4,w/2,h);
+  s+=`<rect class="hit" data-i="${i}" x="${l+i*bw}" y="${t}" width="${bw}" height="${ih}"/>`;
+  s+=h>0?`<path class="b" d="M${x},${t+ih}V${t+ih-h+R}Q${x},${t+ih-h} ${x+R},${t+ih-h}H${x+w-R}Q${x+w},${t+ih-h} ${x+w},${t+ih-h+R}V${t+ih}Z"/>`:`<path class="b"/>`;
+  if(i%cada==(n-1)%cada)s+=`<text class="ax" x="${l+i*bw+bw/2}" y="${H-6}" text-anchor="middle">${n==1?"hoje":dm(p.d)}</text>`});
+ s+=`</svg><div class="tip" role="status"></div>`;el.innerHTML=s;
+ const tip=el.querySelector(".tip"),sv=el.querySelector("svg");
+ el.querySelectorAll(".hit").forEach(h=>{const i=+h.dataset.i,p=P[i];
+  const mostra=()=>{const R=sv.getBoundingClientRect(),k=R.width/W;tip.innerHTML=`<b>${diaLongo(p.d)}</b>${esc(p.t)}`;tip.style.left=Math.min(R.width-60,Math.max(60,(l+i*bw+bw/2)*k))+"px";tip.style.top=(y(p.v)*k)+"px";tip.classList.add("on")};
+  h.addEventListener("pointerenter",mostra);h.addEventListener("pointerdown",mostra);h.addEventListener("pointerleave",()=>tip.classList.remove("on"))})}
+
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{dias=+b.dataset.d;document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed",x==b));carregar()});
+$("bAtu").onclick=carregar;
+setInterval(()=>{atuTxt();if(D&&document.visibilityState=="visible"&&Date.now()-quandoAtu>60000)carregar()},15000);
+if(!NUVEM.on)msg("Banco de dados desligado","Este painel precisa do banco de dados ligado.");
+else carregar();
+</script>

@@ -830,11 +830,25 @@ function drawEq(){document.querySelectorAll(".game .vez,.game .desc").forEach(e=
   card(g).insertAdjacentHTML("beforeend",`<div class="desc" role="status"><b>💤 ${BIPV.NOME_JOGO[g].replace(/^Bip /,"")} descansando</b><span>Jogue mais <b>${min} min</b> nos jogos ★ para liberar.</span><div class="bar"><i style="width:${(1-f/BIPV.EQ_DESC)*100}%"></i></div></div>`)}}
 $("frame").addEventListener("load",()=>{try{const w=$("frame").contentWindow;const t=()=>{ultimoToque=Date.now()};
  ["keydown","pointerdown","pointermove","touchstart","wheel"].forEach(ev=>w.addEventListener(ev,t,{passive:true,capture:true}));t()}catch(e){}});
-setInterval(()=>{if(!jogoAberto||$("play").hidden||document.visibilityState=="hidden"||Date.now()-ultimoToque>60000)return;contaTempo(curP(),jogoAberto,5)},5000);
+setInterval(()=>{if(!jogoAberto||$("play").hidden||document.visibilityState=="hidden"||Date.now()-ultimoToque>60000)return;contaTempo(curP(),jogoAberto,5);usoAdd("j",jogoAberto,5);if(++usoTic%24==0)enviaUso()},5000);
+
+/* ============ Estatística anônima (para o Painel do Criador) ============
+   Cada navegador sorteia um número só seu. Por dia, manda: quantos perfis existem neste aparelho,
+   se é celular, e quantos segundos/vezes cada jogo foi aberto. Nada de nome, apelido ou e-mail. */
+let usoTic=0;
+const aparelho=(()=>{let id=ls.get("bipsite-aparelho",null);if(!id||!/^[0-9a-f-]{36}$/.test(id)){
+  id=(crypto.randomUUID?crypto.randomUUID():"10000000-1000-4000-8000-100000000000".replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)));ls.set("bipsite-aparelho",id)}return id})();
+function usoGet(){let u=ls.get("bipsite-uso",null);const d=diaHoje();if(!u||u.dia!=d)u={dia:d,j:{},n:{}};return u}
+function usoAdd(k,g,v){if(!BIPV.JOGOS.includes(g))return;const u=usoGet();u[k][g]=(u[k][g]||0)+v;ls.set("bipsite-uso",u)}
+function enviaUso(keep){if(!NUVEM.on)return;const u=usoGet();
+ NUVEM.rpc("registrar_visita",{p_aparelho:aparelho,p_perfis:profiles.filter(p=>!p.cloud).length,p_turma:profiles.filter(p=>p.cloud).length,
+  p_celular:matchMedia("(pointer:coarse)").matches,p_jogos:u.j,p_aberturas:u.n},null,keep).catch(()=>{})}
+setTimeout(()=>enviaUso(),2500);
+addEventListener("pagehide",()=>enviaUso(true));
 
 /* ---- abrir e fechar os jogos ---- */
-document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{if(!cur||(EQ&&EQ.bloq[b.dataset.open]))return;jogoAberto=b.dataset.open;ultimoToque=Date.now();LOBBY.pause(true);try{localStorage.setItem("bipsite-ultimo:"+cur,b.dataset.open)}catch(e){}$("frame").src=b.dataset.open+".html#p-"+cur;$("play").hidden=false;document.body.style.overflow="hidden"});
-function closeGame(){jogoAberto=null;$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";LOBBY.pause(false);drawMenu();push(curP());
+document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{if(!cur||(EQ&&EQ.bloq[b.dataset.open]))return;jogoAberto=b.dataset.open;usoAdd("n",jogoAberto,1);ultimoToque=Date.now();LOBBY.pause(true);try{localStorage.setItem("bipsite-ultimo:"+cur,b.dataset.open)}catch(e){}$("frame").src=b.dataset.open+".html#p-"+cur;$("play").hidden=false;document.body.style.overflow="hidden"});
+function closeGame(){jogoAberto=null;enviaUso();$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";LOBBY.pause(false);drawMenu();push(curP());
  if(lastCoins!=null)setTimeout(()=>LOBBY.gesture("comemorar"),400)}
 
 /* ============ Loja ============ */

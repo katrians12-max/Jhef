@@ -175,7 +175,7 @@ th button[data-dir]::after{content:attr(data-dir);font-size:.9em}
 
 <div class="wrap">
  <header class="top"><a class="logo" href="./" aria-label="Mundo do Bip: voltar ao início"><!--LOGO--></a><span class="badge">Área do professor</span>
-  <div class="who" id="whoBox" hidden><span id="whoName"></span><button class="btn sm" id="bOut">Sair</button></div></header>
+  <div class="who" id="whoBox" hidden><a class="btn sm" id="bCriador" href="criador.html" hidden>🛠 Painel do criador</a><span id="whoName"></span><button class="btn sm" id="bOut">Sair</button></div></header>
 
  <div class="panel notice" id="offMsg" hidden>A área do professor ainda não foi ligada ao banco de dados. Volte depois que a configuração estiver pronta.</div>
 
@@ -287,12 +287,14 @@ async function token(){if(!ses)throw {code:"precisa_entrar"};
  if(Date.now()>ses.expires_at-60000){try{keep(await NUVEM.auth("token?grant_type=refresh_token",{refresh_token:ses.refresh_token}))}catch(e){sair();throw {code:"precisa_entrar"}}}
  return ses.access_token}
 async function rpc(fn,args){try{return await NUVEM.rpc(fn,args,await token())}catch(e){if(e.code=="precisa_entrar"||e.code=="sem_permissao"){sair();}throw e}}
-function sair(){if(ses)NUVEM.auth("logout",{},ses.access_token).catch(()=>{});ses=null;ls.del("bipsite-prof");go("auth")}
+function sair(){criador=null;$("bCriador").hidden=true;if(ses)NUVEM.auth("logout",{},ses.access_token).catch(()=>{});ses=null;ls.del("bipsite-prof");go("auth")}
 
 /* ---- telas ---- */
+/* só aparece para a conta do criador (o banco é quem confere; a página do painel confere de novo) */
+let criador=null;async function checaCriador(){if(criador===null){try{criador=(await NUVEM.rpc("sou_criador",{},await token()))===true}catch(e){criador=false}}$("bCriador").hidden=!criador}
 function go(t){["scrAuth","scrTurmas","scrTurma"].forEach(k=>$(k).hidden=true);$("whoBox").hidden=!ses;
  if(t=="auth"){$("scrAuth").hidden=false;form("fIn")}
- if(t=="turmas"){$("scrTurmas").hidden=false;loadTurmas()}
+ if(t=="turmas"){$("scrTurmas").hidden=false;loadTurmas();checaCriador()}
  if(t=="turma"){$("scrTurma").hidden=false}
  if(ses)$("whoName").textContent=ses.nome?`Olá, ${ses.nome}`:ses.email}
 function form(id){["fIn","fUp","fForgot","fNewPass"].forEach(k=>$(k).hidden=k!=id);document.querySelectorAll(".err,.ok").forEach(e=>e.textContent="")}
