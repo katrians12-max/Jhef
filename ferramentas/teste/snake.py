@@ -52,7 +52,9 @@ async def main():
         check('errou a conta: vem outra conta com números em outros lugares',await P.evaluate("tokens.length==4")and (await P.evaluate("S.q.txt")!=q1 or await P.evaluate("tokens.map(t=>t.c+','+t.r).join(' ')")!=pos1))
         check('erro de conta vai para a lista do professor',await P.evaluate("Object.keys(REC.err).length")>=1)
         # pausa
-        qa=await P.evaluate("S.q.txt");await P.keyboard.press('p');await P.wait_for_timeout(200)
+        n0=await P.evaluate("S.ok");qa=await P.evaluate("S.q.txt");await P.keyboard.press('p');await P.wait_for_timeout(200)
+        r=await P.evaluate("[S.ok,wagons.length,body.length,$('pTx').textContent]")
+        check('pausar zera os vagões (trem volta ao tamanho do começo)',r[0]==0 and r[1]==2 and r[2]==3 and (n0==0 or f'{n0} vag' in r[3]),(n0,r))
         check('na pausa os números e a pergunta somem',await P.evaluate("tokens.every(t=>!t.G.visible)&&$('q').classList.contains('hide')"))
         await P.keyboard.press('p');check('ao voltar: contagem 3, 2, 1',await P.evaluate("state")=='count')
         await P.wait_for_timeout(2400);check('volta com números novos',await P.evaluate("state=='run'&&tokens.length==4&&tokens.every(t=>t.G.visible)"))
@@ -61,8 +63,8 @@ async def main():
         await P.evaluate("window.__parado=0;S.lives=3;drawLives();body=[[11,6],[10,6],[9,6]];prev=body.map(p=>p.slice());dir=[1,0];queue=[]");await P.wait_for_timeout(2400)
         check('bater na parede tira 1 vida e o trem vira sozinho',await P.evaluate("S.lives")==2 and await P.evaluate("state")=='run' and await P.evaluate("dir[0]")==0,await P.evaluate("[S.lives,state,dir]"))
         # fim de jogo
-        await P.evaluate("S.lives=1;drawLives();eat(tokens.find(t=>!t.ok))");await P.wait_for_selector('#sEnd:not([hidden])',timeout=6000)
-        k=await P.evaluate("S.ok");await P.screenshot(path=OUT+'s-fim.png')
+        await P.evaluate("window.__parado=1;for(let i=0;i<3;i++)eat(tokens.find(t=>t.ok));S.lives=1;drawLives();eat(tokens.find(t=>!t.ok))");await P.wait_for_selector('#sEnd:not([hidden])',timeout=6000)
+        k=await P.evaluate("S.ok");check('depois da pausa o trem volta a crescer normalmente',k>=3,k);await P.screenshot(path=OUT+'s-fim.png')
         rec=await P.evaluate("JSON.parse(localStorage.getItem('bipsite-runner:t1'))")
         check('recorde salvo junto com o Runner (best.snakemisto)',rec['best'].get('snakemisto')==k and rec.get('sruns')==1,rec.get('best'))
         check('Bipcoins: 1 por vagão, contados no saldo',sum(rec['scoins'].values())==min(k,60) and await P.evaluate("BIPV.ganhosSnake(JSON.parse(localStorage.getItem('bipsite-runner:t1')))")==min(k,60))

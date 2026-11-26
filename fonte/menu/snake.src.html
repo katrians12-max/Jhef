@@ -125,13 +125,13 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 <div class="hud" id="hud" hidden>
  <div class="htop">
   <div class="lives glass" id="lives" aria-label="Vidas"></div>
-  <button class="ib" id="bPause" aria-label="Pausar">⏸</button>
+  <button class="ib" id="bPause" aria-label="Pausar (zera os vagões)" title="Pausar zera os vagões do trem">⏸</button>
   <span class="sp"></span>
   <div class="score glass"><small>Trem</small><b id="sc">0<small>vagões</small></b><span class="combo" id="cb"></span></div>
  </div>
  <div class="q glass" id="q" aria-live="polite"><div class="lab" id="qlab">Coma só os</div><b id="qt">pares</b><div class="tm"><i id="qtm"></i></div></div>
  <div class="toast" id="toast" aria-live="assertive"></div>
- <div class="keys glass" id="keys">Mova o trem com <kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> ou <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> · <kbd>P</kbd> pausa</div>
+ <div class="keys glass" id="keys">Mova o trem com <kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> ou <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> · <kbd>P</kbd> pausa (zera os vagões)</div>
  <div class="pad" id="pad" hidden><button id="dU" aria-label="Para cima">▲</button><button id="dL" aria-label="Para a esquerda">◀</button><button id="dD" aria-label="Para baixo">▼</button><button id="dR" aria-label="Para a direita">▶</button></div>
 </div>
 <div class="cd" id="cd" aria-live="assertive"></div>
@@ -139,7 +139,7 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 <section class="scr" id="sStart">
  <div class="card glass">
   <div class="brandrow"><!--LOGO--></div>
-  <div><h1>Bip Snake</h1><p>O Bip puxa um trenzinho. Pegue só os números certos: cada acerto vira um vagão. Vence quem deixar o trem maior!</p></div>
+  <div><h1>Bip Snake</h1><p>O Bip puxa um trenzinho. Pegue só os números certos: cada acerto vira um vagão. Vence quem deixar o trem maior! <b>Pausar zera os vagões.</b></p></div>
   <ul class="rules"><li><b>Coma só os certos:</b> a regra aparece no alto (pares, múltiplos, primos…).</li><li><b>Coma a resposta:</b> aparece uma conta; pegue o resultado.</li><li>Comer errado ou bater tira <b>1 vida</b>. São 3 vidas.</li></ul>
   <div><div class="lbl">Modo</div><div class="chips" id="modos" role="group" aria-label="Escolha o modo"></div></div>
   <div class="rec"><div><b id="rBest">0</b><span>seu recorde (vagões)</span></div><div><b id="rCoins">0/60</b><span>Bipcoins hoje</span></div></div>
@@ -149,7 +149,7 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 </section>
 
 <section class="scr center" id="sPause" hidden>
- <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="pT"><h2 id="pT">Pausado</h2><p>Na pausa os números somem. Quando você voltar, eles aparecem em <b>outros lugares</b> (a conta continua a mesma), e a sequência recomeça do zero.</p>
+ <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="pT"><h2 id="pT">Pausado</h2><p id="pTx">Pausar zera os vagões do trem.</p>
   <div class="row"><button class="btn go" id="bResume">▶ Continuar</button><button class="btn" id="bQuit">Sair do jogo</button></div></div>
 </section>
 
@@ -392,8 +392,14 @@ function end(){state="end";$("hud").hidden=true;turn=1;
  const uniq=[...new Set(S.erros)];$("eRev").hidden=!uniq.length;$("eFacts").innerHTML=uniq.slice(0,10).map(e=>`<span>${e}</span>`).join("");
  BIPV.setMood(P,novo?"festa":"feliz");$("sEnd").hidden=false;$("bAgain").focus();drawRec()}
 /* pausa: os números e a regra somem; na volta eles mudam de lugar, mas a conta é a MESMA (não dá para pausar e pular conta difícil) e a sequência recomeça */
-function pause(v){if(v&&state=="run"){state="pause";$("q").classList.add("hide");tokens.forEach(t=>t.G.visible=false);$("sPause").hidden=false;$("bResume").focus()}
- else if(!v&&state=="pause"){$("sPause").hidden=true;tokens.forEach(t=>dispose(t.G));tokens=[];if(S.combo){S.combo=0;drawScore()}
+/* pausa: o trem PERDE os vagões (volta ao tamanho do começo), porque os vagões são os pontos, o recorde e os Bipcoins.
+   Os números somem; na volta mudam de lugar, mas a conta é a mesma. Pausar para pensar ou pular conta não compensa. */
+function pause(v){if(v&&state=="run"){state="pause";const perdeu=S.ok;
+  if(perdeu||grow){wagons.splice(2).forEach(dispose);body=body.slice(0,3);prev=prev.slice(0,3);grow=0;plates=[]}
+  S.ok=0;S.combo=0;drawScore();
+  $("pTx").innerHTML=perdeu?`O trem perdeu os <b>${perdeu} ${perdeu==1?"vagão":"vagões"}</b> e voltou ao tamanho do começo. Quando você voltar, os números aparecem em outros lugares, mas a <b>conta é a mesma</b>.`
+   :`Pausar zera os vagões do trem. Quando você voltar, os números aparecem em outros lugares, mas a <b>conta é a mesma</b>.`;$("q").classList.add("hide");tokens.forEach(t=>t.G.visible=false);$("sPause").hidden=false;$("bResume").focus()}
+ else if(!v&&state=="pause"){$("sPause").hidden=true;tokens.forEach(t=>dispose(t.G));tokens=[];
   state="count";let n=3;const tick=()=>{if(state!="count")return;$("cd").innerHTML=n?`<span>${n}</span>`:`<span>JÁ!</span>`;n?SFX.cd():SFX.go();if(n--)setTimeout(tick,600);else setTimeout(()=>{$("cd").innerHTML="";$("q").classList.remove("hide");fillTokens();state="run";acc=0;last=performance.now()},350)};tick()}}
 /* direção: até 2 viradas guardadas; não deixa voltar para trás */
 function steer(d){if(state!="run"&&state!="count"&&state!="stun")return;const lastD=queue.length?queue[queue.length-1]:dir;if(d[0]==lastD[0]&&d[1]==lastD[1])return;if(d[0]==-lastD[0]&&d[1]==-lastD[1])return;if(queue.length<2){queue.push(d);SFX.turn()}}
