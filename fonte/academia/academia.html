@@ -1211,7 +1211,7 @@ function setup(a,S){
    if(closed&&res.n==uniq.length&&a.check(res,tr)){poly(uniq,{edges:false});win(a.ok)}else miss(a.no)}}}
 
 $("next").onclick=()=>{const L=LES();if(!solved||$("next").disabled)return;
- if(L.steps[step].end){const k=lid(cw,cl),before=new Set(save.done);if(!save.done.includes(k))save.done.push(k);save.stars=save.stars||{};save.stars[k]=Math.max(save.stars[k]||0,starsFor(errs));store();
+ if(L.steps[step].end){const k=lid(cw,cl),before=new Set(save.done);try{if(before.has(k))BIPV.focoAula(PID,"a:"+k,Math.max(1,(save.stars||{})[k]||0),starsFor(errs))}catch(e){}if(!save.done.includes(k))save.done.push(k);save.stars=save.stars||{};save.stars[k]=Math.max(save.stars[k]||0,starsFor(errs));store();
   const now=new Set(save.done),nx=cw+1;if(WORLDS[nx]&&!worldOpen(nx,before)&&worldOpen(nx,now))unlockMsg=WORLDS[nx].L?`Mundo ${nx+1} liberado: ${WORLDS[nx].t}!`:`Você terminou o Mundo ${cw+1}! O Mundo ${nx+1} (${WORLDS[nx].t}) está chegando.`;
   return closeLesson()}
  step++;show()};

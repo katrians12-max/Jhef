@@ -43,14 +43,22 @@ function ganhosVez(tp){let c=0;const v=(tp&&tp.vez)||{};for(const k in v)c+=Math
 function mergeTempo(a,b){if(!a)return b;if(!b)return a;const d={};for(const s of [a.d||{},b.d||{}])for(const k in s){d[k]=d[k]||{};for(const g in s[k])d[k][g]=Math.max(+d[k][g]||0,+s[k][g]||0)}
  const vez={...(a.vez||{})};for(const k in b.vez||{})vez[k]=Math.max(+vez[k]||0,+b.vez[k]||0);
  const fa=a.foco,fb=b.foco;let foco=fa||fb;
- if(fa&&fb)foco=fa.id==fb.id?{id:fa.id,base:Math.min(+fa.base||0,+fb.base||0),gasto:Math.max(+fa.gasto||0,+fb.gasto||0),volta:Math.max(+fa.volta||0,+fb.volta||0),
+ if(fa&&fb)foco=fa.id==fb.id?{id:fa.id,base:Math.min(+fa.base||0,+fb.base||0),gasto:Math.max(+fa.gasto||0,+fb.gasto||0),volta:Math.max(+fa.volta||0,+fb.volta||0),bonus:Math.max(+fa.bonus||0,+fb.bonus||0),rev:(()=>{const r=Object.assign({},fa.rev||{});for(const k in fb.rev||{})if(!r[k]||fb.rev[k]>r[k])r[k]=fb.rev[k];return r})(),
    vezAtual:Math.max(+fa.vezAtual||0,+fb.vezAtual||0),vezSeg:Math.max(+fa.vezSeg||0,+fb.vezSeg||0),vez:((fa.vez||{}).dia||"")>=((fb.vez||{}).dia||"")?fa.vez:fb.vez}:(String(fa.id)>String(fb.id)?fa:fb);
  const r={d,vez,eq:(((a.eq||{}).t||0)>=((b.eq||{}).t||0)?a.eq:b.eq)||{}};if(foco)r.foco=foco;return r}
 /* ===== MODO FOCO (o professor liga por turma): cada aula da Academia ou fase NOVA do Robô dá ⚡2;
    cada partida de jogo rápido (Runner, Snake, Defesa, Bomber) gasta ⚡1. Sem limite: quanto mais aulas, mais energia.
    A energia não fica guardada como número: é (aulas+fases concluídas desde que o Foco foi ligado) × 2 − partidas jogadas.
    tempo.foco = {id: quando o professor ligou, base: aulas+fases que o aluno já tinha, gasto: partidas} */
-const FOCO_AULA=2,JOGOS_RAPIDOS=["runner","snake","defesa","bomber"],FOCO_CANSADO=.4,FOCO_MIN=15*60,FOCO_VOLTA=180;
+/* lista das fases do Robô e das aulas da Academia (o build preenche): para saber o que falta e quem terminou tudo */
+const CONTEUDO=/*CONTEUDO*/{robo:[],academia:[]};
+function progressoAulas(robo,acad){const st=(robo&&robo.stars)||{},dn=new Set((acad&&acad.done)||[]);
+ const faltaRobo=CONTEUDO.robo.filter(t=>!(+st[t]>0)).length,faltaAcad=CONTEUDO.academia.filter(x=>!dn.has(x)).length;
+ return {faltaRobo,faltaAcad,mestre:CONTEUDO.robo.length>0&&CONTEUDO.academia.length>0&&!faltaRobo&&!faltaAcad}}
+/* para onde mandar o aluno ganhar energia: aula nova da Academia > fase nova do Robô > revisão */
+function focoAlvo(pid){const p=progressoAulas(ls("robo4:"+pid),ls("academia-bip-3d-v1:"+pid));
+ return p.faltaAcad?{jogo:"academia",txt:"Fazer uma aula"}:p.faltaRobo?{jogo:"robo",txt:"Fazer uma fase do Robô"}:{jogo:"academia",txt:"Revisar uma aula"}}
+const FOCO_AULA=2,FOCO_REV=1,FOCO_REV_DIAS=7,JOGOS_RAPIDOS=["runner","snake","defesa","bomber"],FOCO_CANSADO=.4,FOCO_MIN=15*60,FOCO_VOLTA=180;
 /* para o aluno aprender TODOS os jogos, o preço muda: o jogo rápido que ele menos jogou na semana é o "⭐ jogo da vez"
    (custa ⚡1, mas a cada 3 min jogando de verdade a energia volta: na prática é de graça para quem se esforça);
    o jogo que passou de 40% do tempo dele nos jogos rápidos da semana fica "cansado" e custa ⚡2. */
@@ -63,14 +71,30 @@ function focoDe(pid){const p=(ls("bipsite-profiles")||[]).find(q=>q.id==pid),t=p
 function energia(pid){const id=focoDe(pid);if(!id)return null;const k=tempoKey(pid),tp=ls(k)||{},n=concluidas(ls("robo4:"+pid),ls("academia-bip-3d-v1:"+pid));
  if(!tp.foco||tp.foco.id!=id)tp.foco={id,base:n,gasto:0};
  const P=precos(tp);try{localStorage.setItem(k,JSON.stringify(tp))}catch(e){}
- const f=tp.foco,ganhou=FOCO_AULA*Math.max(0,n-(+f.base||0)),gasto=+f.gasto||0,volta=+f.volta||0;
- return {id,ganhou,gasto,volta,energia:ganhou-gasto+volta,vez:P.vez,preco:P.preco,vezSeg:+f.vezSeg||0}}
+ const f=tp.foco,bonus=+f.bonus||0,ganhou=FOCO_AULA*Math.max(0,n-(+f.base||0))+bonus,gasto=+f.gasto||0,volta=+f.volta||0,
+  mestre=progressoAulas(ls("robo4:"+pid),ls("academia-bip-3d-v1:"+pid)).mestre;
+ return {id,ganhou,bonus,gasto,volta,energia:ganhou-gasto+volta,vez:P.vez,preco:P.preco,vezSeg:+f.vezSeg||0,mestre}}
+/* Academia e Robô chamam quando o aluno termina uma aula/fase que JÁ tinha feito (antes = estrelas que tinha):
+   melhorou as estrelas → ⚡1; revisão boa (2★ ou mais) → ⚡1, no máximo uma vez por semana em cada aula/fase */
+function focoAula(pid,key,antes,depois){const e=energia(pid);if(!e||e.mestre||!antes)return 0;
+ const k=tempoKey(pid),tp=ls(k)||{},f=tp.foco;if(!f)return 0;f.rev=f.rev||{};const hoje=diaDe(new Date()),ult=f.rev[key];
+ const dias=ult?Math.round((Date.parse(hoje)-Date.parse(ult))/864e5):99;let n=0,msg;
+ if(depois>antes){n=FOCO_REV;msg=`⚡+${FOCO_REV} de energia: você melhorou as estrelas!`}
+ else if(depois>=2&&dias>=FOCO_REV_DIAS){n=FOCO_REV;msg=`⚡+${FOCO_REV} de energia pela revisão!`}
+ else if(depois>=2)msg=`Boa revisão! Esta aula volta a dar energia em ${FOCO_REV_DIAS-dias} ${FOCO_REV_DIAS-dias==1?"dia":"dias"}.`;
+ else msg=`Revise com no máximo 2 erros para ganhar ⚡${FOCO_REV}.`;
+ if(n){f.bonus=(+f.bonus||0)+n;f.rev[key]=hoje;try{localStorage.setItem(k,JSON.stringify(tp))}catch(e){}}
+ focoAviso(msg,!!n);return n}
+function focoAviso(msg,bom){if(typeof document=="undefined")return;let t=document.getElementById("bipFocoAviso");
+ if(!t){t=document.createElement("div");t.id="bipFocoAviso";t.setAttribute("role","status");document.body.appendChild(t)}
+ t.style.cssText=`position:fixed;left:50%;bottom:max(22px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9999;max-width:calc(100% - 32px);padding:10px 18px;border-radius:14px;font:700 15px/1.3 system-ui,sans-serif;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.35);background:${bom?"#f2c230":"#1d2a4a"};color:${bom?"#2a1a00":"#fff"};transition:opacity .3s;opacity:1`;
+ t.textContent=msg;clearTimeout(t._h);t._h=setTimeout(()=>{t.style.opacity="0"},4200)}
 /* chamado a cada 5 s de jogo de verdade (pelo saguão): no jogo da vez, a cada 3 min devolve ⚡1 (no máximo 1 por partida) */
 function focoConta(pid,g,s){const e=energia(pid);if(!e||g!=e.vez)return false;const k=tempoKey(pid),tp=ls(k)||{},f=tp.foco;if(!f)return false;
  let volta=false;if(f.vezAtual){f.vezSeg=(+f.vezSeg||0)+s;if(f.vezSeg>=FOCO_VOLTA){f.vezSeg=0;f.vezAtual=0;f.volta=(+f.volta||0)+1;volta=true}}else f.vezSeg=0;
  try{localStorage.setItem(k,JSON.stringify(tp))}catch(e){}return volta}
 /* chamado quando uma partida começa: gasta ⚡1. Sem energia, mostra o aviso e a partida não começa. */
-function focoGasta(pid,g){const e=energia(pid);if(!e){focoMostra(pid,g);return true}const p=e.preco[g]||1;
+function focoGasta(pid,g){const e=energia(pid);if(!e||e.mestre){focoMostra(pid,g);return true}const p=e.preco[g]||1;
  if(e.energia<p){focoSemEnergia(p,e,g);focoMostra(pid,g);return false}
  const k=tempoKey(pid),tp=ls(k)||{};tp.foco.gasto=(+tp.foco.gasto||0)+p;tp.foco.vezAtual=g==e.vez?1:0;tp.foco.vezSeg=0;/* só a partida que acabou de começar pode devolver ⚡1 */
  try{localStorage.setItem(k,JSON.stringify(tp))}catch(e){}focoMostra(pid,g);return true}
@@ -80,7 +104,7 @@ function focoMostra(pid,g){if(typeof document=="undefined")return;const e=energi
  document.querySelectorAll("#bGo,#bAgain,#bNovo").forEach(b=>{const row=b.parentElement;let el=row.parentElement.querySelector(":scope > .bip-foco");
   if(!e){if(el)el.remove();return}
   if(!el){el=document.createElement("p");el.className="bip-foco";el.style.cssText="margin:0;padding:8px 12px;border-radius:12px;background:rgba(242,194,48,.14);border:1px solid rgba(242,194,48,.5);color:#ffe9a6;font-weight:700;font-size:.92rem;text-align:center";row.parentElement.insertBefore(el,row)}
-  el.innerHTML=e.energia>0?`⚡ Modo foco · você tem <b style="color:#fff">${e.energia}</b> ${e.energia==1?"energia":"energias"}. ${g?precoTxt(e,g):"Cada partida gasta 1."}`
+  el.innerHTML=e.mestre?`🏆 Mestre do Bip! Você terminou todas as aulas e fases: os jogos rápidos estão liberados.`:e.energia>0?`⚡ Modo foco · você tem <b style="color:#fff">${e.energia}</b> ${e.energia==1?"energia":"energias"}. ${g?precoTxt(e,g):"Cada partida gasta 1."}`
    :`⚡ Modo foco · sem energia. Faça uma aula da Academia ou uma fase do Robô para ganhar ⚡${FOCO_AULA}.`})}
 function focoSemEnergia(p,e,g){if(typeof document=="undefined")return;let d=document.getElementById("bipSemEnergia");if(d)d.remove();d=null;
  const tit=e&&e.energia>0?`Falta energia`:`Sem energia`,extra=e&&e.energia>0&&p>1?`<p style="margin:0;color:#ffe9a6">Este jogo está <b>cansado</b> (⚡${p} por partida) porque você jogou muito ele. O <b>⭐ jogo da vez</b> (${NOME_JOGO[e.vez]}) sai de graça!</p>`:"";
@@ -439,5 +463,5 @@ const ICON=(()=>{const SZ=160;let R=null,scene,cam,P,arc,props,ok=null;const cac
   if(fila.length)requestAnimationFrame(proximo);else rodando=false}
  return {item:(id,look,cb)=>pedir("i:"+id,look,l=>fazItem(id,l),cb),pose:(n,look,cb)=>pedir("p:"+n,look,l=>fazPose(n,l),cb),ok:()=>init()}})();
 
-return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,BOMB_DIA,ganhosBomber,bomberBest,bomberDec,FOCO_AULA,JOGOS_RAPIDOS,FOCO_CANSADO,FOCO_MIN,FOCO_VOLTA,precos,focoConta,concluidas,focoDe,energia,focoGasta,focoMostra,JOGOS,NOME_JOGO,EQ_MIN,EQ_LIM,EQ_DESC,EQ_CRED,VEZ_DIA,tempoKey,diaDe,tempo7,ganhosVez,mergeTempo,equilibrio,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
+return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,BOMB_DIA,ganhosBomber,bomberBest,bomberDec,CONTEUDO,progressoAulas,focoAlvo,focoAula,focoAviso,FOCO_REV,FOCO_REV_DIAS,FOCO_AULA,JOGOS_RAPIDOS,FOCO_CANSADO,FOCO_MIN,FOCO_VOLTA,precos,focoConta,concluidas,focoDe,energia,focoGasta,focoMostra,JOGOS,NOME_JOGO,EQ_MIN,EQ_LIM,EQ_DESC,EQ_CRED,VEZ_DIA,tempoKey,diaDe,tempo7,ganhosVez,mergeTempo,equilibrio,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
  faceTex,eyePreview,buildBody,dress,tick,setMood,glowTex,face2d,patTex,ICON}})();

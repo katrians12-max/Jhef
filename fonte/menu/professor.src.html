@@ -364,9 +364,9 @@ function stat(a){const pg=a.progresso||{},r=pg.robo||{},ac=pg.academia||{},lj=pg
  const dias=a.ultimo_acesso?(Date.now()-new Date(a.ultimo_acesso))/864e5:Infinity;
  return {a,feitas,done,fases:feitas.size,est,aulas:done.size,ativ:feitas.size+done.size,ganhos,gastos,saldo:ganhos-gastos,itens:owned.filter(id=>!BIPV.gratis(id)).length,look:lj.look||{},dias,
   run:+((ru.best||{}).tabuada)||0,run2:+((ru.best||{}).somasub)||0,runs:+ru.runs||0,rerr:ru.err||{},rtot:["tabuada","somasub"].reduce((o,k)=>{const t=(ru.tot||{})[k]||{};o.ok+=+t.ok||0;o.bad+=+t.bad||0;return o},{ok:0,bad:0}),snake:BIPV.snakeBest(ru),sruns:+ru.sruns||0,defesa:BIPV.defesaBest(ru),dfx:BIPV.defesaDec(BIPV.defesaBest(ru)),druns:+ru.druns||0,bomber:BIPV.bomberBest(ru),bfx:BIPV.bomberDec(BIPV.bomberBest(ru)),bruns:+ru.bruns||0,best_:+((ru.bmeta||{}).est)||0,
-  t7:BIPV.tempo7(ru.tempo),eq:BIPV.equilibrio(ru.tempo),concl:BIPV.concluidas(r,ac),fo:(ru.tempo||{}).foco||null}}
+  t7:BIPV.tempo7(ru.tempo),eq:BIPV.equilibrio(ru.tempo),concl:BIPV.concluidas(r,ac),mestre:BIPV.progressoAulas(r,ac).mestre,fo:(ru.tempo||{}).foco||null}}
 /* energia do Modo foco de um aluno (só vale se ele já entrou com o foco ligado desta vez) */
-function energiaDe(S){if(!turma||!turma.foco||!S.fo||String(S.fo.id)!=String(turma.foco_em))return null;const g=BIPV.FOCO_AULA*Math.max(0,S.concl-(+S.fo.base||0)),x=+S.fo.gasto||0,v=+S.fo.volta||0;return {g,x,v,tem:g-x+v}}
+function energiaDe(S){if(!turma||!turma.foco||!S.fo||String(S.fo.id)!=String(turma.foco_em))return null;const g=BIPV.FOCO_AULA*Math.max(0,S.concl-(+S.fo.base||0))+(+S.fo.bonus||0),x=+S.fo.gasto||0,v=+S.fo.volta||0;return {g,x,v,tem:g-x+v}}
 const av=S=>`<span class="bipav" aria-hidden="true">${BIPV.face2d(S.look)}</span>`;
 const pl=(n,um,varios)=>`${nf(n)} ${n==1?um:varios}`;
 let SS=[],tab=ls.get("bipsite-prof-tab")||"rank",crit=ls.get("bipsite-prof-crit")||"ativ",sortK=["apelido",1];
@@ -491,7 +491,7 @@ function drawTempo(){const J=BIPV.JOGOS,n=SS.length;
  const menos=J.slice().sort((x,y)=>tot[x]-tot[y])[0];
  const call=`<div class="callout">📊 A turma jogou <b>${nf(mins(T))} min</b> nesta semana. O jogo menos jogado é o <b>${BIPV.NOME_JOGO[menos]}</b> (${nf(mins(tot[menos]))} min).</div>`;
  const L=SS.slice().sort((x,y)=>y.eq.T-x.eq.T||x.a.apelido.localeCompare(y.a.apelido,"pt-BR")),FO=turma&&turma.foco;
- const enTd=S=>{if(!FO)return "";const e=energiaDe(S);return e?`<td class="nw" title="ganhou ⚡${e.g} fazendo aulas, gastou ⚡${e.x} em partidas${e.v?`, recebeu ⚡${e.v} de volta jogando o jogo da vez`:""}">⚡ <b>${e.tem}</b> <span class="sub">(+${e.g} −${e.x}${e.v?` +${e.v}★`:""})</span></td>`:'<td><span class="sub">ainda não entrou</span></td>'};
+ const enTd=S=>{if(!FO)return "";if(S.mestre)return '<td class="nw" title="Terminou todas as aulas e fases: jogos rápidos liberados">🏆 terminou tudo</td>';const e=energiaDe(S);return e?`<td class="nw" title="ganhou ⚡${e.g} fazendo e revisando aulas, gastou ⚡${e.x} em partidas${e.v?`, recebeu ⚡${e.v} de volta jogando o jogo da vez`:""}">⚡ <b>${e.tem}</b> <span class="sub">(+${e.g} −${e.x}${e.v?` +${e.v}★`:""})</span></td>`:'<td><span class="sub">ainda não entrou</span></td>'};
  const rows=L.map(S=>{const E=S.eq,lado=E.T?J.slice().sort((x,y)=>S.t7[x]-S.t7[y])[0]:null,desc=Object.keys(E.bloq);
   return `<tr><td><span class="mini">${av(S)}<b>${esc(S.a.apelido)}</b></span></td><td class="nw"><b>${nf(mins(E.T))}</b> min</td><td>${bar(S.t7)}</td>
    ${J.map(g=>`<td>${mins(S.t7[g])}</td>`).join("")}

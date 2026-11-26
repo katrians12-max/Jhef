@@ -822,7 +822,7 @@ function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.i
 const diaHoje=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const runSave=id=>ls.get(BIPV.runKey(id),null)||{};
 function drawPlay(p,st){let g=lastGame(p);const b=$("bPlay");if(EQ&&EQ.bloq[g])g=EQ.vez[0]||BIPV.JOGOS.find(x=>!EQ.bloq[x]);
- if(FOCO&&BIPV.JOGOS_RAPIDOS.includes(g)&&FOCO.energia<FOCO.preco[g])g=FOCO.energia>=1?FOCO.vez:"academia";b.dataset.open=g;
+ if(FOCO&&!FOCO.mestre&&BIPV.JOGOS_RAPIDOS.includes(g)&&FOCO.energia<FOCO.preco[g])g=FOCO.energia>=1?FOCO.vez:BIPV.focoAlvo(p.id).jogo;b.dataset.open=g;
  if(g=="runner"){b.querySelector("b").textContent="▶ CORRER";$("playSub").textContent=`Bip Runner · recorde ${BIPV.fmt(Math.max(+(runSave(p.id).best||{}).tabuada||0,+(runSave(p.id).best||{}).somasub||0))}`;return}
  if(g=="snake"){b.querySelector("b").textContent="▶ JOGAR";$("playSub").textContent=`Bip Snake · recorde ${BIPV.snakeBest(runSave(p.id))} vagões`;return}
  if(g=="bomber"){b.querySelector("b").textContent="▶ EXPLODIR";{const d=BIPV.bomberDec(BIPV.bomberBest(runSave(p.id)));$("playSub").textContent=d.arena?`Bip Bomber · recorde: arena ${d.arena}`:"Bip Bomber"}return}
@@ -851,13 +851,14 @@ function tempoSet(id,tp){const lim=new Date();lim.setDate(lim.getDate()-14);cons
 let EQ=null,FOCO=null,jogoAberto=null,ultimoToque=0,voltouEnergia=0;
 /* Modo foco (o professor liga): cada aula/fase nova dá ⚡2, cada partida de jogo rápido gasta ⚡1 (o gasto acontece dentro do jogo) */
 function drawFoco(){const bar=$("focoBar"),E=FOCO;document.querySelectorAll(".game .semE,.game .preco").forEach(e=>e.remove());bar.hidden=!E;if(!E)return;
- const n=Math.max(0,E.energia);
+ if(E.mestre){bar.innerHTML=`<span class="raio" aria-hidden="true">🏆</span><span><b>Mestre do Bip!</b> Você terminou todas as aulas e fases: jogos rápidos liberados.</span>`;return}
+ const n=Math.max(0,E.energia),alvo=BIPV.focoAlvo(cur);
  bar.innerHTML=`<span class="raio" aria-hidden="true">⚡</span><span>Modo foco: <b>${n}</b> ${n==1?"energia":"energias"}</span><span class="pts" aria-hidden="true">${"<i></i>".repeat(Math.min(n,12))}</span><small>cada aula ou fase nova dá ⚡${BIPV.FOCO_AULA} · ★ jogo da vez: a energia volta</small>${voltouEnergia?`<small style="color:#8dffbd;font-weight:800">⚡+${voltouEnergia} de volta pelo jogo da vez!</small>`:""}`;voltouEnergia=0;
  for(const g of BIPV.JOGOS_RAPIDOS){const b=$(GO[g]),card=b.closest(".game"),p=E.preco[g],vez=g==E.vez;
   if(vez)card.classList.add("davez");
   card.querySelector(".art").insertAdjacentHTML("beforeend",`<span class="preco${vez?" vez":p>1?" caro":""}" title="${vez?"Jogo da vez: a partida gasta ⚡1, mas jogando 3 minutos a energia volta":p>1?"Você jogou muito este jogo: cada partida gasta ⚡"+p:"Cada partida gasta ⚡1"}">${vez?"★ da vez":p>1?"⚡"+p+" cansado":"⚡1"}</span>`);
   if(n<p){b.disabled=true;
-   card.insertAdjacentHTML("beforeend",`<div class="semE" role="status"><small style="font-size:.68rem;opacity:.75;font-weight:700">${BIPV.NOME_JOGO[g]}</small><b>⚡ ${n<1?"Sem energia":"Precisa de ⚡"+p}</b><span>${n<1?`Faça uma aula ou fase nova para ganhar ⚡${BIPV.FOCO_AULA}`:`Você jogou muito este. O ★ ${BIPV.NOME_JOGO[E.vez].replace(/^Bip /,"")} sai de graça!`}</span><button type="button" data-ir="${n<1?"academia":E.vez}">${n<1?"Fazer uma aula":"Jogar o da vez"}</button></div>`)}}
+   card.insertAdjacentHTML("beforeend",`<div class="semE" role="status"><small style="font-size:.68rem;opacity:.75;font-weight:700">${BIPV.NOME_JOGO[g]}</small><b>⚡ ${n<1?"Sem energia":"Precisa de ⚡"+p}</b><span>${n<1?(alvo.txt=="Revisar uma aula"?`Revise uma aula (até 2 erros) para ganhar ⚡${BIPV.FOCO_REV}`:`Faça uma aula ou fase nova para ganhar ⚡${BIPV.FOCO_AULA}`):`Você jogou muito este. O ★ ${BIPV.NOME_JOGO[E.vez].replace(/^Bip /,"")} sai de graça!`}</span><button type="button" data-ir="${n<1?alvo.jogo:E.vez}">${n<1?alvo.txt:"Jogar o da vez"}</button></div>`)}}
  document.querySelectorAll("[data-ir]").forEach(x=>x.onclick=()=>$(GO[x.dataset.ir]).click())}
 function eqAvalia(p){if(!p||!p.cloud||FOCO)return EQ=null;/* com o Modo foco ligado, o Equilíbrio descansa */const tp=tempoGet(p.id),eq=tp.eq;let E=BIPV.equilibrio(tp),mud=0;
  for(const g of BIPV.JOGOS){const parte=E.T?E.t[g]/E.T:0;
@@ -897,7 +898,7 @@ setTimeout(()=>enviaUso(),2500);
 addEventListener("pagehide",()=>enviaUso(true));
 
 /* ---- abrir e fechar os jogos ---- */
-document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{if(!cur||(EQ&&EQ.bloq[b.dataset.open])||(FOCO&&BIPV.JOGOS_RAPIDOS.includes(b.dataset.open)&&FOCO.energia<FOCO.preco[b.dataset.open]))return;jogoAberto=b.dataset.open;usoAdd("n",jogoAberto,1);ultimoToque=Date.now();LOBBY.pause(true);try{localStorage.setItem("bipsite-ultimo:"+cur,b.dataset.open)}catch(e){}$("frame").src=b.dataset.open+".html#p-"+cur;$("play").hidden=false;document.body.style.overflow="hidden"});
+document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{if(!cur||(EQ&&EQ.bloq[b.dataset.open])||(FOCO&&!FOCO.mestre&&BIPV.JOGOS_RAPIDOS.includes(b.dataset.open)&&FOCO.energia<FOCO.preco[b.dataset.open]))return;jogoAberto=b.dataset.open;usoAdd("n",jogoAberto,1);ultimoToque=Date.now();LOBBY.pause(true);try{localStorage.setItem("bipsite-ultimo:"+cur,b.dataset.open)}catch(e){}$("frame").src=b.dataset.open+".html#p-"+cur;$("play").hidden=false;document.body.style.overflow="hidden"});
 function closeGame(){jogoAberto=null;enviaUso();$("play").hidden=true;$("frame").src="about:blank";document.body.style.overflow="";LOBBY.pause(false);drawMenu();
  const pc=curP();Promise.resolve(push(pc)).then(()=>{if(pc&&pc.cloud&&pc.cloud.vista&&curP()==pc&&!$("scrMenu").hidden)pull(pc).then(ok=>{if(ok&&curP()==pc)drawMenu()})});
  if(lastCoins!=null)setTimeout(()=>LOBBY.gesture("comemorar"),400)}
