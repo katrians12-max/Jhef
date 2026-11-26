@@ -255,6 +255,7 @@ body:not(.toque) .bdet{display:none}
 const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a),rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[Math.floor(Math.random()*a.length)];
 let PID=(location.hash.match(/^#p-([\w-]+)/)||[])[1]||null;if(!PID)try{PID=localStorage.getItem("bipsite-cur")}catch(e){}
+setTimeout(()=>BIPV.focoMostra(PID,"bomber"),0);/* Modo foco: mostra a energia nas telas de início e fim */
 const LOOK=PID?BIPV.loja(PID).look:Object.assign({},BIPV.DEFAULT);
 const INFRAME=window.parent!==window;
 function voltar(e){if(INFRAME){e&&e.preventDefault();window.parent.postMessage({bip:"menu"},"*")}}
@@ -654,7 +655,7 @@ function fim(){state="end";$("hud").hidden=true;$("eT").textContent=concluidas?`
  $("eGanho").innerHTML=ganhoJogo?`Você ganhou <b style="color:#ffd24a">${ganhoJogo} Bipcoins</b> nesta partida.`:hojeCoins()>=BIPV.BOMB_DIA?"Você já ganhou todos os Bipcoins do Bip Bomber hoje. O recorde continua valendo!":"";
  const pc=proximaConq();$("eProx").innerHTML=pc?`Próxima conquista: <b>${pc.c.n}</b>: ${pc.c.d} (${nf(pc.v)}/${nf(pc.c.alvo)})${pc.c.lib?`, libera a carta <b>${CARTAS[pc.c.lib].n}</b>`:""}`:"Você liberou todas as conquistas!";
  drawRec();$("sEnd").hidden=false;$("bNovo").focus()}
-function novoJogo(){arena=1;concluidas=0;pts=0;vidas=3;estoque={};sel=2;cap=1;fogo=0;patins=0;escudo=false;stats={rob:0,cx:0,erro:0};novoRec=false;visto=REC.partidas>2?new Set(["ini"]):new Set();
+function novoJogo(){if(!BIPV.focoGasta(PID,"bomber"))return;arena=1;concluidas=0;pts=0;vidas=3;estoque={};sel=2;cap=1;fogo=0;patins=0;escudo=false;stats={rob:0,cx:0,erro:0};novoRec=false;visto=REC.partidas>2?new Set(["ini"]):new Set();
  cartas={};combinando=false;novasConq=[];ganhoJogo=0;estrelasJogo=0;avisouRec=false;bestIni=DEC(REC.best).arena;REC.partidas=(REC.partidas||0)+1;salvaREC();["sCarta"].forEach(id=>$(id).hidden=true);
  ["sStart","sEnd","sPause"].forEach(id=>$(id).hidden=true);$("hud").hidden=false;state="play";montarArena(1)}
 

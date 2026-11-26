@@ -223,6 +223,7 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a);
 let PID=(location.hash.match(/^#p-([\w-]+)/)||[])[1]||null;if(!PID)try{PID=localStorage.getItem("bipsite-cur")}catch(e){}
+setTimeout(()=>BIPV.focoMostra(PID,"defesa"),0);/* Modo foco: mostra a energia nas telas de início e fim */
 const LOOK=PID?BIPV.loja(PID).look:Object.assign({},BIPV.DEFAULT);
 /* ---------- recorde e Bipcoins: guardados junto com o Bip Runner (mesma chave) ----------
    best.definf = ondas vencidas × 100000 + pontos (até 99.999): quem vai mais longe fica no topo; os pontos desempatam.
@@ -486,7 +487,7 @@ const liberadas=()=>new Set(LIBERA.slice(0,wi+1).flat());
 const towerAt=i=>towers.find(t=>t.pad==i);
 const proxima=()=>cache[wi]||(cache[wi]=gerarOnda(wi));
 function limpar(){bugs.forEach(b=>dispose(b.G));bugs=[];shots.forEach(s=>dispose(s.o));shots=[];fila=[];towers.forEach(t=>dispose(t.G));towers=[];soltar();fecharMenu()}
-function novoJogo(){REC.druns=(REC.druns||0)+1;ganhoJogo=0;novoRec=false;salvar();limpar();
+function novoJogo(){if(!BIPV.focoGasta(PID,"defesa"))return;REC.druns=(REC.druns||0)+1;ganhoJogo=0;novoRec=false;salvar();limpar();
  wi=0;en=EN0;vidas=VIDAS;kills=0;pts=0;vencidas=0;carga=CMAX;combo=0;acertos=0;erros=0;escaparam=[];cache={};ondas={};visto=new Set();tSpawn=0;cedoVis=false;
  ["sStart","sEnd","sPause"].forEach(id=>$(id).hidden=true);$("hud").hidden=false;padsVisiveis();planejar()}
 function planejar(){state="plan";const L=proxima(),bo=$("bOnda");bo.hidden=false;bo.classList.remove("cedo");bo.textContent=`▶ Chamar onda ${wi+1}`;cedoVis=false;

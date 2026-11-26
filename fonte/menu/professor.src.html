@@ -58,6 +58,9 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .aula.on{border-color:var(--good);background:color-mix(in srgb,var(--good) 10%,transparent)}.aula.on .luz{background:var(--good);box-shadow:0 0 0 5px color-mix(in srgb,var(--good) 25%,transparent)}
 .aula .btn{font-size:1.05rem;padding:10px 22px}
 .aula .btn.abre{background:var(--good);color:#fff;border-color:transparent}
+.aula.foco{margin-top:10px}.aula.foco .luz{font-size:1.25rem;width:auto;height:auto;background:none;line-height:1}
+.aula.foco.on{border-color:#d9a400;background:color-mix(in srgb,#f2c230 14%,transparent)}.aula.foco.on .luz{background:none;box-shadow:none}
+.aula .btn.liga{background:#f2c230;color:#2a1a00;border-color:transparent}
 .head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
 .head .tx{flex:1;min-width:240px}
 .head h2{font-size:1.8rem}
@@ -234,6 +237,7 @@ th button[data-dir]::after{content:attr(data-dir);font-size:.9em}
    <div class="codebig"><small>Código da turma</small><b id="tCode">———</b><button class="btn sm" id="bCopy">Copiar</button></div>
   </div>
   <div class="aula" id="aula"></div>
+  <div class="aula foco" id="foco"></div>
   <div class="stats" id="stats"></div>
   <div class="tabbar">
    <div role="tablist" aria-label="O que ver da turma" class="acts" style="gap:4px">
@@ -340,7 +344,14 @@ function drawAula(){const t=turma,el=$("aula");
  el.className="aula"+(t.aberta?" on":"");
  el.innerHTML=t.aberta?`<span class="luz"></span><div class="tx"><b>Aula aberta${t.aberta_em?" desde "+hora(t.aberta_em):""}</b><span>Os alunos podem entrar na turma, e o progresso conta para o ranking.</span></div><button class="btn" id="bAula">■ Fechar aula</button>`
   :`<span class="luz"></span><div class="tx"><b>Turma fechada</b><span>Ninguém entra na turma. Em casa, os alunos podem jogar só no modo normal, que não conta para a turma.</span></div><button class="btn abre" id="bAula">▶ Abrir aula</button>`;
- $("bAula").onclick=()=>busy($("bAula"),async()=>{try{const r=await rpc("professor_aula",{p_turma:t.id,p_aberta:!t.aberta});t.aberta=r.aberta;t.aberta_em=r.aberta_em;drawAula()}catch(x){$("errRows").textContent=erroBip(x)}})}
+ $("bAula").onclick=()=>busy($("bAula"),async()=>{try{const r=await rpc("professor_aula",{p_turma:t.id,p_aberta:!t.aberta});t.aberta=r.aberta;t.aberta_em=r.aberta_em;drawAula()}catch(x){$("errRows").textContent=erroBip(x)}});drawFoco()}
+/* Modo foco: aulas dão energia (⚡2), cada partida de jogo rápido gasta ⚡1 */
+function drawFoco(){const t=turma,el=$("foco");
+ if(t.foco===undefined){el.className="aula foco";el.innerHTML='<span class="luz">⚡</span><div class="tx"><b>Modo foco</b><span>Para usar, falta rodar a atualização <b style="display:inline;font-size:inherit">006_foco.sql</b> no Supabase.</span></div>';return}
+ el.className="aula foco"+(t.foco?" on":"");
+ el.innerHTML=t.foco?`<span class="luz">⚡</span><div class="tx"><b>Modo foco ligado${t.foco_em?" desde "+hora(t.foco_em):""}</b><span>Cada aula da Academia ou fase nova do Robô dá ⚡${BIPV.FOCO_AULA}. Cada partida de jogo rápido gasta ⚡1.</span></div><button class="btn" id="bFoco">Desligar foco</button>`
+  :`<span class="luz">⚡</span><div class="tx"><b>Modo foco desligado</b><span>Ligue para os alunos precisarem fazer aulas (Academia ou Robô) para ganhar energia para os jogos rápidos.</span></div><button class="btn liga" id="bFoco">⚡ Ligar foco</button>`;
+ $("bFoco").onclick=()=>busy($("bFoco"),async()=>{try{const r=await rpc("professor_foco",{p_turma:t.id,p_foco:!t.foco});t.foco=r.foco;t.foco_em=r.foco_em;drawFoco();try{drawAlunos()}catch(e){}}catch(x){$("errRows").textContent=erroBip(x)}})}
 $("bBack").onclick=()=>go("turmas");
 $("bReload").onclick=()=>busy($("bReload"),loadAlunos);
 $("bCopy").onclick=()=>{const t=$("tCode").textContent;try{navigator.clipboard.writeText(t).then(()=>{$("bCopy").textContent="Copiado!";setTimeout(()=>$("bCopy").textContent="Copiar",1500)})}catch(e){}};
@@ -353,7 +364,9 @@ function stat(a){const pg=a.progresso||{},r=pg.robo||{},ac=pg.academia||{},lj=pg
  const dias=a.ultimo_acesso?(Date.now()-new Date(a.ultimo_acesso))/864e5:Infinity;
  return {a,feitas,done,fases:feitas.size,est,aulas:done.size,ativ:feitas.size+done.size,ganhos,gastos,saldo:ganhos-gastos,itens:owned.filter(id=>!BIPV.gratis(id)).length,look:lj.look||{},dias,
   run:+((ru.best||{}).tabuada)||0,run2:+((ru.best||{}).somasub)||0,runs:+ru.runs||0,rerr:ru.err||{},rtot:["tabuada","somasub"].reduce((o,k)=>{const t=(ru.tot||{})[k]||{};o.ok+=+t.ok||0;o.bad+=+t.bad||0;return o},{ok:0,bad:0}),snake:BIPV.snakeBest(ru),sruns:+ru.sruns||0,defesa:BIPV.defesaBest(ru),dfx:BIPV.defesaDec(BIPV.defesaBest(ru)),druns:+ru.druns||0,bomber:BIPV.bomberBest(ru),bfx:BIPV.bomberDec(BIPV.bomberBest(ru)),bruns:+ru.bruns||0,best_:+((ru.bmeta||{}).est)||0,
-  t7:BIPV.tempo7(ru.tempo),eq:BIPV.equilibrio(ru.tempo)}}
+  t7:BIPV.tempo7(ru.tempo),eq:BIPV.equilibrio(ru.tempo),concl:BIPV.concluidas(r,ac),fo:(ru.tempo||{}).foco||null}}
+/* energia do Modo foco de um aluno (só vale se ele já entrou com o foco ligado desta vez) */
+function energiaDe(S){if(!turma||!turma.foco||!S.fo||String(S.fo.id)!=String(turma.foco_em))return null;const g=BIPV.FOCO_AULA*Math.max(0,S.concl-(+S.fo.base||0)),x=+S.fo.gasto||0,v=+S.fo.volta||0;return {g,x,v,tem:g-x+v}}
 const av=S=>`<span class="bipav" aria-hidden="true">${BIPV.face2d(S.look)}</span>`;
 const pl=(n,um,varios)=>`${nf(n)} ${n==1?um:varios}`;
 let SS=[],tab=ls.get("bipsite-prof-tab")||"rank",crit=ls.get("bipsite-prof-crit")||"ativ",sortK=["apelido",1];
@@ -471,19 +484,20 @@ const CORJ={robo:"#3b82f6",academia:"#8b5cf6",runner:"#f97316",snake:"#22c55e",d
 const mins=s=>Math.round((+s||0)/60);
 function drawTempo(){const J=BIPV.JOGOS,n=SS.length;
  const leg=`<div class="legend">${J.map(g=>`<span><i style="background:${CORJ[g]}"></i>${BIPV.NOME_JOGO[g]}</span>`).join("")}</div>`;
- const head=`<p class="hint">Minutos de jogo de verdade nos últimos 7 dias (o relógio para quando o aluno fica mais de 1 minuto sem mexer). O <b>Equilíbrio do Bip</b> é automático: quando um jogo passa de ${Math.round(BIPV.EQ_LIM*100)}% do tempo do aluno, ele descansa até o aluno jogar ${BIPV.EQ_DESC/60} minutos nos jogos que menos joga, e esses dão +1 Bipcoin por minuto.</p>`;
+ const head=`<p class="hint">Minutos de jogo de verdade nos últimos 7 dias (o relógio para quando o aluno fica mais de 1 minuto sem mexer). O <b>Equilíbrio do Bip</b> é automático: quando um jogo passa de ${Math.round(BIPV.EQ_LIM*100)}% do tempo do aluno, ele descansa até o aluno jogar ${BIPV.EQ_DESC/60} minutos nos jogos que menos joga, e esses dão +1 Bipcoin por minuto.${turma&&turma.foco?` <b>Com o Modo foco ligado, o Equilíbrio fica desligado nesta turma</b>, e a coluna ⚡ Energia mostra quanto cada aluno ganhou fazendo aulas e gastou jogando (★ = energia que voltou jogando o jogo da vez). Para equilibrar os jogos, o jogo rápido que o aluno menos joga sai de graça e o que ele joga demais custa ⚡2.`:""}</p>`;;
  const tot={};J.forEach(g=>tot[g]=SS.reduce((s,S)=>s+S.t7[g],0));const T=J.reduce((s,g)=>s+tot[g],0);
  if(!n||!T){$("tabTempo").innerHTML=head+leg+'<p class="empty">O tempo aparece aqui quando os alunos jogarem com a turma aberta.</p>';return}
  const bar=t=>{const s=J.reduce((a,g)=>a+t[g],0);return `<div class="segbar">${s?J.filter(g=>t[g]>0).map(g=>`<i style="width:${t[g]/s*100}%;background:${CORJ[g]}" title="${BIPV.NOME_JOGO[g]}: ${mins(t[g])} min"></i>`).join(""):""}</div>`};
  const menos=J.slice().sort((x,y)=>tot[x]-tot[y])[0];
  const call=`<div class="callout">📊 A turma jogou <b>${nf(mins(T))} min</b> nesta semana. O jogo menos jogado é o <b>${BIPV.NOME_JOGO[menos]}</b> (${nf(mins(tot[menos]))} min).</div>`;
- const L=SS.slice().sort((x,y)=>y.eq.T-x.eq.T||x.a.apelido.localeCompare(y.a.apelido,"pt-BR"));
+ const L=SS.slice().sort((x,y)=>y.eq.T-x.eq.T||x.a.apelido.localeCompare(y.a.apelido,"pt-BR")),FO=turma&&turma.foco;
+ const enTd=S=>{if(!FO)return "";const e=energiaDe(S);return e?`<td class="nw" title="ganhou ⚡${e.g} fazendo aulas, gastou ⚡${e.x} em partidas${e.v?`, recebeu ⚡${e.v} de volta jogando o jogo da vez`:""}">⚡ <b>${e.tem}</b> <span class="sub">(+${e.g} −${e.x}${e.v?` +${e.v}★`:""})</span></td>`:'<td><span class="sub">ainda não entrou</span></td>'};
  const rows=L.map(S=>{const E=S.eq,lado=E.T?J.slice().sort((x,y)=>S.t7[x]-S.t7[y])[0]:null,desc=Object.keys(E.bloq);
   return `<tr><td><span class="mini">${av(S)}<b>${esc(S.a.apelido)}</b></span></td><td class="nw"><b>${nf(mins(E.T))}</b> min</td><td>${bar(S.t7)}</td>
    ${J.map(g=>`<td>${mins(S.t7[g])}</td>`).join("")}
-   <td>${!E.T?'<span class="sub">ainda não jogou</span>':`<span class="chip">${BIPV.NOME_JOGO[lado]}</span>`}</td><td><span class="chips">${desc.map(g=>`<span class="chip w" title="Descansando até o aluno jogar os outros">💤 ${BIPV.NOME_JOGO[g]}</span>`).join("")||'<span class="sub">—</span>'}</span></td></tr>`}).join("");
- $("tabTempo").innerHTML=head+leg+call+`<div class="tbl"><table class="tt"><thead><tr><th>Aluno</th><th>Total</th><th>Divisão</th>${J.map(g=>`<th title="${BIPV.NOME_JOGO[g]} (min)">${BIPV.NOME_JOGO[g].replace("Bip ","").replace(" Programador","").replace(" do Bip","")}</th>`).join("")}<th>Menos jogado</th><th>Descansando</th></tr></thead>
-  <tbody>${rows}</tbody><tfoot><tr><td><b>Turma</b></td><td class="nw"><b>${nf(mins(T))}</b> min</td><td>${bar(tot)}</td>${J.map(g=>`<td><b>${nf(mins(tot[g]))}</b></td>`).join("")}<td></td><td></td></tr></tfoot></table></div>`}
+   <td>${!E.T?'<span class="sub">ainda não jogou</span>':`<span class="chip">${BIPV.NOME_JOGO[lado]}</span>`}</td>${enTd(S)}<td><span class="chips">${desc.map(g=>`<span class="chip w" title="Descansando até o aluno jogar os outros">💤 ${BIPV.NOME_JOGO[g]}</span>`).join("")||'<span class="sub">—</span>'}</span></td></tr>`}).join("");
+ $("tabTempo").innerHTML=head+leg+call+`<div class="tbl"><table class="tt"><thead><tr><th>Aluno</th><th>Total</th><th>Divisão</th>${J.map(g=>`<th title="${BIPV.NOME_JOGO[g]} (min)">${BIPV.NOME_JOGO[g].replace("Bip ","").replace(" Programador","").replace(" do Bip","")}</th>`).join("")}<th>Menos jogado</th>${FO?'<th title="Modo foco: energia que o aluno tem agora (ganhou com aulas − gastou em partidas)">⚡ Energia</th>':""}<th>Descansando</th></tr></thead>
+  <tbody>${rows}</tbody><tfoot><tr><td><b>Turma</b></td><td class="nw"><b>${nf(mins(T))}</b> min</td><td>${bar(tot)}</td>${J.map(g=>`<td><b>${nf(mins(tot[g]))}</b></td>`).join("")}<td></td>${FO?"<td></td>":""}<td></td></tr></tfoot></table></div>`}
 
 function drawAlunos(){SS=alunos.map(stat);const n=SS.length,ativos=SS.filter(S=>S.dias<7).length,tot=k=>SS.reduce((s,S)=>s+S[k],0);
  $("nAlunos").textContent=pl(n,"aluno","alunos");

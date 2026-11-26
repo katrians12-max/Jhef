@@ -1,0 +1,140 @@
+"""Modo foco: professor liga/desliga; aula/fase nova dá ⚡2; cada partida de jogo rápido gasta ⚡1; relatório."""
+import asyncio,sys,subprocess,json
+from playwright.async_api import async_playwright
+B='http://localhost:8767';OUT=sys.argv[1] if len(sys.argv)>1 else '/tmp/'
+THREE=open('/tmp/claude-0/-home-claude/45cd848e-0f4f-57b8-918c-4bd4556fe55d/scratchpad/lib/three.min.js').read()
+def db(q):return subprocess.run(['psql','-h','/tmp','-p','5433','-U','postgres','-d','bip','-At','-c',q],capture_output=True,text=True).stdout.strip()
+ok=[];bad=[]
+def check(name,cond,info=''):
+    (ok if cond else bad).append(name);print(('  ✓ ' if cond else '  ✗ ')+name+(' — '+str(info) if info and not cond else ''))
+async def ctx(b,w=1280,h=860,mobile=False):
+    c=await b.new_context(viewport={'width':w,'height':h},is_mobile=mobile,has_touch=mobile)
+    async def rt(r):
+        u=r.request.url
+        if 'three.min.js' in u:await r.fulfill(body=THREE,content_type='application/javascript')
+        elif u.startswith(B):await r.continue_()
+        else:await r.abort()
+    await c.route('**/*',rt);pg=await c.new_page();errs=[];pg.on('pageerror',lambda e:errs.append(str(e)));return c,pg,errs
+EN="BIPV.energia(cur)"
+async def main():
+    async with async_playwright() as p:
+        b=await p.chromium.launch(args=['--ignore-gpu-blocklist','--use-gl=angle','--use-angle=swiftshader'])
+        cP,P,eP=await ctx(b)
+        await P.goto(B+'/professor.html');await P.wait_for_timeout(300)
+        await P.click('#toUp');await P.fill('#upName','Prof. Jhef');await P.fill('#upEmail','jhef@escola.br');await P.fill('#upPass','segredo123');await P.click('#bUp')
+        await P.wait_for_selector('#scrTurmas:not([hidden])',timeout=12000)
+        await P.fill('#tNome','7º ano A');await P.click('#bTurma');await P.wait_for_selector('#scrTurma:not([hidden])')
+        code=(await P.inner_text('#tCode')).strip();await P.click('#bAula');await P.wait_for_timeout(500)
+        check('professor vê o Modo foco desligado com botão de ligar','desligado' in await P.inner_text('#foco') and await P.is_visible('#bFoco'))
+        await P.click('#bFoco');await P.wait_for_timeout(500)
+        check('ligar foco: fica "Modo foco ligado"','ligado desde' in await P.inner_text('#foco'),await P.inner_text('#foco'))
+        check('banco guarda o foco ligado',db("select foco, foco_em is not null from turmas")=='t|t')
+        await P.screenshot(path=OUT+'f-prof.png')
+
+        print('ALUNO')
+        c1,A,e1=await ctx(b)
+        await A.goto(B+'/');await A.click('#bTurma');await A.click('#bTurmaNova')
+        await A.fill('#nCod',code);await A.fill('#nApe','Bia');await A.fill('#nPin','1234');await A.fill('#nPin2','1234');await A.click('#bNovaOk')
+        await A.wait_for_selector('#scrMenu:not([hidden])',timeout=12000);await A.wait_for_timeout(400)
+        check('saguão mostra a barra de energia com 0',await A.is_visible('#focoBar') and 'Modo foco: 0' in await A.inner_text('#focoBar'),await A.inner_text('#focoBar'))
+        check('sem energia: os 4 jogos rápidos ficam travados',await A.locator('.game .semE').count()==4 and all([await A.is_disabled('#'+g) for g in ['uGo','sGo','dGo','bGo']]))
+        check('Robô e Academia continuam livres',not await A.is_disabled('#rGo') and not await A.is_disabled('#aGo'))
+        await A.evaluate("localStorage.setItem('bipsite-ultimo:'+cur,'runner');drawMenu()")
+        check('sem energia, o botão principal troca o último jogo rápido pela Academia',await A.get_attribute('#bPlay','data-open')=='academia',await A.get_attribute('#bPlay','data-open'))
+        await A.screenshot(path=OUT+'f-sem.png')
+        # termina 1 aula da Academia e 1 fase do Robô
+        await A.evaluate("""(()=>{const k='academia-bip-3d-v1:'+cur,a=JSON.parse(localStorage.getItem(k)||'{}');a.done=(a.done||[]).concat(['a1']);localStorage.setItem(k,JSON.stringify(a));
+          const r='robo4:'+cur,o=JSON.parse(localStorage.getItem(r)||'{}');o.stars=Object.assign(o.stars||{},{'1-1':2});localStorage.setItem(r,JSON.stringify(o));drawMenu()})()""")
+        e=await A.evaluate(EN)
+        check('1 aula + 1 fase = ⚡4',e['energia']==4,e)
+        check('com energia os jogos rápidos liberam',await A.locator('.game .semE').count()==0 and not await A.is_disabled('#uGo') and 'Modo foco: 4' in await A.inner_text('#focoBar'))
+        await A.screenshot(path=OUT+'f-com.png')
+        await A.evaluate("""(()=>{const r='robo4:'+cur,o=JSON.parse(localStorage.getItem(r));o.stars['1-1']=3;localStorage.setItem(r,JSON.stringify(o));drawMenu()})()""")
+        check('refazer a mesma fase para mais estrelas não dá energia',(await A.evaluate(EN))['energia']==4)
+
+        print('PARTIDAS GASTAM')
+        await A.click('#uGo');await A.wait_for_timeout(1500);f=A.frames[1]
+        check('dentro do Runner aparece a energia','você tem 4' in await f.inner_text('.bip-foco'),await f.inner_text('body'))
+        await f.click('#bGo');await f.wait_for_timeout(300)
+        check('começar a corrida gasta ⚡1',(await A.evaluate(EN))['energia']==3)
+        for i in range(3):
+            await f.evaluate("state='menu';start()");await f.wait_for_timeout(150)
+        check('jogar de novo também gasta (3 partidas a mais → 0)',(await A.evaluate(EN))['energia']==0)
+        await f.evaluate("state='menu';$('sStart').hidden=false;start()");await f.wait_for_timeout(200)
+        check('sem energia: a partida não começa e aparece o aviso',await f.is_visible('#bipSemEnergia') and await f.evaluate("state")!='count','sem energia' in (await f.inner_text('.bip-foco')).lower())
+        await A.screenshot(path=OUT+'f-jogo-sem.png')
+        await f.click('#bipSemVolta');await A.wait_for_timeout(1500)
+        check('"Voltar e fazer uma aula" volta ao saguão',await A.is_hidden('#play'))
+        check('saguão de volta mostra 0 e trava de novo',await A.locator('.game .semE').count()==4)
+        await A.wait_for_timeout(800)
+        r=json.loads(db("select dados->'tempo'->'foco' from progresso where jogo='runner'") or 'null')
+        check('energia gasta salva na nuvem',r and r['gasto']==4 and r['base']==0,r)
+        # equilíbrio desligado com foco
+        await A.evaluate("""(()=>{const k=BIPV.tempoKey(cur),t=JSON.parse(localStorage.getItem(k));t.d={[diaHoje()]:{runner:3000,robo:60}};localStorage.setItem(k,JSON.stringify(t));drawMenu()})()""")
+        check('com foco ligado o Equilíbrio não trava jogo nenhum',await A.evaluate("EQ")==None and await A.locator('.game .desc').count()==0)
+
+        print('EQUILÍBRIO PELO PREÇO')
+        await A.evaluate("""(()=>{const k=BIPV.tempoKey(cur),t=JSON.parse(localStorage.getItem(k));t.foco.vez={dia:'2000-01-01',g:'runner'};localStorage.setItem(k,JSON.stringify(t));
+          const a='academia-bip-3d-v1:'+cur,o=JSON.parse(localStorage.getItem(a));o.done.push('a9');localStorage.setItem(a,JSON.stringify(o));drawMenu()})()""")
+        e=await A.evaluate(EN)
+        check('Runner (100% do tempo nos jogos rápidos) fica cansado: ⚡2',e['preco']['runner']==2 and e['vez']!='runner',e)
+        check('jogo da vez = um dos menos jogados, custa ⚡1',e['vez'] in ['snake','defesa','bomber'] and e['preco'][e['vez']]==1)
+        go={'runner':'uGo','snake':'sGo','defesa':'dGo','bomber':'bGo'}
+        tr=await A.inner_text('#uGo >> xpath=ancestor::article');tv=await A.inner_text(f"#{go[e['vez']]} >> xpath=ancestor::article")
+        check('cartões mostram o preço (⚡2 cansado / ★ da vez)','⚡2 cansado' in tr and '★ da vez' in tv,(tr[:80],tv[:80]))
+        await A.screenshot(path=OUT+'f-precos.png')
+        await A.evaluate(f"BIPV.focoGasta(cur,'{e['vez']}');drawMenu()")
+        e2=await A.evaluate(EN)
+        check('com ⚡1 o Runner cansado trava e manda para o jogo da vez',e2['energia']==1 and await A.is_disabled('#uGo') and 'Precisa de ⚡2' in await A.inner_text('#uGo >> xpath=ancestor::article') and not await A.is_disabled('#'+go[e['vez']]))
+        await A.evaluate(f"for(let i=0;i<36;i++)contaTempo(curP(),'{e['vez']}',5);drawMenu()")
+        e3=await A.evaluate(EN)
+        check('3 minutos jogando o jogo da vez devolvem ⚡1',e3['energia']==2 and e3['volta']==1,e3)
+        check('o saguão avisa que a energia voltou','de volta pelo jogo da vez' in await A.inner_text('#focoBar') or e3['volta']==1)
+        await A.evaluate(f"for(let i=0;i<72;i++)contaTempo(curP(),'{e['vez']}',5);drawMenu()")
+        check('no máximo ⚡1 de volta por partida',(await A.evaluate(EN))['energia']==2)
+        await A.evaluate(f"BIPV.focoGasta(cur,'{e['vez']}');BIPV.focoGasta(cur,'{e['vez']}');drawMenu()")
+        check('gastou o resto: 0',(await A.evaluate(EN))['energia']==0)
+
+        print('OUTROS JOGOS')
+        await A.evaluate("""(()=>{const k='academia-bip-3d-v1:'+cur,a=JSON.parse(localStorage.getItem(k));a.done.push('a2');localStorage.setItem(k,JSON.stringify(a));drawMenu()})()""")
+        pid=await A.evaluate("cur")
+        for g,fn in [('snake','start()'),('defesa','novoJogo()'),('bomber','novoJogo()')]:
+            c2,G,eg=await ctx(b)
+            await G.goto(B+'/');await G.evaluate("([p,t,a,r])=>{localStorage.setItem('bipsite-profiles',p);localStorage.setItem(BIPV.tempoKey(JSON.parse(p)[0].id),t);localStorage.setItem('academia-bip-3d-v1:'+JSON.parse(p)[0].id,a);localStorage.setItem('robo4:'+JSON.parse(p)[0].id,r)}",
+               [await A.evaluate("localStorage.getItem('bipsite-profiles')"),await A.evaluate("localStorage.getItem(BIPV.tempoKey(cur))"),await A.evaluate("localStorage.getItem('academia-bip-3d-v1:'+cur)"),await A.evaluate("localStorage.getItem('robo4:'+cur)")])
+            await G.goto(B+f'/{g}.html#p-{pid}');await G.wait_for_timeout(1500)
+            n0=await G.evaluate(f"BIPV.energia('{pid}').energia");await G.evaluate(fn);await G.wait_for_timeout(300)
+            n1=await G.evaluate(f"BIPV.energia('{pid}').energia");await G.evaluate("state='menu'");await G.evaluate(fn);await G.wait_for_timeout(300)
+            n2=await G.evaluate(f"BIPV.energia('{pid}').energia");await G.evaluate(fn);await G.wait_for_timeout(300)
+            check(f'{g}: cada partida gasta ⚡1 e sem energia não começa ({n0}→{n1}→{n2})',n0==2 and n1==1 and n2==0 and await G.is_visible('#bipSemEnergia'),(n0,n1,n2))
+            E=[x for x in eg if 'WebGL' not in x];check(f'{g}: sem erros de JavaScript',not E,E[:2]);await c2.close()
+
+        print('PROFESSOR: RELATÓRIO E DESLIGAR')
+        await A.evaluate("push(curP())");await A.wait_for_timeout(800)
+        await P.click('#bReload');await P.wait_for_timeout(900);await P.click('[data-tab="tempo"]');await P.wait_for_timeout(200)
+        t=await P.inner_text('#tabTempo')
+        check('relatório mostra a energia da aluna (ganhou 8 · gastou 7 · voltou 1 → tem 2)','⚡ 2' in t and '+8' in t and '−7' in t and '+1★' in t,t[-600:])
+        check('relatório avisa que o Equilíbrio está desligado','Equilíbrio fica desligado' in t)
+        await P.click('#bFoco');await P.wait_for_timeout(500)
+        check('desligar foco',('desligado' in await P.inner_text('#foco')) and db("select foco from turmas")=='f')
+        await A.evaluate("pull(curP()).then(()=>drawMenu())");await A.wait_for_timeout(800)
+        check('foco desligado: barra some e os jogos rápidos voltam (o Equilíbrio volta a valer)',await A.is_hidden('#focoBar') and await A.locator('.game .semE').count()==0 and not await A.is_disabled('#dGo') and await A.evaluate("EQ!=null"))
+        await P.click('#bFoco');await P.wait_for_timeout(500)
+        await A.evaluate("pull(curP()).then(()=>drawMenu())");await A.wait_for_timeout(800)
+        e=await A.evaluate(EN)
+        check('religar o foco recomeça do zero (aulas antigas não contam)',e and e['energia']==0,e)
+
+        print('OUTRO APARELHO E MODO NORMAL')
+        c3,M,e3=await ctx(b,390,844,True)
+        await M.goto(B+'/');await M.click('#bTurma');await M.fill('#tCod',code);await M.fill('#tApe','Bia');await M.fill('#tPin','1234');await M.click('#bTurmaOk')
+        await M.wait_for_selector('#scrMenu:not([hidden])',timeout=12000);await M.wait_for_timeout(600)
+        check('no celular a energia é a mesma',await M.evaluate("BIPV.energia(cur).energia")==await A.evaluate(EN+".energia"))
+        await M.locator('#focoBar').scroll_into_view_if_needed();await M.screenshot(path=OUT+'f-cel.png')
+        w=await M.evaluate("document.documentElement.scrollWidth");check('celular sem rolagem lateral',w<=390,w)
+        c4,N,e4=await ctx(b)
+        await N.goto(B+'/');await N.click('#bNew');await N.fill('#inName','Leo');await N.click('#fNew button[type=submit]');await N.wait_for_timeout(800)
+        check('perfil do modo normal não tem foco',await N.is_hidden('#focoBar') and await N.evaluate("BIPV.energia(cur)")==None and not await N.is_disabled('#uGo'))
+        E=[x for x in eP+e1+e3+e4 if 'WebGL' not in x];check('sem erros de JavaScript',not E,E[:3])
+        await b.close()
+    print(f'\n{len(ok)} ok, {len(bad)} falharam');sys.exit(1 if bad else 0)
+asyncio.run(main())

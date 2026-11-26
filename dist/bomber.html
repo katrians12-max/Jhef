@@ -303,7 +303,59 @@ function tempo7(tp,agora){const o={};JOGOS.forEach(g=>o[g]=0);const d=(tp&&tp.d)
 function ganhosVez(tp){let c=0;const v=(tp&&tp.vez)||{};for(const k in v)c+=Math.max(0,Math.min(VEZ_DIA,Math.floor((+v[k]||0)/60)));return c}
 function mergeTempo(a,b){if(!a)return b;if(!b)return a;const d={};for(const s of [a.d||{},b.d||{}])for(const k in s){d[k]=d[k]||{};for(const g in s[k])d[k][g]=Math.max(+d[k][g]||0,+s[k][g]||0)}
  const vez={...(a.vez||{})};for(const k in b.vez||{})vez[k]=Math.max(+vez[k]||0,+b.vez[k]||0);
- return {d,vez,eq:(((a.eq||{}).t||0)>=((b.eq||{}).t||0)?a.eq:b.eq)||{}}}
+ const fa=a.foco,fb=b.foco;let foco=fa||fb;
+ if(fa&&fb)foco=fa.id==fb.id?{id:fa.id,base:Math.min(+fa.base||0,+fb.base||0),gasto:Math.max(+fa.gasto||0,+fb.gasto||0),volta:Math.max(+fa.volta||0,+fb.volta||0),
+   vezAtual:Math.max(+fa.vezAtual||0,+fb.vezAtual||0),vezSeg:Math.max(+fa.vezSeg||0,+fb.vezSeg||0),vez:((fa.vez||{}).dia||"")>=((fb.vez||{}).dia||"")?fa.vez:fb.vez}:(String(fa.id)>String(fb.id)?fa:fb);
+ const r={d,vez,eq:(((a.eq||{}).t||0)>=((b.eq||{}).t||0)?a.eq:b.eq)||{}};if(foco)r.foco=foco;return r}
+/* ===== MODO FOCO (o professor liga por turma): cada aula da Academia ou fase NOVA do Robô dá ⚡2;
+   cada partida de jogo rápido (Runner, Snake, Defesa, Bomber) gasta ⚡1. Sem limite: quanto mais aulas, mais energia.
+   A energia não fica guardada como número: é (aulas+fases concluídas desde que o Foco foi ligado) × 2 − partidas jogadas.
+   tempo.foco = {id: quando o professor ligou, base: aulas+fases que o aluno já tinha, gasto: partidas} */
+const FOCO_AULA=2,JOGOS_RAPIDOS=["runner","snake","defesa","bomber"],FOCO_CANSADO=.4,FOCO_MIN=15*60,FOCO_VOLTA=180;
+/* para o aluno aprender TODOS os jogos, o preço muda: o jogo rápido que ele menos jogou na semana é o "⭐ jogo da vez"
+   (custa ⚡1, mas a cada 3 min jogando de verdade a energia volta: na prática é de graça para quem se esforça);
+   o jogo que passou de 40% do tempo dele nos jogos rápidos da semana fica "cansado" e custa ⚡2. */
+function focoVez(tp){const f=tp.foco,hoje=diaDe(new Date());if(f.vez&&f.vez.dia==hoje&&JOGOS_RAPIDOS.includes(f.vez.g))return f.vez.g;
+ const t=tempo7(tp),g=JOGOS_RAPIDOS.slice().sort((x,y)=>t[x]-t[y])[0];f.vez={dia:hoje,g};return g}
+function precos(tp){const t=tempo7(tp),T=JOGOS_RAPIDOS.reduce((s,x)=>s+t[x],0),vez=focoVez(tp),o={};
+ for(const g of JOGOS_RAPIDOS)o[g]=g==vez?1:(T>=FOCO_MIN&&t[g]/T>FOCO_CANSADO?2:1);return {vez,preco:o}}
+const concluidas=(robo,acad)=>{let n=0;const st=(robo&&robo.stars)||{};for(const k in st)if(+st[k]>0)n++;return n+((acad&&acad.done)||[]).length};
+function focoDe(pid){const p=(ls("bipsite-profiles")||[]).find(q=>q.id==pid),t=p&&p.cloud&&p.cloud.turma;return t&&t.foco?String(t.foco_em||"ligado"):null}
+function energia(pid){const id=focoDe(pid);if(!id)return null;const k=tempoKey(pid),tp=ls(k)||{},n=concluidas(ls("robo4:"+pid),ls("academia-bip-3d-v1:"+pid));
+ if(!tp.foco||tp.foco.id!=id)tp.foco={id,base:n,gasto:0};
+ const P=precos(tp);try{localStorage.setItem(k,JSON.stringify(tp))}catch(e){}
+ const f=tp.foco,ganhou=FOCO_AULA*Math.max(0,n-(+f.base||0)),gasto=+f.gasto||0,volta=+f.volta||0;
+ return {id,ganhou,gasto,volta,energia:ganhou-gasto+volta,vez:P.vez,preco:P.preco,vezSeg:+f.vezSeg||0}}
+/* chamado a cada 5 s de jogo de verdade (pelo saguão): no jogo da vez, a cada 3 min devolve ⚡1 (no máximo 1 por partida) */
+function focoConta(pid,g,s){const e=energia(pid);if(!e||g!=e.vez)return false;const k=tempoKey(pid),tp=ls(k)||{},f=tp.foco;if(!f)return false;
+ let volta=false;if(f.vezAtual){f.vezSeg=(+f.vezSeg||0)+s;if(f.vezSeg>=FOCO_VOLTA){f.vezSeg=0;f.vezAtual=0;f.volta=(+f.volta||0)+1;volta=true}}else f.vezSeg=0;
+ try{localStorage.setItem(k,JSON.stringify(tp))}catch(e){}return volta}
+/* chamado quando uma partida começa: gasta ⚡1. Sem energia, mostra o aviso e a partida não começa. */
+function focoGasta(pid,g){const e=energia(pid);if(!e){focoMostra(pid,g);return true}const p=e.preco[g]||1;
+ if(e.energia<p){focoSemEnergia(p,e,g);focoMostra(pid,g);return false}
+ const k=tempoKey(pid),tp=ls(k)||{};tp.foco.gasto=(+tp.foco.gasto||0)+p;tp.foco.vezAtual=g==e.vez?1:0;tp.foco.vezSeg=0;/* só a partida que acabou de começar pode devolver ⚡1 */
+ try{localStorage.setItem(k,JSON.stringify(tp))}catch(e){}focoMostra(pid,g);return true}
+const precoTxt=(e,g)=>g==e.vez?`⭐ Este é o seu <b>jogo da vez</b>: a partida gasta ⚡1, mas jogando 3 minutos a energia volta.`
+ :e.preco[g]>1?`😮‍💨 Você jogou muito este jogo: cada partida gasta <b>⚡${e.preco[g]}</b>. O jogo da vez (${NOME_JOGO[e.vez]}) sai de graça.`:`Cada partida gasta ⚡1.`;
+function focoMostra(pid,g){if(typeof document=="undefined")return;const e=energia(pid);
+ document.querySelectorAll("#bGo,#bAgain,#bNovo").forEach(b=>{const row=b.parentElement;let el=row.parentElement.querySelector(":scope > .bip-foco");
+  if(!e){if(el)el.remove();return}
+  if(!el){el=document.createElement("p");el.className="bip-foco";el.style.cssText="margin:0;padding:8px 12px;border-radius:12px;background:rgba(242,194,48,.14);border:1px solid rgba(242,194,48,.5);color:#ffe9a6;font-weight:700;font-size:.92rem;text-align:center";row.parentElement.insertBefore(el,row)}
+  el.innerHTML=e.energia>0?`⚡ Modo foco · você tem <b style="color:#fff">${e.energia}</b> ${e.energia==1?"energia":"energias"}. ${g?precoTxt(e,g):"Cada partida gasta 1."}`
+   :`⚡ Modo foco · sem energia. Faça uma aula da Academia ou uma fase do Robô para ganhar ⚡${FOCO_AULA}.`})}
+function focoSemEnergia(p,e,g){if(typeof document=="undefined")return;let d=document.getElementById("bipSemEnergia");if(d)d.remove();d=null;
+ const tit=e&&e.energia>0?`Falta energia`:`Sem energia`,extra=e&&e.energia>0&&p>1?`<p style="margin:0;color:#ffe9a6">Este jogo está <b>cansado</b> (⚡${p} por partida) porque você jogou muito ele. O <b>⭐ jogo da vez</b> (${NOME_JOGO[e.vez]}) sai de graça!</p>`:"";
+ if(!d){d=document.createElement("div");d.id="bipSemEnergia";d.setAttribute("role","alertdialog");d.setAttribute("aria-modal","true");
+  d.style.cssText="position:fixed;inset:0;z-index:99;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,8,22,.78);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)";
+  d.innerHTML=`<div style="max-width:400px;background:#121a36;border:1px solid rgba(255,255,255,.2);border-radius:22px;padding:24px;text-align:center;color:#fff;font-family:inherit;display:flex;flex-direction:column;gap:12px;align-items:center">
+   <div style="font-size:3rem;line-height:1">⚡</div><b style="font-size:1.4rem">${tit}</b>${extra}
+   <p style="margin:0;color:#c9d3f5">O professor ligou o <b>Modo foco</b>. Cada aula da Academia ou fase nova do Robô dá <b>⚡${FOCO_AULA}</b>, e cada partida gasta ⚡1.</p>
+   <button id="bipSemVolta" style="font:inherit;font-weight:800;border:0;border-radius:14px;padding:10px 20px;background:#f2c230;color:#2a1a00;cursor:pointer">← Voltar e fazer uma aula</button>
+   <button id="bipSemFica" style="font:inherit;border:0;background:none;color:#c9d3f5;text-decoration:underline;cursor:pointer">Ficar aqui</button></div>`;
+  document.body.appendChild(d);
+  d.querySelector("#bipSemVolta").onclick=()=>{d.remove();const a=document.querySelector("a.back");if(a)a.click();else location.href="./"};
+  d.querySelector("#bipSemFica").onclick=()=>d.remove()}
+ d.querySelector("#bipSemVolta").focus()}
 function equilibrio(tp){const t=tempo7(tp),T=JOGOS.reduce((s,g)=>s+t[g],0),eq=(tp&&tp.eq)||{},bloq=eq.bloq||{},media=T/JOGOS.length;
  const vd=eq.vd&&eq.vd.dia==diaDe(new Date())?eq.vd.g:null,/* os jogos da vez ficam fixos o dia inteiro */
   vez=(vd||(T>=600?JOGOS.filter(g=>t[g]<media).sort((x,y)=>t[x]-t[y]).slice(0,2):[])).filter(g=>!bloq[g]);
@@ -648,7 +700,7 @@ const ICON=(()=>{const SZ=160;let R=null,scene,cam,P,arc,props,ok=null;const cac
   if(fila.length)requestAnimationFrame(proximo);else rodando=false}
  return {item:(id,look,cb)=>pedir("i:"+id,look,l=>fazItem(id,l),cb),pose:(n,look,cb)=>pedir("p:"+n,look,l=>fazPose(n,l),cb),ok:()=>init()}})();
 
-return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,BOMB_DIA,ganhosBomber,bomberBest,bomberDec,JOGOS,NOME_JOGO,EQ_MIN,EQ_LIM,EQ_DESC,EQ_CRED,VEZ_DIA,tempoKey,diaDe,tempo7,ganhosVez,mergeTempo,equilibrio,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
+return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,BOMB_DIA,ganhosBomber,bomberBest,bomberDec,FOCO_AULA,JOGOS_RAPIDOS,FOCO_CANSADO,FOCO_MIN,FOCO_VOLTA,precos,focoConta,concluidas,focoDe,energia,focoGasta,focoMostra,JOGOS,NOME_JOGO,EQ_MIN,EQ_LIM,EQ_DESC,EQ_CRED,VEZ_DIA,tempoKey,diaDe,tempo7,ganhosVez,mergeTempo,equilibrio,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
  faceTex,eyePreview,buildBody,dress,tick,setMood,glowTex,face2d,patTex,ICON}})();
 </script>
 <script>window.BIP_CFG={"url": "https://plxnximnaphzcfoazbpk.supabase.co", "key": "sb_publishable_wUTEKu_akkP0lR2uDm44vQ_i2rrtHPn"};</script>
@@ -709,6 +761,7 @@ const erroBip=e=>(e&&ERROS_BIP[e.code])||(e&&e.msg)||"Algo deu errado. Tente de 
 const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a),rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[Math.floor(Math.random()*a.length)];
 let PID=(location.hash.match(/^#p-([\w-]+)/)||[])[1]||null;if(!PID)try{PID=localStorage.getItem("bipsite-cur")}catch(e){}
+setTimeout(()=>BIPV.focoMostra(PID,"bomber"),0);/* Modo foco: mostra a energia nas telas de início e fim */
 const LOOK=PID?BIPV.loja(PID).look:Object.assign({},BIPV.DEFAULT);
 const INFRAME=window.parent!==window;
 function voltar(e){if(INFRAME){e&&e.preventDefault();window.parent.postMessage({bip:"menu"},"*")}}
@@ -1108,7 +1161,7 @@ function fim(){state="end";$("hud").hidden=true;$("eT").textContent=concluidas?`
  $("eGanho").innerHTML=ganhoJogo?`Você ganhou <b style="color:#ffd24a">${ganhoJogo} Bipcoins</b> nesta partida.`:hojeCoins()>=BIPV.BOMB_DIA?"Você já ganhou todos os Bipcoins do Bip Bomber hoje. O recorde continua valendo!":"";
  const pc=proximaConq();$("eProx").innerHTML=pc?`Próxima conquista: <b>${pc.c.n}</b>: ${pc.c.d} (${nf(pc.v)}/${nf(pc.c.alvo)})${pc.c.lib?`, libera a carta <b>${CARTAS[pc.c.lib].n}</b>`:""}`:"Você liberou todas as conquistas!";
  drawRec();$("sEnd").hidden=false;$("bNovo").focus()}
-function novoJogo(){arena=1;concluidas=0;pts=0;vidas=3;estoque={};sel=2;cap=1;fogo=0;patins=0;escudo=false;stats={rob:0,cx:0,erro:0};novoRec=false;visto=REC.partidas>2?new Set(["ini"]):new Set();
+function novoJogo(){if(!BIPV.focoGasta(PID,"bomber"))return;arena=1;concluidas=0;pts=0;vidas=3;estoque={};sel=2;cap=1;fogo=0;patins=0;escudo=false;stats={rob:0,cx:0,erro:0};novoRec=false;visto=REC.partidas>2?new Set(["ini"]):new Set();
  cartas={};combinando=false;novasConq=[];ganhoJogo=0;estrelasJogo=0;avisouRec=false;bestIni=DEC(REC.best).arena;REC.partidas=(REC.partidas||0)+1;salvaREC();["sCarta"].forEach(id=>$(id).hidden=true);
  ["sStart","sEnd","sPause"].forEach(id=>$(id).hidden=true);$("hud").hidden=false;state="play";montarArena(1)}
 

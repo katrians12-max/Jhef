@@ -163,6 +163,7 @@ const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return 
 /* ---------- quem está jogando (mesmo perfil do Mundo do Bip) ---------- */
 /* o menu abre o jogo como runner.html#p-<perfil>; aberto direto, usa o último perfil */
 let PID=(location.hash.match(/^#p-([\w-]+)/)||[])[1]||null;if(!PID)try{PID=localStorage.getItem("bipsite-cur")}catch(e){}
+setTimeout(()=>BIPV.focoMostra(PID,"runner"),0);/* Modo foco: mostra a energia nas telas de início e fim */
 const LOOK=PID?BIPV.loja(PID).look:Object.assign({},BIPV.DEFAULT);
 const RKEY=BIPV.runKey(PID||"anon");
 const REC=Object.assign({v:1,best:{},runs:0,coins:{},err:{},tot:{}},ls.get(RKEY)||{});
@@ -314,7 +315,7 @@ function dropGate(g){scene.remove(g.G);g.G.traverse(o=>{if(o.material){if(o.mate
 /* ---------- regras ---------- */
 let S=null,state="menu",last=performance.now(),tAll=0;
 const LV=lv=>({v:Math.min(21,11+lv*1.5),T:Math.max(2.4,4.6-lv*.32)});
-function start(){for(const g of gates)dropGate(g);gates=[];recent=[];
+function start(){if(!BIPV.focoGasta(PID,"runner"))return;for(const g of gates)dropGate(g);gates=[];recent=[];
  S={score:0,ok:0,okM:0,pausas:0,bad:0,combo:0,best:0,lives:modo=="treino"?Infinity:3,lv:0,erros:[],q:null,dist:0,speed:LV(0).v};
  Bip.lane=1;Bip.x=0;drawLives();$("sc").textContent="0";$("cb").textContent="";
  ["sStart","sEnd","sPause"].forEach(id=>$(id).hidden=true);$("hud").hidden=false;$("q").style.visibility="hidden";

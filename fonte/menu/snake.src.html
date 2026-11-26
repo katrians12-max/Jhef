@@ -176,6 +176,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 /* ---------- quem está jogando (mesmo perfil do Mundo do Bip) ---------- */
 /* o Snake guarda os dados junto com o Bip Runner (mesma chave): recordes em best.snake<modo>, Bipcoins do dia em scoins */
 let PID=(location.hash.match(/^#p-([\w-]+)/)||[])[1]||null;if(!PID)try{PID=localStorage.getItem("bipsite-cur")}catch(e){}
+setTimeout(()=>BIPV.focoMostra(PID,"snake"),0);/* Modo foco: mostra a energia nas telas de início e fim */
 const LOOK=PID?BIPV.loja(PID).look:Object.assign({},BIPV.DEFAULT);
 const RKEY=BIPV.runKey(PID||"anon");
 const REC=Object.assign({v:1,best:{},runs:0,coins:{},err:{},tot:{},sruns:0,scoins:{}},ls.get(RKEY)||{});REC.scoins=REC.scoins||{};REC.best=REC.best||{};REC.err=REC.err||{};
@@ -319,7 +320,7 @@ const POR_FASE=8,VIDAS=3;
 let S=null,state="menu",last=performance.now(),tAll=0,acc=0;
 let body=[],prev=[],dir=[1,0],queue=[],wagons=[],tokens=[],plates=[],grow=0;
 function stepTime(){return Math.max(.19,.4-S.ok*.006)}
-function start(){clearBoard();recent=[];
+function start(){if(!BIPV.focoGasta(PID,"snake"))return;clearBoard();recent=[];
  S={ok:0,bad:0,combo:0,best:0,lives:VIDAS,phase:0,inPhase:0,okConta:0,erros:[],kind:"regra",rule:null,q:null};
  body=[[4,6],[3,6],[2,6]];prev=body.map(p=>p.slice());dir=[1,0];queue=[];grow=0;plates=[];
  for(let i=1;i<body.length;i++)wagons.push(makeWagon(i-1,null));
