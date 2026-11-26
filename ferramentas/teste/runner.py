@@ -61,6 +61,31 @@ async def main():
         # contas: 300 geradas, todas com 3 opções diferentes, positivas e uma certa
         r=await P.evaluate("(()=>{let bad=0;for(let lv=0;lv<7;lv++)for(let i=0;i<300;i++){const q=pergunta(lv);const ok=new Set(q.opts).size==3&&q.opts.every(x=>Number.isInteger(x)&&x>0)&&q.opts[q.ok]==q.c&&q.opts.filter(x=>x==q.c).length==1;const [a,op,b]=q.txt.split(' ');if(!ok||(op=='×'?a*b:a/b)!=q.c)bad++}return bad})()")
         check('2.100 contas geradas: todas corretas e com 3 opções válidas',r==0,r)
+        # ---- trilha nova: adição e subtração ----
+        r=await P.evaluate("""(()=>{const t0=trilha;trilha='somasub';let bad=[],sub=0,neg=0,erroVaiUm=0,n=0,dig=[];
+          for(let lv=0;lv<8;lv++){let mx=0;for(let i=0;i<300;i++){const q=pergunta(lv);n++;const [a,op,b]=q.txt.split(' ');
+            const conta=op=='+'?+a + +b:op=='−'?a-b:NaN;if(op=='−')sub++;if(q.c<0)neg++;mx=Math.max(mx,+a,+b);
+            const ok=new Set(q.opts).size==3&&q.opts.every(x=>Number.isInteger(x)&&x>0)&&q.opts[q.ok]==q.c&&conta==q.c;if(!ok)bad.push(q);
+            if(op=='+'){const e=porCasa(+a,+b,(x,y)=>(x+y)%10);if(e!=q.c&&q.opts.includes(e))erroVaiUm++}}dig.push(mx)}
+          trilha=t0;return {bad:bad.length,ex:bad.slice(0,2),sub,n,neg,erroVaiUm,dig}})()""")
+        check('2.400 contas de + e −: todas certas, 3 opções positivas e diferentes',r['bad']==0,r)
+        check('metade é subtração, e nenhuma dá negativo',0.4<r['sub']/r['n']<0.6 and r['neg']==0,r)
+        check('portais errados trazem o erro de esquecer o "vai um"',r['erroVaiUm']>100,r['erroVaiUm'])
+        check('dificuldade sobe: nível 1 até 20, níveis altos com centenas',r['dig'][0]<=19 and r['dig'][1]<100 and r['dig'][5]>=100,r['dig'])
+        await P.goto(B+'/runner.html');await P.wait_for_timeout(1000)
+        check('menu mostra a trilha Adição e subtração liberada',await P.is_enabled('[data-tr="somasub"]'))
+        await P.click('[data-tr="somasub"]');await P.click('#bGo');await P.wait_for_timeout(4000)
+        qt=await P.inner_text('#qt');ql=await P.inner_text('#qlab')
+        check('corrida de + e −: conta com + ou − e rótulo da trilha',('+' in qt or '−' in qt) and 'ADIÇÃO E SUBTRAÇÃO' in ql.upper(),(qt,ql))
+        te=await P.evaluate("(()=>{const a=tempoExtra(4);trilha='tabuada';const b=tempoExtra(4);trilha='somasub';return [a,b]})()")
+        check('conta de + e − com mais algarismos ganha mais tempo',te[0]>1 and te[1]==1,te)
+        await P.evaluate("trilha='somasub'");await P.evaluate("S.score=777;state='over';end()");await P.wait_for_timeout(1200)
+        bs=await P.evaluate("JSON.parse(localStorage.getItem(BIPV.runKey(PID))).best")
+        check('recorde separado por trilha (somasub = 777, tabuada intacto)',bs.get('somasub')==777 and bs.get('tabuada',0)!=777,bs)
+        await P.evaluate("(()=>{const k=BIPV.runKey(PID),r=JSON.parse(localStorage.getItem(k));r.coins={};localStorage.setItem(k,JSON.stringify(r))})()")
+        await P.goto(B+'/runner.html');await P.wait_for_timeout(800)
+        check('o jogo lembra a última trilha escolhida',await P.get_attribute('[data-tr="somasub"]','aria-pressed')=='true')
+        await P.click('[data-tr="tabuada"]')
         check('sem erros de script (computador)',not e,e[:2])
         # ---- pelo menu (oficial): abre em tela cheia, ganha Bipcoins, volta ao saguão ----
         await P.goto(B+'/');await P.wait_for_timeout(1500)

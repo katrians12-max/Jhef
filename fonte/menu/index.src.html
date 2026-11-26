@@ -764,7 +764,7 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  $("aTxt").textContent=`${st.aDone} de ${ACAD.length} aulas`;$("aLv").innerHTML=`+${BIPV.POR_AULA} ${BIPV.COIN} por aula`;$("aBar").style.width=st.aDone/ACAD.length*100+"%";
  $("aGo").textContent=st.aDone?"Continuar":"Começar";
  const ru=runSave(p.id),hoje=Math.min(BIPV.RUN_DIA,Math.floor((ru.coins||{})[diaHoje()]||0));
- $("uTxt").textContent=`Recorde: ${BIPV.fmt((ru.best||{}).tabuada||0)}`;$("uLv").innerHTML=`hoje ${hoje}/${BIPV.RUN_DIA} ${BIPV.COIN}`;$("uBar").style.width=hoje/BIPV.RUN_DIA*100+"%";
+ $("uTxt").textContent=`Recorde: ${BIPV.fmt(Math.max(+(ru.best||{}).tabuada||0,+(ru.best||{}).somasub||0))}`;$("uLv").innerHTML=`hoje ${hoje}/${BIPV.RUN_DIA} ${BIPV.COIN}`;$("uBar").style.width=hoje/BIPV.RUN_DIA*100+"%";
  {const sh=Math.min(BIPV.SNAKE_DIA,Math.floor((ru.scoins||{})[diaHoje()]||0)),sb=BIPV.snakeBest(ru);$("sTxt").textContent=`Recorde: ${sb}`;$("sTxt").title=`${sb} ${sb==1?"vagão":"vagões"}`;$("sLv").innerHTML=`hoje ${sh}/${BIPV.SNAKE_DIA} ${BIPV.COIN}`;$("sBar").style.width=sh/BIPV.SNAKE_DIA*100+"%"}
  {const dh=Math.min(BIPV.DEF_DIA,Math.floor((ru.dcoins||{})[diaHoje()]||0));{const d=BIPV.defesaDec(BIPV.defesaBest(ru));$("dTxt").textContent=d.onda?`Recorde: onda ${d.onda}`:"Recorde: —";$("dTxt").title=`${BIPV.fmt(d.pts)} pontos`}$("dLv").innerHTML=`hoje ${dh}/${BIPV.DEF_DIA} ${BIPV.COIN}`;$("dBar").style.width=dh/BIPV.DEF_DIA*100+"%"}
  {const bh=Math.min(BIPV.BOMB_DIA,Math.floor((ru.bcoins||{})[diaHoje()]||0)),d=BIPV.bomberDec(BIPV.bomberBest(ru));$("bTxt").textContent=d.arena?`Recorde: arena ${d.arena}`:"Recorde: —";$("bTxt").title=`${BIPV.fmt(d.pts)} pontos`;$("bLv").innerHTML=`hoje ${bh}/${BIPV.BOMB_DIA} ${BIPV.COIN}`;$("bBar").style.width=bh/BIPV.BOMB_DIA*100+"%"}
@@ -784,7 +784,7 @@ function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.i
 const diaHoje=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const runSave=id=>ls.get(BIPV.runKey(id),null)||{};
 function drawPlay(p,st){let g=lastGame(p);const b=$("bPlay");if(EQ&&EQ.bloq[g])g=EQ.vez[0]||BIPV.JOGOS.find(x=>!EQ.bloq[x]);b.dataset.open=g;
- if(g=="runner"){b.querySelector("b").textContent="▶ CORRER";$("playSub").textContent=`Bip Runner · recorde ${BIPV.fmt((runSave(p.id).best||{}).tabuada||0)}`;return}
+ if(g=="runner"){b.querySelector("b").textContent="▶ CORRER";$("playSub").textContent=`Bip Runner · recorde ${BIPV.fmt(Math.max(+(runSave(p.id).best||{}).tabuada||0,+(runSave(p.id).best||{}).somasub||0))}`;return}
  if(g=="snake"){b.querySelector("b").textContent="▶ JOGAR";$("playSub").textContent=`Bip Snake · recorde ${BIPV.snakeBest(runSave(p.id))} vagões`;return}
  if(g=="bomber"){b.querySelector("b").textContent="▶ EXPLODIR";{const d=BIPV.bomberDec(BIPV.bomberBest(runSave(p.id)));$("playSub").textContent=d.arena?`Bip Bomber · recorde: arena ${d.arena}`:"Bip Bomber"}return}
  if(g=="defesa"){b.querySelector("b").textContent="▶ DEFENDER";{const d=BIPV.defesaDec(BIPV.defesaBest(runSave(p.id)));$("playSub").textContent=d.onda?`Bip Defesa · recorde: onda ${d.onda}`:"Bip Defesa"}return}

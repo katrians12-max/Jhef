@@ -352,7 +352,7 @@ function stat(a){const pg=a.progresso||{},r=pg.robo||{},ac=pg.academia||{},lj=pg
  const owned=Array.isArray(lj.owned)?lj.owned:[],ganhos=BIPV.ganhos(r,ac,ru),gastos=BIPV.gasto(owned,lj.kits);
  const dias=a.ultimo_acesso?(Date.now()-new Date(a.ultimo_acesso))/864e5:Infinity;
  return {a,feitas,done,fases:feitas.size,est,aulas:done.size,ativ:feitas.size+done.size,ganhos,gastos,saldo:ganhos-gastos,itens:owned.filter(id=>!BIPV.gratis(id)).length,look:lj.look||{},dias,
-  run:+((ru.best||{}).tabuada)||0,runs:+ru.runs||0,rerr:ru.err||{},rtot:(ru.tot||{}).tabuada||{ok:0,bad:0},snake:BIPV.snakeBest(ru),sruns:+ru.sruns||0,defesa:BIPV.defesaBest(ru),dfx:BIPV.defesaDec(BIPV.defesaBest(ru)),druns:+ru.druns||0,bomber:BIPV.bomberBest(ru),bfx:BIPV.bomberDec(BIPV.bomberBest(ru)),bruns:+ru.bruns||0,best_:+((ru.bmeta||{}).est)||0,
+  run:+((ru.best||{}).tabuada)||0,run2:+((ru.best||{}).somasub)||0,runs:+ru.runs||0,rerr:ru.err||{},rtot:["tabuada","somasub"].reduce((o,k)=>{const t=(ru.tot||{})[k]||{};o.ok+=+t.ok||0;o.bad+=+t.bad||0;return o},{ok:0,bad:0}),snake:BIPV.snakeBest(ru),sruns:+ru.sruns||0,defesa:BIPV.defesaBest(ru),dfx:BIPV.defesaDec(BIPV.defesaBest(ru)),druns:+ru.druns||0,bomber:BIPV.bomberBest(ru),bfx:BIPV.bomberDec(BIPV.bomberBest(ru)),bruns:+ru.bruns||0,best_:+((ru.bmeta||{}).est)||0,
   t7:BIPV.tempo7(ru.tempo),eq:BIPV.equilibrio(ru.tempo)}}
 const av=S=>`<span class="bipav" aria-hidden="true">${BIPV.face2d(S.look)}</span>`;
 const pl=(n,um,varios)=>`${nf(n)} ${n==1?um:varios}`;
@@ -365,6 +365,7 @@ const CRIT={
  est:{n:"Estrelas",v:S=>S.est,tie:S=>S.fases,fmt:S=>`${nf(S.est)} ★`,note:"Estrelas do Robô Programador: até 3 por fase."},
  aulas:{n:"Aulas",v:S=>S.aulas,tie:S=>S.ganhos,fmt:S=>pl(S.aulas,"aula","aulas"),note:"Aulas concluídas na Academia do Bip."},
  run:{n:"Bip Runner",v:S=>S.run,tie:S=>S.runs,fmt:S=>`${nf(S.run)} pontos`,note:"Recorde de cada aluno no Bip Runner (trilha da tabuada)."},
+ run2:{n:"Runner + e −",v:S=>S.run2,tie:S=>S.runs,fmt:S=>`${nf(S.run2)} pontos`,note:"Recorde de cada aluno no Bip Runner, trilha de adição e subtração."},
  snake:{n:"Bip Snake",v:S=>S.snake,tie:S=>S.sruns,fmt:S=>pl(S.snake,"vagão","vagões"),note:"Maior trem de cada aluno no Bip Snake (o melhor entre os modos Misturado, Só regras e Só contas)."},
  defesa:{n:"Bip Defesa",v:S=>S.defesa,tie:S=>S.druns,fmt:S=>`onda ${S.dfx.onda} · ${nf(S.dfx.pts)} pts`,note:"Até onde cada aluno chegou no Bip Defesa (as ondas não acabam e ficam cada vez mais difíceis). Empate na onda: ganha quem fez mais pontos. Os pontos vêm dos Bugs destruídos e das contas certas no Poder do Bip."},
  bomber:{n:"Bip Bomber",v:S=>S.bomber,tie:S=>S.bruns,fmt:S=>`arena ${S.bfx.arena} · ${nf(S.bfx.pts)} pts`,note:"Quantas arenas cada aluno venceu seguidas no Bip Bomber (as arenas não acabam). Empate: ganha quem fez mais pontos. Só destrói caixas e robôs quem escolhe a bomba certa (o número tem que ser múltiplo)."}};
@@ -446,11 +447,11 @@ function drawAtiv(){const n=SS.length;if(!n){$("tabAtiv").innerHTML='<p class="e
 /* Bip Runner: as contas que mais alunos erraram e a resposta errada mais escolhida (mostra a confusão da turma) */
 function runErros(){const n=SS.length,F={};let ok=0,bad=0;
  SS.forEach(S=>{ok+=S.rtot.ok||0;bad+=S.rtot.bad||0;for(const k in S.rerr){const e=S.rerr[k];if(!(e.n>0))continue;const f=F[k]||(F[k]={al:0,n:0,r:{}});f.al++;f.n+=e.n;for(const v in e.r||{})f.r[v]=(f.r[v]||0)+e.r[v]}});
- const L=Object.entries(F).sort((x,y)=>y[1].al-x[1].al||y[1].n-x[1].n).slice(0,10),certa=k=>{const m=k.match(/^(\d+) ([×÷]) (\d+)$/);return m?(m[2]=="×"?m[1]*m[3]:m[1]/m[3]):"?"};
+ const L=Object.entries(F).sort((x,y)=>y[1].al-x[1].al||y[1].n-x[1].n).slice(0,10),certa=k=>{const m=k.match(/^(\d+) ([×÷+−]) (\d+)$/);if(!m)return "?";const a=+m[1],b=+m[3];return {"×":a*b,"÷":a/b,"+":a+b,"−":a-b}[m[2]]};
  const head=`<section class="act" style="margin-top:22px"><h3>Bip Runner · contas que a turma mais erra</h3>`;
- if(!L.length)return head+'<p class="hint">Quando os alunos correrem no Bip Runner, aqui aparecem as contas da tabuada que a turma mais erra e qual resposta errada eles mais escolhem.</p></section>';
+ if(!L.length)return head+'<p class="hint">Quando os alunos correrem no Bip Runner, aqui aparecem as contas (tabuada, adição e subtração) que a turma mais erra e qual resposta errada eles mais escolhem.</p></section>';
  const pc=ok+bad?Math.round(ok/(ok+bad)*100):0;
- return head+`<p class="hint">A turma acertou <b>${pc}%</b> das contas da tabuada (${nf(ok)} acertos e ${nf(bad)} erros). A resposta errada mais escolhida mostra a confusão: por exemplo, 54 em 7 × 8 é confundir com 6 × 9.</p>
+ return head+`<p class="hint">A turma acertou <b>${pc}%</b> das contas do Runner (${nf(ok)} acertos e ${nf(bad)} erros). A resposta errada mais escolhida mostra a confusão: por exemplo, 54 em 7 × 8 é confundir com 6 × 9.</p>
   ${L.map(([k,f])=>{const top=Object.entries(f.r).sort((x,y)=>y[1]-x[1])[0];return `<div class="arow" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr) 120px minmax(0,1.1fr)"><span class="t"><b>${esc(k)} = ${certa(k)}</b></span><span class="b"><i style="width:${f.al/n*100}%;background:var(--warn)"></i></span><span class="n" style="text-align:left">${pl(f.al,"aluno","alunos")} · ${pl(f.n,"erro","erros")}</span><span>${top?`<span class="chip w">mais marcado: ${esc(top[0])}</span>`:""}</span></div>`}).join("")}</section>`}
 
 /* ---- precisam de atenção ---- */
