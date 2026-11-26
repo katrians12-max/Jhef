@@ -111,13 +111,13 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 <div class="hud" id="hud" hidden>
  <div class="htop">
   <div class="lives glass" id="lives" aria-label="Vidas"></div>
-  <button class="ib" id="bPause" aria-label="Pausar">⏸</button>
+  <button class="ib" id="bPause" aria-label="Pausar (zera os pontos da corrida)" title="Pausar zera os pontos da corrida">⏸</button>
   <span class="sp"></span>
   <div class="score glass"><small>Pontos</small><b id="sc">0</b><span class="combo" id="cb"></span></div>
  </div>
  <div class="q glass" id="q" aria-live="polite"><div class="lab" id="qlab">Tabuada</div><b id="qt">7 × 8 = ?</b><div class="tm"><i id="qtm"></i></div></div>
  <div class="toast" id="toast" aria-live="assertive"></div>
- <div class="keys glass" id="keys">Troque de faixa com <kbd>←</kbd> <kbd>→</kbd> ou <kbd>A</kbd> <kbd>D</kbd> · <kbd>P</kbd> pausa</div>
+ <div class="keys glass" id="keys">Troque de faixa com <kbd>←</kbd> <kbd>→</kbd> ou <kbd>A</kbd> <kbd>D</kbd> · <kbd>P</kbd> pausa (zera os pontos)</div>
  <div class="touch" id="touch" hidden><button id="tL" aria-label="Faixa da esquerda">◀</button><button id="tR" aria-label="Faixa da direita">▶</button></div>
 </div>
 <div class="cd" id="cd" aria-live="assertive"></div>
@@ -125,7 +125,7 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 <section class="scr" id="sStart">
  <div class="card glass">
   <div class="brandrow"><!--LOGO--></div>
-  <div><h1>Bip Runner</h1><p>A conta aparece no alto. Troque de faixa e passe pelo portal com a resposta certa. Quanto mais acertos seguidos, mais rápido e mais pontos!</p></div>
+  <div><h1>Bip Runner</h1><p>A conta aparece no alto. Troque de faixa e passe pelo portal com a resposta certa. Quanto mais acertos seguidos, mais rápido e mais pontos! <b>Pausar zera os pontos.</b></p></div>
   <div><div class="lbl">Trilha</div><div class="chips" id="trilhas" role="group" aria-label="Escolha a trilha"></div><p class="more">+ 5 trilhas chegando: operações, inteiros, frações, porcentagem e potência.</p></div>
   <div><div class="lbl">Modo</div><div class="chips" role="group" aria-label="Modo de jogo">
    <button class="chip" data-modo="normal" aria-pressed="true"><svg class="hrt" viewBox="0 0 32 28" aria-hidden="true"><path d="M16 27C6 19 1 14 1 8.5 1 4.4 4.2 1 8.3 1c3 0 5.6 1.7 7.7 4.4C18.1 2.7 20.7 1 23.7 1 27.8 1 31 4.4 31 8.5 31 14 26 19 16 27z" fill="#ff4f6d" stroke="#8a1630" stroke-width="2"/><path d="M7 6.5c1.4-1.6 3.6-1.8 5-.6" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".85"/></svg> Normal <small>3 vidas, acelera</small></button>
@@ -137,7 +137,7 @@ kbd{display:inline-block;min-width:24px;padding:1px 6px;border-radius:6px;backgr
 </section>
 
 <section class="scr center" id="sPause" hidden>
- <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="pT"><h2 id="pT">Pausado</h2><p>Na pausa a conta some. Quando você voltar, a <b>mesma conta</b> aparece de novo (com os portais trocados de lugar) e a sequência recomeça do zero.</p>
+ <div class="card glass" role="dialog" aria-modal="true" aria-labelledby="pT"><h2 id="pT">Pausado</h2><p id="pTx">Pausar zera os pontos da corrida.</p>
   <div class="row"><button class="btn go" id="bResume">▶ Continuar</button><button class="btn" id="bQuit">Sair da corrida</button></div></div>
 </section>
 
@@ -315,7 +315,7 @@ function dropGate(g){scene.remove(g.G);g.G.traverse(o=>{if(o.material){if(o.mate
 let S=null,state="menu",last=performance.now(),tAll=0;
 const LV=lv=>({v:Math.min(21,11+lv*1.5),T:Math.max(2.4,4.6-lv*.32)});
 function start(){for(const g of gates)dropGate(g);gates=[];recent=[];
- S={score:0,ok:0,bad:0,combo:0,best:0,lives:modo=="treino"?Infinity:3,lv:0,erros:[],q:null,dist:0,speed:LV(0).v};
+ S={score:0,ok:0,okM:0,pausas:0,bad:0,combo:0,best:0,lives:modo=="treino"?Infinity:3,lv:0,erros:[],q:null,dist:0,speed:LV(0).v};
  Bip.lane=1;Bip.x=0;drawLives();$("sc").textContent="0";$("cb").textContent="";
  ["sStart","sEnd","sPause"].forEach(id=>$(id).hidden=true);$("hud").hidden=false;$("q").style.visibility="hidden";
  $("touch").hidden=!matchMedia("(pointer:coarse)").matches;state="count";turn=0;BIPV.setMood(P,"feliz");
@@ -330,7 +330,7 @@ function nextQ(pend){const L=LV(modo=="treino"?0:S.lv);let q;
 function toast(html,cls,long){const t=$("toast");t.className="toast";void t.offsetWidth;t.innerHTML=html;t.className="toast show "+cls+(long?" long":"")}
 function drawLives(){$("lives").innerHTML=S.lives==Infinity?'<b class="inf" title="Modo treino">∞</b><span style="font-size:.85rem;font-weight:700">treino</span>':[0,1,2].map(i=>`<span class="${i<S.lives?"":"off"}">${HEART}</span>`).join("");$("lives").setAttribute("aria-label",S.lives==Infinity?"Modo treino":`${S.lives} vidas`)}
 function judge(g){g.done=true;const lane=Bip.lane,ok=lane==g.q.ok,cx=(g.q.ok-1)*LANE;
- if(ok){S.ok++;S.combo++;S.best=Math.max(S.best,S.combo);const mult=Math.min(5,1+Math.floor(S.combo/5)),pts=10*mult+(S.lv*2);S.score+=pts;
+ if(ok){S.ok++;S.okM++;S.combo++;S.best=Math.max(S.best,S.combo);const mult=Math.min(5,1+Math.floor(S.combo/5)),pts=10*mult+(S.lv*2);S.score+=pts;
   SFX.ok(S.combo);burst(cx,g.G.position.z,GCOL[g.q.ok]);toast(`+${pts}${S.combo>=3?` <small style="font-size:.55em">sequência ${S.combo}!</small>`:""}`,"ok");
   BIPV.setMood(P,S.combo%5==0?"festa":"feliz");
   if(modo!="treino"&&S.ok%5==0){S.lv++;setTimeout(()=>{SFX.lv();toast(`Nível ${S.lv+1}!<small style="display:block;font-size:.5em;color:#fff">mais rápido</small>`,"lv")},450)}}
@@ -346,7 +346,7 @@ function end(){state="end";$("hud").hidden=true;turn=1;Bip.lane=1;
  const novo=modo!="treino"&&S.score>(REC.best[trilha]||0);if(modo!="treino"){REC.runs++;if(novo)REC.best[trilha]=S.score}
  const tt=REC.tot[trilha]||(REC.tot[trilha]={ok:0,bad:0});tt.ok+=S.ok;tt.bad+=S.bad;
  /* Bipcoins: 1 a cada 8 pontos (no treino, 1 a cada 2 acertos), até 60 por dia */
- const ganhou=modo=="treino"?Math.floor(S.ok/2):Math.floor(S.score/8),antes=hojeCoins(),add=Math.max(0,Math.min(ganhou,BIPV.RUN_DIA-antes));
+ const ganhou=modo=="treino"?Math.floor(S.okM/2):Math.floor(S.score/8),antes=hojeCoins(),add=Math.max(0,Math.min(ganhou,BIPV.RUN_DIA-antes));
  if(add)REC.coins[dia()]=antes+add;salvar();
  $("eCoin").innerHTML=add?`${BIPV.COIN}<span>+${add} Bipcoins para gastar na Loja do Bip! <small style="opacity:.8">(hoje: ${antes+add}/${BIPV.RUN_DIA})</small></span>`
   :antes>=BIPV.RUN_DIA?`${BIPV.COIN}<span>Você já ganhou os ${BIPV.RUN_DIA} Bipcoins de hoje no Runner. Amanhã tem mais! Continue treinando para bater o recorde.</span>`:"";
@@ -354,11 +354,13 @@ function end(){state="end";$("hud").hidden=true;turn=1;Bip.lane=1;
  $("eOk").textContent=S.ok;$("eCombo").textContent=S.best;$("eLv").textContent=S.lv+1;
  const uniq=[...new Set(S.erros)];$("eRev").hidden=!uniq.length;$("eFacts").innerHTML=uniq.map(e=>`<span>${e}</span>`).join("");
  BIPV.setMood(P,novo?"festa":"feliz");$("sEnd").hidden=false;$("bAgain").focus();drawRec()}
-/* pausa: a conta e os portais somem; na volta, depois de 3, 2, 1, vem a MESMA conta (portais trocados de lugar)
-   e a sequência recomeça. Assim não dá para pausar para pular uma conta difícil nem para ficar calculando. */
-function pause(v){if(v&&state=="run"){state="pause";{const g=gates.find(x=>!x.done);S.pend=g?{q:g.q,z:g.G.position.z}:null}$("q").style.visibility="hidden";gates.forEach(g=>{if(!g.done)g.G.visible=false});$("sPause").hidden=false;$("bResume").focus()}
+/* pausa: ZERA os pontos da corrida (e, no treino, os acertos que valem Bipcoins). A conta e os portais somem;
+   na volta, depois de 3, 2, 1, vem a MESMA conta. Assim pausar para pensar ou para pular uma conta não compensa. */
+function pause(v){if(v&&state=="run"){state="pause";const perdeu=S.score;S.score=0;S.combo=0;S.okM=0;S.pausas++;$("sc").textContent="0";$("cb").textContent="";
+  $("pTx").innerHTML=modo=="treino"?`Pausar zera os acertos do treino que valem Bipcoins. Quando você voltar, a <b>mesma conta</b> aparece de novo.`
+   :perdeu?`Você perdeu os <b>${perdeu.toLocaleString("pt-BR")} pontos</b> desta corrida. Quando você voltar, a <b>mesma conta</b> aparece de novo e a contagem de pontos recomeça do zero.`
+   :`Pausar zera os pontos da corrida. Quando você voltar, a <b>mesma conta</b> aparece de novo.`;{const g=gates.find(x=>!x.done);S.pend=g?{q:g.q,z:g.G.position.z}:null}$("q").style.visibility="hidden";gates.forEach(g=>{if(!g.done)g.G.visible=false});$("sPause").hidden=false;$("bResume").focus()}
  else if(!v&&state=="pause"){$("sPause").hidden=true;const tinha=gates.some(g=>!g.done);gates=gates.filter(g=>{if(!g.done){dropGate(g);return false}return true});
-  if(tinha&&S.combo){S.combo=0;$("cb").textContent=""}
   state="count";let n=3;const tick=()=>{if(state!="count")return;$("cd").innerHTML=n?`<span>${n}</span>`:`<span>JÁ!</span>`;n?SFX.cd():SFX.go();if(n--)setTimeout(tick,600);else setTimeout(()=>{$("cd").innerHTML="";state="run";last=performance.now();const pd=S.pend;S.pend=null;nextQ(pd)},350)};tick()}}
 function move(d){if(state!="run"&&state!="count")return;const n=Math.max(0,Math.min(2,Bip.lane+d));if(n!=Bip.lane){Bip.lane=n;SFX.lane()}}
 document.addEventListener("keydown",e=>{const k=e.key.toLowerCase();

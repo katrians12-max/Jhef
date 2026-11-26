@@ -42,7 +42,8 @@ async def main():
         check('primeiro recorde salvo',await P.is_visible('#eNew') and await P.evaluate("JSON.parse(localStorage.getItem('bipsite-runner:'+localStorage.getItem('bipsite-cur'))).best.tabuada>0"))
         await P.screenshot(path=OUT+'r-fim.png')
         # pausa
-        await P.click('#bAgain');await P.wait_for_timeout(3600);await P.keyboard.press('p');await P.wait_for_timeout(200)
+        await P.click('#bAgain');await P.wait_for_timeout(3600);await P.evaluate("S.score=150;$('sc').textContent='150'");await P.keyboard.press('p');await P.wait_for_timeout(200)
+        check('pausar zera os pontos da corrida',await P.evaluate("S.score")==0 and await P.inner_text('#sc')=='0' and '150 pontos' in await P.inner_text('#pTx'),await P.inner_text('#pTx'))
         z1=await P.evaluate('gates[0]&&gates[0].G.position.z');await P.wait_for_timeout(600);z2=await P.evaluate('gates[0]&&gates[0].G.position.z')
         check('pausa congela a corrida',await P.is_visible('#sPause') and z1==z2,(z1,z2))
         check('na pausa a conta e os portais somem',await P.evaluate("getComputedStyle($('q')).visibility=='hidden'&&gates.filter(g=>!g.done).every(g=>!g.G.visible)"))
