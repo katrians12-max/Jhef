@@ -52,7 +52,7 @@ async def main():
 
         # simula uma semana viciada no Runner: 25 min de Runner, pouco nos outros
         saldo0=await A.evaluate("BIPV.saldo(cur)")
-        await A.evaluate("""(()=>{const k=BIPV.tempoKey(cur),d=diaHoje();localStorage.setItem(k,JSON.stringify({d:{[d]:{runner:1500,robo:120,academia:60,snake:30,defesa:0,bomber:90}},vez:{},eq:{}}));
+        await A.evaluate("""(()=>{const k=BIPV.tempoKey(cur),d=diaHoje();localStorage.setItem(k,JSON.stringify({d:{[d]:{runner:1500,robo:120,academia:60,snake:30,defesa:0,bomber:90,space:45}},vez:{},eq:{}}));
           localStorage.setItem('bipsite-ultimo:'+cur,'runner');drawMenu()})()""")
         await A.wait_for_timeout(300)
         check('Runner (antes 83% do tempo) vai descansar',await A.locator('#uGo').is_disabled() and await A.locator('#uGo >> xpath=ancestor::article//div[contains(@class,"desc")]').count()==1)
