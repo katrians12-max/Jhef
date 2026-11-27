@@ -351,6 +351,7 @@ body.full .foot{padding:0 16px 30px}
 .game .preco.vez{background:#ffd24a;color:#2a1a00;border-color:#ffd24a}.game .preco.caro{background:#5a1f2a;color:#ffc2c8;border-color:#ff8a96}
 .game .semE button{font:inherit;font-weight:800;font-size:.74rem;border:0;border-radius:10px;padding:4px 10px;background:#ffd24a;color:#2a1a00;cursor:pointer}
 .minis .mrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.minis .mrow>.game.wide{grid-column:1/-1}
 .saguao .minis .game.mini{flex-direction:row;align-items:stretch}
 .saguao .minis .game.mini .art{width:62px;height:auto;min-height:0;flex:none}
 .saguao .minis .game.mini .bd{padding:6px 8px 7px;gap:2px;min-width:0;flex:1}
@@ -573,7 +574,7 @@ body.full .foot{padding:0 16px 30px}
         <button class="btn main go" data-open="defesa" id="dGo">Jogar</button></div>
       </article>
      <article class="game mini">
-       <div class="art" aria-hidden="true"><span class="novo">Novo!</span><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice">
+       <div class="art" aria-hidden="true"><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice">
  <defs><radialGradient id="bbG" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#ffe07a"/><stop offset=".45" stop-color="#ff9a3c"/><stop offset="1" stop-color="#ff5a3c" stop-opacity="0"/></radialGradient></defs>
  <rect width="400" height="170" fill="#27315c"/>
  <g fill="#2c376a" stroke="rgba(94,240,224,.15)" stroke-width="2"><rect x="100" y="10" width="46" height="46"/><rect x="254" y="10" width="46" height="46"/><rect x="100" y="114" width="46" height="46"/><rect x="254" y="114" width="46" height="46"/></g>
@@ -587,6 +588,28 @@ body.full .foot{padding:0 16px 30px}
        <div class="bd"><span class="eyebrow">Múltiplos e fatores</span><h3>Bip Bomber</h3><p>Exploda caixas com a bomba certa e junte fatores.</p>
         <div class="prog"><div class="row"><span id="bTxt">Recorde: —</span><span id="bLv"></span></div><div class="bar"><i id="bBar" style="background:linear-gradient(90deg,#ff9a3c,#ffd24a)"></i></div></div>
         <button class="btn main go" data-open="bomber" id="bGo">Jogar</button></div>
+      </article>
+     <article class="game mini wide">
+       <div class="art" aria-hidden="true"><span class="novo">Novo!</span><svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice">
+ <defs><linearGradient id="spSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#03040e"/><stop offset=".6" stop-color="#0c1650"/><stop offset="1" stop-color="#2f6fd6"/></linearGradient>
+ <radialGradient id="spFire" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#fff6c0"/><stop offset=".4" stop-color="#ffb02e"/><stop offset="1" stop-color="#ff3b5c" stop-opacity="0"/></radialGradient></defs>
+ <rect width="400" height="170" fill="url(#spSky)"/>
+ <g fill="#fff"><circle cx="40" cy="22" r="1.6"/><circle cx="92" cy="50" r="1.2"/><circle cx="150" cy="16" r="1.4"/><circle cx="250" cy="30" r="1.2"/><circle cx="350" cy="18" r="1.6"/><circle cx="372" cy="70" r="1.1"/><circle cx="20" cy="80" r="1.1"/><circle cx="300" cy="60" r="1"/></g>
+ <ellipse cx="200" cy="230" rx="260" ry="80" fill="#1f63c9"/><path d="M40 170q40-30 90-24t60 24z" fill="#3a9a4f"/><ellipse cx="200" cy="230" rx="262" ry="82" fill="none" stroke="#9fd0ff" stroke-width="4" opacity=".5"/>
+ <g transform="translate(318 62)"><circle r="26" fill="#e3cf96"/><path d="M-26 -4h52M-25 6h50" stroke="#b89b5c" stroke-width="5"/><ellipse rx="46" ry="10" fill="none" stroke="#f0dca8" stroke-width="5" transform="rotate(-18)"/></g>
+ <g transform="translate(70 52)"><circle r="13" fill="#c9552e"/><circle cx="-4" cy="-3" r="3" fill="#9a3a1e"/></g>
+ <g transform="translate(180 18) rotate(18)">
+  <path d="M-14 104q14 60 28 0z" fill="url(#spFire)"/>
+  <rect x="-16" y="30" width="32" height="74" rx="10" fill="#f4f6ff"/><rect x="-16" y="40" width="32" height="7" fill="#7b5cff"/><rect x="-16" y="88" width="32" height="5" fill="#f2c230"/>
+  <path d="M-16 74l-14 30h14zM16 74l14 30h-14z" fill="#7b5cff"/>
+  <path d="M-17 32a17 22 0 0 1 34 0z" fill="#bfe9ff" opacity=".55" stroke="#f2c230" stroke-width="3"/>
+  <rect x="-9" y="12" width="18" height="14" rx="3" fill="#f2c230"/><rect x="-6" y="15" width="12" height="7" rx="2" fill="#172536"/><circle cx="-2.5" cy="18.5" r="1.3" fill="#5ef0e0"/><circle cx="2.5" cy="18.5" r="1.3" fill="#5ef0e0"/>
+ </g>
+ <g font-family="Baloo 2,system-ui,sans-serif" font-weight="800" text-anchor="middle"><rect x="228" y="118" width="96" height="30" rx="15" fill="rgba(10,14,40,.88)" stroke="#2fd47a" stroke-width="2"/><text x="276" y="139" font-size="17" fill="#fff">7 × 8 = ?</text></g>
+</svg></div>
+       <div class="bd"><span class="eyebrow">Tabuada · + e −</span><h3>Bip Space</h3><p>Acerte as contas para encher o tanque e leve o foguete do Bip até os planetas.</p>
+        <div class="prog"><div class="row"><span id="xTxt">Recorde: —</span><span id="xLv"></span></div><div class="bar"><i id="xBar" style="background:linear-gradient(90deg,#5ef0e0,#7b5cff)"></i></div></div>
+        <button class="btn main go" data-open="space" id="xGo">Decolar</button></div>
       </article>
      </div></div>
      <button class="btn play" id="bPlay" data-open="robo"><b>▶ CONTINUAR</b><small id="playSub">Robô Programador</small></button>
@@ -717,7 +740,7 @@ const KEYS={robo:id=>"robo4:"+id,academia:id=>"academia-bip-3d-v1:"+id,loja:id=>
 function mergeRunner(a,b){if(!a)return b;if(!b)return a;const mx=(x,y)=>{const o={...(y||{})};for(const k in x||{})o[k]=Math.max(+o[k]||0,+x[k]||0);return o};
  const err={...(b.err||{})};for(const k in a.err||{}){const e=a.err[k],f=err[k]||{n:0,r:{}};err[k]={n:Math.max(e.n||0,f.n||0),r:mx(e.r,f.r)}}
  const tot={};for(const k of new Set([...Object.keys(a.tot||{}),...Object.keys(b.tot||{})]))tot[k]=mx((a.tot||{})[k],(b.tot||{})[k]);
- return {v:1,best:mx(a.best,b.best),runs:Math.max(a.runs||0,b.runs||0),coins:mx(a.coins,b.coins),err,tot,sruns:Math.max(a.sruns||0,b.sruns||0),scoins:mx(a.scoins,b.scoins),druns:Math.max(a.druns||0,b.druns||0),dcoins:mx(a.dcoins,b.dcoins),bruns:Math.max(a.bruns||0,b.bruns||0),bcoins:mx(a.bcoins,b.bcoins),bmeta:mergeBmeta(a.bmeta,b.bmeta),t:Math.max(a.t||0,b.t||0)}}
+ return {v:1,best:mx(a.best,b.best),runs:Math.max(a.runs||0,b.runs||0),coins:mx(a.coins,b.coins),err,tot,sruns:Math.max(a.sruns||0,b.sruns||0),scoins:mx(a.scoins,b.scoins),druns:Math.max(a.druns||0,b.druns||0),dcoins:mx(a.dcoins,b.dcoins),bruns:Math.max(a.bruns||0,b.bruns||0),bcoins:mx(a.bcoins,b.bcoins),xruns:Math.max(a.xruns||0,b.xruns||0),xcoins:mx(a.xcoins,b.xcoins),bmeta:mergeBmeta(a.bmeta,b.bmeta),t:Math.max(a.t||0,b.t||0)}}
 /* Bip Bomber: estrelas e totais pelo maior; conquistas somam */
 function mergeBmeta(a,b){if(!a)return b;if(!b)return a;const tot={...(a.tot||{})};for(const k in b.tot||{})tot[k]=Math.max(+tot[k]||0,+b.tot[k]||0);return {est:Math.max(+a.est||0,+b.est||0),conq:{...(a.conq||{}),...(b.conq||{})},tot}}
 /* loja: junta os itens comprados nos dois lugares; o visual é o mais recente */
@@ -806,6 +829,7 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  {const sh=Math.min(BIPV.SNAKE_DIA,Math.floor((ru.scoins||{})[diaHoje()]||0)),sb=BIPV.snakeBest(ru);$("sTxt").textContent=`Recorde: ${sb}`;$("sTxt").title=`${sb} ${sb==1?"vagão":"vagões"}`;$("sLv").innerHTML=`hoje ${sh}/${BIPV.SNAKE_DIA} ${BIPV.COIN}`;$("sBar").style.width=sh/BIPV.SNAKE_DIA*100+"%"}
  {const dh=Math.min(BIPV.DEF_DIA,Math.floor((ru.dcoins||{})[diaHoje()]||0));{const d=BIPV.defesaDec(BIPV.defesaBest(ru));$("dTxt").textContent=d.onda?`Recorde: onda ${d.onda}`:"Recorde: —";$("dTxt").title=`${BIPV.fmt(d.pts)} pontos`}$("dLv").innerHTML=`hoje ${dh}/${BIPV.DEF_DIA} ${BIPV.COIN}`;$("dBar").style.width=dh/BIPV.DEF_DIA*100+"%"}
  {const bh=Math.min(BIPV.BOMB_DIA,Math.floor((ru.bcoins||{})[diaHoje()]||0)),d=BIPV.bomberDec(BIPV.bomberBest(ru));$("bTxt").textContent=d.arena?`Recorde: arena ${d.arena}`:"Recorde: —";$("bTxt").title=`${BIPV.fmt(d.pts)} pontos`;$("bLv").innerHTML=`hoje ${bh}/${BIPV.BOMB_DIA} ${BIPV.COIN}`;$("bBar").style.width=bh/BIPV.BOMB_DIA*100+"%"}
+ {const xh=Math.min(BIPV.SPACE_DIA,Math.floor((ru.xcoins||{})[diaHoje()]||0)),xb=BIPV.spaceBest(ru);$("xTxt").textContent=xb?`Recorde: ${BIPV.spaceFmt(xb)}`:"Recorde: —";$("xTxt").title=xb?BIPV.spaceZona(xb):"";$("xLv").innerHTML=`hoje ${xh}/${BIPV.SPACE_DIA} ${BIPV.COIN}`;$("xBar").style.width=xh/BIPV.SPACE_DIA*100+"%"}
  $("myCode").textContent=makeCode(st);
  $("codeBox").hidden=!!p.cloud;$("cloudBox").hidden=!p.cloud;$("foot").hidden=!NUVEM.on;
  if(p.cloud){$("cloudTurma").textContent="☁ Turma "+p.cloud.turma.nome;if(p.cloud.expired)setSync("Entre de novo para salvar",true)}
@@ -818,13 +842,14 @@ function drawMenu(){const p=profiles.find(q=>q.id==cur);if(!p)return drawWho();
  if(d.cat=="cenario")$("lojaIc").innerHTML=`<img class="pc" src="${CENA.postal(d.id)}" alt="">`;else BIPV.ICON.item(d.id,l.look,u=>{$("lojaIc").innerHTML=`<img src="${u}" alt="">`});
  document.querySelectorAll("[data-pose]").forEach(el=>BIPV.ICON.pose(el.dataset.pose,l.look,u=>{el.innerHTML=`<img src="${u}" alt="">`}));}
 /* Botão principal: continua o último jogo aberto (ou começa pelo Robô) */
-function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.id)}catch(e){}return g=="academia"||g=="runner"||g=="snake"||g=="defesa"||g=="bomber"?g:"robo"}
+function lastGame(p){let g=null;try{g=localStorage.getItem("bipsite-ultimo:"+p.id)}catch(e){}return g=="academia"||g=="runner"||g=="snake"||g=="defesa"||g=="bomber"||g=="space"?g:"robo"}
 const diaHoje=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const runSave=id=>ls.get(BIPV.runKey(id),null)||{};
 function drawPlay(p,st){let g=lastGame(p);const b=$("bPlay");if(EQ&&EQ.bloq[g])g=EQ.vez[0]||BIPV.JOGOS.find(x=>!EQ.bloq[x]);
  if(FOCO&&!FOCO.mestre&&BIPV.JOGOS_RAPIDOS.includes(g)&&FOCO.energia<FOCO.preco[g])g=FOCO.energia>=1?FOCO.vez:BIPV.focoAlvo(p.id).jogo;b.dataset.open=g;
  if(g=="runner"){b.querySelector("b").textContent="▶ CORRER";$("playSub").textContent=`Bip Runner · recorde ${BIPV.fmt(Math.max(+(runSave(p.id).best||{}).tabuada||0,+(runSave(p.id).best||{}).somasub||0))}`;return}
  if(g=="snake"){b.querySelector("b").textContent="▶ JOGAR";$("playSub").textContent=`Bip Snake · recorde ${BIPV.snakeBest(runSave(p.id))} vagões`;return}
+ if(g=="space"){b.querySelector("b").textContent="▶ DECOLAR";{const xb=BIPV.spaceBest(runSave(p.id));$("playSub").textContent=xb?`Bip Space · recorde: ${BIPV.spaceFmt(xb)}`:"Bip Space"}return}
  if(g=="bomber"){b.querySelector("b").textContent="▶ EXPLODIR";{const d=BIPV.bomberDec(BIPV.bomberBest(runSave(p.id)));$("playSub").textContent=d.arena?`Bip Bomber · recorde: arena ${d.arena}`:"Bip Bomber"}return}
  if(g=="defesa"){b.querySelector("b").textContent="▶ DEFENDER";{const d=BIPV.defesaDec(BIPV.defesaBest(runSave(p.id)));$("playSub").textContent=d.onda?`Bip Defesa · recorde: onda ${d.onda}`:"Bip Defesa"}return}
  const novo=g=="robo"?!st.rDone:!st.aDone;b.querySelector("b").textContent=novo?"▶ COMEÇAR":"▶ CONTINUAR";
@@ -845,7 +870,7 @@ $("bCopy").onclick=()=>{const t=$("myCode").textContent;const done=()=>{$("bCopy
    Conta os minutos em que o aluno está mesmo jogando (sem mexer por 60 s, para de contar).
    Jogo com mais de 35% do tempo da semana descansa até o aluno jogar 6 min nos jogos que menos joga;
    os 2 menos jogados são os "jogos da vez" e dão +1 Bipcoin por minuto (até 20 por dia). */
-const GO={robo:"rGo",academia:"aGo",runner:"uGo",snake:"sGo",defesa:"dGo",bomber:"bGo"};
+const GO={robo:"rGo",academia:"aGo",runner:"uGo",snake:"sGo",defesa:"dGo",bomber:"bGo",space:"xGo"};
 const tempoGet=id=>{const t=ls.get(BIPV.tempoKey(id),null)||{};t.d=t.d||{};t.vez=t.vez||{};t.eq=t.eq||{};t.eq.bloq=t.eq.bloq||{};t.eq.cred=t.eq.cred||{};return t};
 function tempoSet(id,tp){const lim=new Date();lim.setDate(lim.getDate()-14);const k0=BIPV.diaDe(lim);for(const k in tp.d)if(k<k0)delete tp.d[k];ls.set(BIPV.tempoKey(id),tp)}
 let EQ=null,FOCO=null,jogoAberto=null,ultimoToque=0,voltouEnergia=0;
@@ -945,7 +970,7 @@ function heroHTML(l,saldo){const d=BIPV.destaque(),own=owns(l,d.id);
  return `<div class="lj-hero"><div class="lj-hero-art">${art}</div><div class="lj-hero-tx"><span class="kick">★ Destaque do dia · Lendário</span><h3>${d.n}</h3>
   <div class="lj-hero-act">${own?`<span class="tag on">✓ Já é seu</span>`:`<span class="price big${saldo<d.p?" lack":""}">${BIPV.COIN}${BIPV.fmt(d.p)}</span>`}<button class="btn buy" data-id="${d.id}">${own?"Ver no Bip":"Experimentar"}</button></div>
   <small>Todo dia um item lendário diferente aparece aqui.</small></div></div>`}
-const EMPTY={posso:"Nada desta seção cabe nas suas Bipcoins ainda. Passe fases no Robô, faça aulas na Academia, jogue os Jogos rápidos (Runner, Snake, Defesa e Bomber) para ganhar mais.",meus:"Você ainda não tem itens desta seção."};
+const EMPTY={posso:"Nada desta seção cabe nas suas Bipcoins ainda. Passe fases no Robô, faça aulas na Academia, jogue os Jogos rápidos (Runner, Snake, Defesa, Bomber e Space) para ganhar mais.",meus:"Você ainda não tem itens desta seção."};
 function vitrineHTML(l,saldo){const cen=BIPV.ITEMS.filter(i=>i.cat=="cenario"&&i.p>0);
  const pode=BIPV.ITEMS.filter(i=>!owns(l,i.id)&&i.p<=saldo&&i.cat!="cenario").sort((a,b)=>b.p-a.p).slice(0,8);
  return heroHTML(l,saldo)+
@@ -987,7 +1012,7 @@ function preview(quiet){const {l}=shopState(),prev=Object.assign({},l.look);let 
  else if(shopSel){const it=BIPV.BYID[shopSel];prev[it.cat]=it.id;cena=it.cat=="cenario";const hat=BIPV.BYID[prev.cabeca];if(it.cat=="antena"&&hat&&hat.hide)prev.cabeca=null}
  LOBBY.frame(cena?"cena":"perto");LOBBY.look(prev);if(!quiet)LOBBY.gesture(cena?"acenar":["acenar","girar","forca","dancar"][Math.floor(Math.random()*4)])}
 function drawSel(){const {l,saldo}=shopState(),el=$("sel"),q=id=>document.getElementById(id),F=BIPV.fmt,C=BIPV.COIN;
- const ganhar=`Passe fases no Robô Programador (até 25 por fase), conclua aulas na Academia (${BIPV.POR_AULA} por aula), jogue os Jogos rápidos (Runner, Snake, Defesa e Bomber).`;
+ const ganhar=`Passe fases no Robô Programador (até 25 por fase), conclua aulas na Academia (${BIPV.POR_AULA} por aula), jogue os Jogos rápidos (Runner, Snake, Defesa, Bomber e Space).`;
  if(!shopSel){el.innerHTML=`<div class="nm"><b>Escolha um item</b><span class="hint2">Ele aparece no seu Bip antes de você comprar.</span></div>`;return}
  const k=BIPV.KIT[shopSel];let act="",msg="",head;
  if(k){const kp=BIPV.kitPreco(k,l.owned);head=`<b>Conjunto ${k.n}</b><span class="rar" style="--rc:#d0428f">${k.itens.length} peças · 15% off</span>`;

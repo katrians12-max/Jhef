@@ -78,8 +78,8 @@ async def main():
           const a='academia-bip-3d-v1:'+cur,o=JSON.parse(localStorage.getItem(a));o.done.push('a9');localStorage.setItem(a,JSON.stringify(o));drawMenu()})()""")
         e=await A.evaluate(EN)
         check('Runner (100% do tempo nos jogos rápidos) fica cansado: ⚡2',e['preco']['runner']==2 and e['vez']!='runner',e)
-        check('jogo da vez = um dos menos jogados, custa ⚡1',e['vez'] in ['snake','defesa','bomber'] and e['preco'][e['vez']]==1)
-        go={'runner':'uGo','snake':'sGo','defesa':'dGo','bomber':'bGo'}
+        check('jogo da vez = um dos menos jogados, custa ⚡1',e['vez'] in ['snake','defesa','bomber','space'] and e['preco'][e['vez']]==1)
+        go={'runner':'uGo','snake':'sGo','defesa':'dGo','bomber':'bGo','space':'xGo'}
         tr=await A.inner_text('#uGo >> xpath=ancestor::article');tv=await A.inner_text(f"#{go[e['vez']]} >> xpath=ancestor::article")
         check('cartões mostram o preço (⚡2 cansado / ★ da vez)','⚡2 cansado' in tr and '★ da vez' in tv,(tr[:80],tv[:80]))
         await A.screenshot(path=OUT+'f-precos.png')
@@ -111,7 +111,7 @@ async def main():
         print('OUTROS JOGOS')
         await A.evaluate("""(()=>{const k='academia-bip-3d-v1:'+cur,a=JSON.parse(localStorage.getItem(k));a.done.push('a2');localStorage.setItem(k,JSON.stringify(a));drawMenu()})()""")
         pid=await A.evaluate("cur")
-        for g,fn in [('snake','start()'),('defesa','novoJogo()'),('bomber','novoJogo()')]:
+        for g,fn in [('snake','start()'),('defesa','novoJogo()'),('bomber','novoJogo()'),('space','prepara();decolar()')]:
             c2,G,eg=await ctx(b)
             await G.goto(B+'/');await G.evaluate("([p,t,a,r])=>{localStorage.setItem('bipsite-profiles',p);localStorage.setItem(BIPV.tempoKey(JSON.parse(p)[0].id),t);localStorage.setItem('academia-bip-3d-v1:'+JSON.parse(p)[0].id,a);localStorage.setItem('robo4:'+JSON.parse(p)[0].id,r)}",
                [await A.evaluate("localStorage.getItem('bipsite-profiles')"),await A.evaluate("localStorage.getItem(BIPV.tempoKey(cur))"),await A.evaluate("localStorage.getItem('academia-bip-3d-v1:'+cur)"),await A.evaluate("localStorage.getItem('robo4:'+cur)")])

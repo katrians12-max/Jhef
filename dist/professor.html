@@ -295,7 +295,7 @@ const BONUS=100,POR_AULA=50,POR_FASE=10,POR_ESTRELA=5;
 const ls=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 /* quanto o aluno já ganhou: sempre calculado a partir do progresso (não dá para duplicar) */
 function ganhos(robo,acad,run){let c=BONUS;const st=(robo&&robo.stars)||{};for(const k in st){const s=+st[k]||0;if(s>0)c+=POR_FASE+POR_ESTRELA*Math.min(3,s)}
- c+=((acad&&acad.done)||[]).length*POR_AULA;return c+ganhosRunner(run)+ganhosSnake(run)+ganhosDefesa(run)+ganhosBomber(run)+ganhosVez(run&&run.tempo)}
+ c+=((acad&&acad.done)||[]).length*POR_AULA;return c+ganhosRunner(run)+ganhosSnake(run)+ganhosDefesa(run)+ganhosBomber(run)+ganhosSpace(run)+ganhosVez(run&&run.tempo)}
 /* Bip Runner: o jogo guarda quanto rendeu em cada dia; cada dia vale no máximo RUN_DIA */
 const RUN_DIA=60,runKey=pid=>"bipsite-runner:"+pid;
 function ganhosRunner(run){let c=0;const m=(run&&run.coins)||{};for(const k in m)c+=Math.max(0,Math.min(RUN_DIA,Math.floor(+m[k]||0)));return c}
@@ -315,12 +315,25 @@ const BOMB_DIA=60;
 function ganhosBomber(run){let c=0;const m=(run&&run.bcoins)||{};for(const k in m)c+=Math.max(0,Math.min(BOMB_DIA,Math.floor(+m[k]||0)));return c}
 const bomberBest=run=>+(((run&&run.best)||{}).bomber)||0;
 const bomberDec=v=>({arena:Math.floor((+v||0)/100000),pts:(+v||0)%100000});
+/* Bip Space: também na chave do Runner. best.space = altitude máxima na unidade do jogo (p); xruns = decolagens;
+   xcoins = Bipcoins do dia (no máximo SPACE_DIA); tot.space = {ok,bad} contas certas e erradas.
+   SPACE_ROTA converte p em km de verdade (camadas da atmosfera e distâncias dos planetas). */
+const SPACE_DIA=60;
+function ganhosSpace(run){let c=0;const m=(run&&run.xcoins)||{};for(const k in m)c+=Math.max(0,Math.min(SPACE_DIA,Math.floor(+m[k]||0)));return c}
+const spaceBest=run=>+(((run&&run.best)||{}).space)||0;
+const SPACE_ROTA=[[0,0],[40,12],[100,50],[160,85],[330,600],[520,1e4],[900,384400],[1600,55e6],[3000,588e6],[5000,1.2e9],[8000,2.6e9],[12000,4.3e9],[18000,2e10]];
+const SPACE_ZONAS=[[0,"Troposfera"],[40,"Estratosfera"],[100,"Mesosfera"],[160,"Termosfera"],[330,"Exosfera"],[520,"Espaço sideral"],[900,"Lua",1],[1600,"Marte",1],[3000,"Júpiter",1],[5000,"Saturno",1],[8000,"Urano",1],[12000,"Netuno",1],[18000,"Espaço profundo"]];
+function spaceKm(p){p=Math.max(0,+p||0);const R=SPACE_ROTA,U=R[R.length-1];if(p>U[0])return U[1]*p/U[0];for(let i=1;i<R.length;i++){const [p0,k0]=R[i-1],[p1,k1]=R[i];if(p<=p1||i==R.length-1){const t=(p-p0)/(p1-p0);return i<=4?k0+(k1-k0)*t:k0*Math.pow(k1/k0,t)}}}
+function spaceFmt(p){const k=spaceKm(p),n=(x,d)=>x.toLocaleString("pt-BR",{maximumFractionDigits:d,minimumFractionDigits:0});
+ if(k<1e3)return n(Math.round(k),0)+" km";if(k<1e6)return n(Math.round(k/1e3),0)+" mil km";if(k<1e9){const m=k/1e6;return n(m,m<10?1:0)+(m<2?" milhão":" milhões")+" de km"}
+ const b=k/1e9;return n(b,b<10?1:0)+(b<2?" bilhão":" bilhões")+" de km"}
+function spaceZona(p){let z=SPACE_ZONAS[0];for(const x of SPACE_ZONAS)if(p>=x[0]*(x[2]?.96:1))z=x;return z[1]}
 /* ===== EQUILÍBRIO DO BIP (modo turma): minutos de jogo ativo por jogo, últimos 7 dias =====
    tempo = {d:{dia:{jogo:segundos}}, vez:{dia:segundos no "jogo da vez"}, eq:{bloq:{jogo:{falta}}, cred:{jogo:segundos}, t}}
    Um jogo com mais de EQ_LIM do tempo da semana "descansa" até o aluno jogar EQ_DESC nos jogos abaixo da média;
    depois ganha EQ_CRED de folga. Os 2 jogos menos jogados são os "jogos da vez": +1 Bipcoin por minuto (até VEZ_DIA). */
-const JOGOS=["robo","academia","runner","snake","defesa","bomber"];
-const NOME_JOGO={robo:"Robô Programador",academia:"Academia do Bip",runner:"Bip Runner",snake:"Bip Snake",defesa:"Bip Defesa",bomber:"Bip Bomber"};
+const JOGOS=["robo","academia","runner","snake","defesa","bomber","space"];
+const NOME_JOGO={robo:"Robô Programador",academia:"Academia do Bip",runner:"Bip Runner",snake:"Bip Snake",defesa:"Bip Defesa",bomber:"Bip Bomber",space:"Bip Space"};
 const EQ_MIN=20*60,EQ_LIM=.35,EQ_DESC=6*60,EQ_CRED=8*60,VEZ_DIA=20;
 const tempoKey=pid=>"bipsite-tempo:"+pid;
 const diaDe=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
@@ -334,7 +347,7 @@ function mergeTempo(a,b){if(!a)return b;if(!b)return a;const d={};for(const s of
    vezAtual:Math.max(+fa.vezAtual||0,+fb.vezAtual||0),vezSeg:Math.max(+fa.vezSeg||0,+fb.vezSeg||0),vez:((fa.vez||{}).dia||"")>=((fb.vez||{}).dia||"")?fa.vez:fb.vez}:(String(fa.id)>String(fb.id)?fa:fb);
  const r={d,vez,eq:(((a.eq||{}).t||0)>=((b.eq||{}).t||0)?a.eq:b.eq)||{}};if(foco)r.foco=foco;return r}
 /* ===== MODO FOCO (o professor liga por turma): cada aula da Academia ou fase NOVA do Robô dá ⚡2;
-   cada partida de jogo rápido (Runner, Snake, Defesa, Bomber) gasta ⚡1. Sem limite: quanto mais aulas, mais energia.
+   cada partida de jogo rápido (Runner, Snake, Defesa, Bomber, Space) gasta ⚡1. Sem limite: quanto mais aulas, mais energia.
    A energia não fica guardada como número: é (aulas+fases concluídas desde que o Foco foi ligado) × 2 − partidas jogadas.
    tempo.foco = {id: quando o professor ligou, base: aulas+fases que o aluno já tinha, gasto: partidas} */
 /* lista das fases do Robô e das aulas da Academia (o build preenche): para saber o que falta e quem terminou tudo */
@@ -345,7 +358,7 @@ function progressoAulas(robo,acad){const st=(robo&&robo.stars)||{},dn=new Set((a
 /* para onde mandar o aluno ganhar energia: aula nova da Academia > fase nova do Robô > revisão */
 function focoAlvo(pid){const p=progressoAulas(ls("robo4:"+pid),ls("academia-bip-3d-v1:"+pid));
  return p.faltaAcad?{jogo:"academia",txt:"Fazer uma aula"}:p.faltaRobo?{jogo:"robo",txt:"Fazer uma fase do Robô"}:{jogo:"academia",txt:"Revisar uma aula"}}
-const FOCO_AULA=2,FOCO_REV=1,FOCO_REV_DIAS=7,JOGOS_RAPIDOS=["runner","snake","defesa","bomber"],FOCO_CANSADO=.4,FOCO_MIN=15*60,FOCO_VOLTA=180;
+const FOCO_AULA=2,FOCO_REV=1,FOCO_REV_DIAS=7,JOGOS_RAPIDOS=["runner","snake","defesa","bomber","space"],FOCO_CANSADO=.4,FOCO_MIN=15*60,FOCO_VOLTA=180;
 /* para o aluno aprender TODOS os jogos, o preço muda: o jogo rápido que ele menos jogou na semana é o "⭐ jogo da vez"
    (custa ⚡1, mas a cada 3 min jogando de verdade a energia volta: na prática é de graça para quem se esforça);
    o jogo que passou de 40% do tempo dele nos jogos rápidos da semana fica "cansado" e custa ⚡2. */
@@ -750,7 +763,7 @@ const ICON=(()=>{const SZ=160;let R=null,scene,cam,P,arc,props,ok=null;const cac
   if(fila.length)requestAnimationFrame(proximo);else rodando=false}
  return {item:(id,look,cb)=>pedir("i:"+id,look,l=>fazItem(id,l),cb),pose:(n,look,cb)=>pedir("p:"+n,look,l=>fazPose(n,l),cb),ok:()=>init()}})();
 
-return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,BOMB_DIA,ganhosBomber,bomberBest,bomberDec,CONTEUDO,progressoAulas,focoAlvo,focoAula,focoAviso,FOCO_REV,FOCO_REV_DIAS,FOCO_AULA,JOGOS_RAPIDOS,FOCO_CANSADO,FOCO_MIN,FOCO_VOLTA,precos,focoConta,concluidas,focoDe,energia,focoGasta,focoMostra,JOGOS,NOME_JOGO,EQ_MIN,EQ_LIM,EQ_DESC,EQ_CRED,VEZ_DIA,tempoKey,diaDe,tempo7,ganhosVez,mergeTempo,equilibrio,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
+return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,BOMB_DIA,ganhosBomber,bomberBest,bomberDec,SPACE_DIA,ganhosSpace,spaceBest,SPACE_ROTA,SPACE_ZONAS,spaceKm,spaceFmt,spaceZona,CONTEUDO,progressoAulas,focoAlvo,focoAula,focoAviso,FOCO_REV,FOCO_REV_DIAS,FOCO_AULA,JOGOS_RAPIDOS,FOCO_CANSADO,FOCO_MIN,FOCO_VOLTA,precos,focoConta,concluidas,focoDe,energia,focoGasta,focoMostra,JOGOS,NOME_JOGO,EQ_MIN,EQ_LIM,EQ_DESC,EQ_CRED,VEZ_DIA,tempoKey,diaDe,tempo7,ganhosVez,mergeTempo,equilibrio,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
  faceTex,eyePreview,buildBody,dress,tick,setMood,glowTex,face2d,patTex,ICON}})();
 </script>
 <script>window.BIP_CFG={"url": "https://plxnximnaphzcfoazbpk.supabase.co", "key": "sb_publishable_wUTEKu_akkP0lR2uDm44vQ_i2rrtHPn"};</script>
@@ -893,7 +906,7 @@ function stat(a){const pg=a.progresso||{},r=pg.robo||{},ac=pg.academia||{},lj=pg
  const owned=Array.isArray(lj.owned)?lj.owned:[],ganhos=BIPV.ganhos(r,ac,ru),gastos=BIPV.gasto(owned,lj.kits);
  const dias=a.ultimo_acesso?(Date.now()-new Date(a.ultimo_acesso))/864e5:Infinity;
  return {a,feitas,done,fases:feitas.size,est,aulas:done.size,ativ:feitas.size+done.size,ganhos,gastos,saldo:ganhos-gastos,itens:owned.filter(id=>!BIPV.gratis(id)).length,look:lj.look||{},dias,
-  run:+((ru.best||{}).tabuada)||0,run2:+((ru.best||{}).somasub)||0,runs:+ru.runs||0,rerr:ru.err||{},rtot:["tabuada","somasub"].reduce((o,k)=>{const t=(ru.tot||{})[k]||{};o.ok+=+t.ok||0;o.bad+=+t.bad||0;return o},{ok:0,bad:0}),snake:BIPV.snakeBest(ru),sruns:+ru.sruns||0,defesa:BIPV.defesaBest(ru),dfx:BIPV.defesaDec(BIPV.defesaBest(ru)),druns:+ru.druns||0,bomber:BIPV.bomberBest(ru),bfx:BIPV.bomberDec(BIPV.bomberBest(ru)),bruns:+ru.bruns||0,best_:+((ru.bmeta||{}).est)||0,
+  run:+((ru.best||{}).tabuada)||0,run2:+((ru.best||{}).somasub)||0,runs:+ru.runs||0,rerr:ru.err||{},rtot:["tabuada","somasub"].reduce((o,k)=>{const t=(ru.tot||{})[k]||{};o.ok+=+t.ok||0;o.bad+=+t.bad||0;return o},{ok:0,bad:0}),snake:BIPV.snakeBest(ru),sruns:+ru.sruns||0,defesa:BIPV.defesaBest(ru),dfx:BIPV.defesaDec(BIPV.defesaBest(ru)),druns:+ru.druns||0,bomber:BIPV.bomberBest(ru),bfx:BIPV.bomberDec(BIPV.bomberBest(ru)),bruns:+ru.bruns||0,best_:+((ru.bmeta||{}).est)||0,space:BIPV.spaceBest(ru),xruns:+ru.xruns||0,xtot:Object.assign({ok:0,bad:0},(ru.tot||{}).space||{}),
   t7:BIPV.tempo7(ru.tempo),eq:BIPV.equilibrio(ru.tempo),concl:BIPV.concluidas(r,ac),mestre:BIPV.progressoAulas(r,ac).mestre,fo:(ru.tempo||{}).foco||null}}
 /* energia do Modo foco de um aluno (só vale se ele já entrou com o foco ligado desta vez) */
 function energiaDe(S){if(!turma||!turma.foco||!S.fo||String(S.fo.id)!=String(turma.foco_em))return null;const g=BIPV.FOCO_AULA*Math.max(0,S.concl-(+S.fo.base||0))+(+S.fo.bonus||0),x=+S.fo.gasto||0,v=+S.fo.volta||0;return {g,x,v,tem:g-x+v}}
@@ -911,7 +924,8 @@ const CRIT={
  run2:{n:"Runner + e −",v:S=>S.run2,tie:S=>S.runs,fmt:S=>`${nf(S.run2)} pontos`,note:"Recorde de cada aluno no Bip Runner, trilha de adição e subtração."},
  snake:{n:"Bip Snake",v:S=>S.snake,tie:S=>S.sruns,fmt:S=>pl(S.snake,"vagão","vagões"),note:"Maior trem de cada aluno no Bip Snake (o melhor entre os modos Misturado, Só regras e Só contas)."},
  defesa:{n:"Bip Defesa",v:S=>S.defesa,tie:S=>S.druns,fmt:S=>`onda ${S.dfx.onda} · ${nf(S.dfx.pts)} pts`,note:"Até onde cada aluno chegou no Bip Defesa (as ondas não acabam e ficam cada vez mais difíceis). Empate na onda: ganha quem fez mais pontos. Os pontos vêm dos Bugs destruídos e das contas certas no Poder do Bip."},
- bomber:{n:"Bip Bomber",v:S=>S.bomber,tie:S=>S.bruns,fmt:S=>`arena ${S.bfx.arena} · ${nf(S.bfx.pts)} pts`,note:"Quantas arenas cada aluno venceu seguidas no Bip Bomber (as arenas não acabam). Empate: ganha quem fez mais pontos. Só destrói caixas e robôs quem escolhe a bomba certa (o número tem que ser múltiplo)."}};
+ bomber:{n:"Bip Bomber",v:S=>S.bomber,tie:S=>S.bruns,fmt:S=>`arena ${S.bfx.arena} · ${nf(S.bfx.pts)} pts`,note:"Quantas arenas cada aluno venceu seguidas no Bip Bomber (as arenas não acabam). Empate: ganha quem fez mais pontos. Só destrói caixas e robôs quem escolhe a bomba certa (o número tem que ser múltiplo)."},
+ space:{n:"Bip Space",v:S=>S.space,tie:S=>S.xruns,fmt:S=>`${BIPV.spaceFmt(S.space)} · ${BIPV.spaceZona(S.space)}`,note:"Altitude máxima que o foguete de cada aluno alcançou no Bip Space. O combustível só se mantém acertando contas (tabuada ou adição e subtração): quem acerta mais e mais rápido sai da atmosfera e chega aos planetas."}};
 function ranking(c){const R=SS.slice().sort((x,y)=>c.v(y)-c.v(x)||c.tie(y)-c.tie(x)||x.a.apelido.localeCompare(y.a.apelido,"pt-BR"));
  R.forEach((S,i)=>{const P=R[i-1];S.pos=P&&c.v(S)==c.v(P)&&c.tie(S)==c.tie(P)?P.pos:i+1});return R}
 function rankHTML(c,max){const R=ranking(c),top=R.filter(S=>c.v(S)>0),zero=R.filter(S=>c.v(S)<=0);
@@ -937,8 +951,8 @@ $("bTelao").onclick=openTelao;
 
 /* ---- planilha (abre no Excel e no Google Planilhas) ---- */
 $("bCsv").onclick=()=>{const R=ranking(CRIT.ativ),q=v=>{v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
- const L=[["Posição","Apelido","Fases do Robô","Estrelas","Aulas da Academia","Atividades","Recorde no Bip Runner","Corridas no Bip Runner","Recorde no Bip Snake (vagões)","Partidas no Bip Snake","Bip Defesa: onda alcançada","Bip Defesa: pontos","Partidas no Bip Defesa","Bip Bomber: arenas vencidas","Bip Bomber: pontos","Bip Bomber: estrelas","Partidas no Bip Bomber","Bipcoins ganhos","Bipcoins gastos","Saldo de Bipcoins","Itens comprados","Último acesso"],
-  ...R.map(S=>[S.pos,S.a.apelido,S.fases,S.est,S.aulas,S.ativ,S.run,S.runs,S.snake,S.sruns,S.dfx.onda,S.dfx.pts,S.druns,S.bfx.arena,S.bfx.pts,S.best_,S.bruns,S.ganhos,S.gastos,S.saldo,S.itens,S.a.ultimo_acesso?new Date(S.a.ultimo_acesso).toLocaleString("pt-BR"):"nunca"])].map(r=>r.map(q).join(";"));
+ const L=[["Posição","Apelido","Fases do Robô","Estrelas","Aulas da Academia","Atividades","Recorde no Bip Runner","Corridas no Bip Runner","Recorde no Bip Snake (vagões)","Partidas no Bip Snake","Bip Defesa: onda alcançada","Bip Defesa: pontos","Partidas no Bip Defesa","Bip Bomber: arenas vencidas","Bip Bomber: pontos","Bip Bomber: estrelas","Partidas no Bip Bomber","Bip Space: altitude máxima","Bip Space: até onde chegou","Decolagens no Bip Space","Bipcoins ganhos","Bipcoins gastos","Saldo de Bipcoins","Itens comprados","Último acesso"],
+  ...R.map(S=>[S.pos,S.a.apelido,S.fases,S.est,S.aulas,S.ativ,S.run,S.runs,S.snake,S.sruns,S.dfx.onda,S.dfx.pts,S.druns,S.bfx.arena,S.bfx.pts,S.best_,S.bruns,S.space?BIPV.spaceFmt(S.space):"",S.space?BIPV.spaceZona(S.space):"",S.xruns,S.ganhos,S.gastos,S.saldo,S.itens,S.a.ultimo_acesso?new Date(S.a.ultimo_acesso).toLocaleString("pt-BR"):"nunca"])].map(r=>r.map(q).join(";"));
  const u=URL.createObjectURL(new Blob(["﻿"+L.join("\r\n")],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");
  a.href=u;a.download=`mundo-do-bip_${turma.nome.replace(/[^\p{L}\p{N}]+/gu,"-")}_${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000)};
 
@@ -948,7 +962,7 @@ function showTab(t){tab=t;ls.set("bipsite-prof-tab",t);document.querySelectorAll
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
 /* ---- tabela de alunos (ordenável) ---- */
-const COLS=[["apelido","Aluno"],["fases","Robô Programador"],["aulas","Academia do Bip"],["run","Bip Runner"],["snake","Bip Snake"],["defesa","Bip Defesa"],["bomber","Bip Bomber"],["saldo","Bipcoins"],["itens","Loja"],["dias","Último acesso"],[null,"Ações"]];
+const COLS=[["apelido","Aluno"],["fases","Robô Programador"],["aulas","Academia do Bip"],["run","Bip Runner"],["snake","Bip Snake"],["defesa","Bip Defesa"],["bomber","Bip Bomber"],["space","Bip Space"],["saldo","Bipcoins"],["itens","Loja"],["dias","Último acesso"],[null,"Ações"]];
 $("thead").onclick=e=>{const b=e.target.closest("[data-sort]");if(!b)return;const k=b.dataset.sort;sortK=[k,sortK[0]==k?-sortK[1]:(k=="apelido"||k=="dias"?1:-1)];drawTable()};
 function drawTable(){const [k,d]=sortK,n=SS.length;
  $("thead").innerHTML=COLS.map(([c,l])=>c?`<th aria-sort="${c==k?(d>0?"ascending":"descending"):"none"}"><button data-sort="${c}"${c==k?` data-dir="${d>0?"▲":"▼"}"`:""}>${l}</button></th>`:`<th>${l}</th>`).join("");
@@ -964,10 +978,11 @@ function drawTable(){const [k,d]=sortK,n=SS.length;
    <td>${S.sruns?`${pl(S.snake,"vagão","vagões")}<span class="sub">${pl(S.sruns,"partida","partidas")}</span>`:'<span class="sub">ainda não jogou</span>'}</td>
    <td>${S.druns?`onda ${S.dfx.onda}<span class="sub">${nf(S.dfx.pts)} pts · ${pl(S.druns,"partida","partidas")}</span>`:'<span class="sub">ainda não jogou</span>'}</td>
    <td>${S.bruns?`arena ${S.bfx.arena}<span class="sub">${nf(S.bfx.pts)} pts · ${pl(S.bruns,"partida","partidas")}</span>`:'<span class="sub">ainda não jogou</span>'}</td>
+   <td>${S.xruns?`${BIPV.spaceFmt(S.space)}<span class="sub">${BIPV.spaceZona(S.space)} · ${pl(S.xruns,"decolagem","decolagens")}</span>`:'<span class="sub">ainda não jogou</span>'}</td>
    <td><span class="coinv">${COIN}${nf(S.saldo)}</span><span class="sub">ganhou ${nf(S.ganhos)} · gastou ${nf(S.gastos)}</span></td>
    <td>${pl(S.itens,"item","itens")}</td>
    <td><span class="dot${on?" on":""}"></span>${ago(a.ultimo_acesso)}</td><td>${acts}</td></tr>`}).join("")
-  :`<tr><td colspan="11" class="empty">Nenhum aluno ainda. Passe o código <b>${fmtCode(turma.codigo)}</b> para a turma.</td></tr>`}
+  :`<tr><td colspan="12" class="empty">Nenhum aluno ainda. Passe o código <b>${fmtCode(turma.codigo)}</b> para a turma.</td></tr>`}
 
 /* ---- por atividade: até onde cada aluno chegou e onde a turma está agora ---- */
 function drawAtiv(){const n=SS.length;if(!n){$("tabAtiv").innerHTML='<p class="empty">Os gráficos aparecem quando os alunos começarem a jogar.</p>';return}
@@ -1010,7 +1025,7 @@ function drawAten(){const v=SS.map(S=>S.ativ).sort((x,y)=>x-y),med=v.length?v[Ma
   :'<p class="empty">Ninguém precisa de atenção agora. 🎉</p>'}
 
 /* ---- tempo de jogo: minutos jogados em cada jogo nos últimos 7 dias (o Equilíbrio do Bip age sozinho) ---- */
-const CORJ={robo:"#3b82f6",academia:"#8b5cf6",runner:"#f97316",snake:"#22c55e",defesa:"#ec4899",bomber:"#eab308"};
+const CORJ={robo:"#3b82f6",academia:"#8b5cf6",runner:"#f97316",snake:"#22c55e",defesa:"#ec4899",bomber:"#eab308",space:"#06b6d4"};
 const mins=s=>Math.round((+s||0)/60);
 function drawTempo(){const J=BIPV.JOGOS,n=SS.length;
  const leg=`<div class="legend">${J.map(g=>`<span><i style="background:${CORJ[g]}"></i>${BIPV.NOME_JOGO[g]}</span>`).join("")}</div>`;

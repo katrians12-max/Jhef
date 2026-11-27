@@ -8,7 +8,7 @@ const BONUS=100,POR_AULA=50,POR_FASE=10,POR_ESTRELA=5;
 const ls=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 /* quanto o aluno já ganhou: sempre calculado a partir do progresso (não dá para duplicar) */
 function ganhos(robo,acad,run){let c=BONUS;const st=(robo&&robo.stars)||{};for(const k in st){const s=+st[k]||0;if(s>0)c+=POR_FASE+POR_ESTRELA*Math.min(3,s)}
- c+=((acad&&acad.done)||[]).length*POR_AULA;return c+ganhosRunner(run)+ganhosSnake(run)+ganhosDefesa(run)+ganhosBomber(run)+ganhosVez(run&&run.tempo)}
+ c+=((acad&&acad.done)||[]).length*POR_AULA;return c+ganhosRunner(run)+ganhosSnake(run)+ganhosDefesa(run)+ganhosBomber(run)+ganhosSpace(run)+ganhosVez(run&&run.tempo)}
 /* Bip Runner: o jogo guarda quanto rendeu em cada dia; cada dia vale no máximo RUN_DIA */
 const RUN_DIA=60,runKey=pid=>"bipsite-runner:"+pid;
 function ganhosRunner(run){let c=0;const m=(run&&run.coins)||{};for(const k in m)c+=Math.max(0,Math.min(RUN_DIA,Math.floor(+m[k]||0)));return c}
@@ -28,12 +28,25 @@ const BOMB_DIA=60;
 function ganhosBomber(run){let c=0;const m=(run&&run.bcoins)||{};for(const k in m)c+=Math.max(0,Math.min(BOMB_DIA,Math.floor(+m[k]||0)));return c}
 const bomberBest=run=>+(((run&&run.best)||{}).bomber)||0;
 const bomberDec=v=>({arena:Math.floor((+v||0)/100000),pts:(+v||0)%100000});
+/* Bip Space: também na chave do Runner. best.space = altitude máxima na unidade do jogo (p); xruns = decolagens;
+   xcoins = Bipcoins do dia (no máximo SPACE_DIA); tot.space = {ok,bad} contas certas e erradas.
+   SPACE_ROTA converte p em km de verdade (camadas da atmosfera e distâncias dos planetas). */
+const SPACE_DIA=60;
+function ganhosSpace(run){let c=0;const m=(run&&run.xcoins)||{};for(const k in m)c+=Math.max(0,Math.min(SPACE_DIA,Math.floor(+m[k]||0)));return c}
+const spaceBest=run=>+(((run&&run.best)||{}).space)||0;
+const SPACE_ROTA=[[0,0],[40,12],[100,50],[160,85],[330,600],[520,1e4],[900,384400],[1600,55e6],[3000,588e6],[5000,1.2e9],[8000,2.6e9],[12000,4.3e9],[18000,2e10]];
+const SPACE_ZONAS=[[0,"Troposfera"],[40,"Estratosfera"],[100,"Mesosfera"],[160,"Termosfera"],[330,"Exosfera"],[520,"Espaço sideral"],[900,"Lua",1],[1600,"Marte",1],[3000,"Júpiter",1],[5000,"Saturno",1],[8000,"Urano",1],[12000,"Netuno",1],[18000,"Espaço profundo"]];
+function spaceKm(p){p=Math.max(0,+p||0);const R=SPACE_ROTA,U=R[R.length-1];if(p>U[0])return U[1]*p/U[0];for(let i=1;i<R.length;i++){const [p0,k0]=R[i-1],[p1,k1]=R[i];if(p<=p1||i==R.length-1){const t=(p-p0)/(p1-p0);return i<=4?k0+(k1-k0)*t:k0*Math.pow(k1/k0,t)}}}
+function spaceFmt(p){const k=spaceKm(p),n=(x,d)=>x.toLocaleString("pt-BR",{maximumFractionDigits:d,minimumFractionDigits:0});
+ if(k<1e3)return n(Math.round(k),0)+" km";if(k<1e6)return n(Math.round(k/1e3),0)+" mil km";if(k<1e9){const m=k/1e6;return n(m,m<10?1:0)+(m<2?" milhão":" milhões")+" de km"}
+ const b=k/1e9;return n(b,b<10?1:0)+(b<2?" bilhão":" bilhões")+" de km"}
+function spaceZona(p){let z=SPACE_ZONAS[0];for(const x of SPACE_ZONAS)if(p>=x[0]*(x[2]?.96:1))z=x;return z[1]}
 /* ===== EQUILÍBRIO DO BIP (modo turma): minutos de jogo ativo por jogo, últimos 7 dias =====
    tempo = {d:{dia:{jogo:segundos}}, vez:{dia:segundos no "jogo da vez"}, eq:{bloq:{jogo:{falta}}, cred:{jogo:segundos}, t}}
    Um jogo com mais de EQ_LIM do tempo da semana "descansa" até o aluno jogar EQ_DESC nos jogos abaixo da média;
    depois ganha EQ_CRED de folga. Os 2 jogos menos jogados são os "jogos da vez": +1 Bipcoin por minuto (até VEZ_DIA). */
-const JOGOS=["robo","academia","runner","snake","defesa","bomber"];
-const NOME_JOGO={robo:"Robô Programador",academia:"Academia do Bip",runner:"Bip Runner",snake:"Bip Snake",defesa:"Bip Defesa",bomber:"Bip Bomber"};
+const JOGOS=["robo","academia","runner","snake","defesa","bomber","space"];
+const NOME_JOGO={robo:"Robô Programador",academia:"Academia do Bip",runner:"Bip Runner",snake:"Bip Snake",defesa:"Bip Defesa",bomber:"Bip Bomber",space:"Bip Space"};
 const EQ_MIN=20*60,EQ_LIM=.35,EQ_DESC=6*60,EQ_CRED=8*60,VEZ_DIA=20;
 const tempoKey=pid=>"bipsite-tempo:"+pid;
 const diaDe=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
@@ -47,7 +60,7 @@ function mergeTempo(a,b){if(!a)return b;if(!b)return a;const d={};for(const s of
    vezAtual:Math.max(+fa.vezAtual||0,+fb.vezAtual||0),vezSeg:Math.max(+fa.vezSeg||0,+fb.vezSeg||0),vez:((fa.vez||{}).dia||"")>=((fb.vez||{}).dia||"")?fa.vez:fb.vez}:(String(fa.id)>String(fb.id)?fa:fb);
  const r={d,vez,eq:(((a.eq||{}).t||0)>=((b.eq||{}).t||0)?a.eq:b.eq)||{}};if(foco)r.foco=foco;return r}
 /* ===== MODO FOCO (o professor liga por turma): cada aula da Academia ou fase NOVA do Robô dá ⚡2;
-   cada partida de jogo rápido (Runner, Snake, Defesa, Bomber) gasta ⚡1. Sem limite: quanto mais aulas, mais energia.
+   cada partida de jogo rápido (Runner, Snake, Defesa, Bomber, Space) gasta ⚡1. Sem limite: quanto mais aulas, mais energia.
    A energia não fica guardada como número: é (aulas+fases concluídas desde que o Foco foi ligado) × 2 − partidas jogadas.
    tempo.foco = {id: quando o professor ligou, base: aulas+fases que o aluno já tinha, gasto: partidas} */
 /* lista das fases do Robô e das aulas da Academia (o build preenche): para saber o que falta e quem terminou tudo */
@@ -58,7 +71,7 @@ function progressoAulas(robo,acad){const st=(robo&&robo.stars)||{},dn=new Set((a
 /* para onde mandar o aluno ganhar energia: aula nova da Academia > fase nova do Robô > revisão */
 function focoAlvo(pid){const p=progressoAulas(ls("robo4:"+pid),ls("academia-bip-3d-v1:"+pid));
  return p.faltaAcad?{jogo:"academia",txt:"Fazer uma aula"}:p.faltaRobo?{jogo:"robo",txt:"Fazer uma fase do Robô"}:{jogo:"academia",txt:"Revisar uma aula"}}
-const FOCO_AULA=2,FOCO_REV=1,FOCO_REV_DIAS=7,JOGOS_RAPIDOS=["runner","snake","defesa","bomber"],FOCO_CANSADO=.4,FOCO_MIN=15*60,FOCO_VOLTA=180;
+const FOCO_AULA=2,FOCO_REV=1,FOCO_REV_DIAS=7,JOGOS_RAPIDOS=["runner","snake","defesa","bomber","space"],FOCO_CANSADO=.4,FOCO_MIN=15*60,FOCO_VOLTA=180;
 /* para o aluno aprender TODOS os jogos, o preço muda: o jogo rápido que ele menos jogou na semana é o "⭐ jogo da vez"
    (custa ⚡1, mas a cada 3 min jogando de verdade a energia volta: na prática é de graça para quem se esforça);
    o jogo que passou de 40% do tempo dele nos jogos rápidos da semana fica "cansado" e custa ⚡2. */
@@ -463,5 +476,5 @@ const ICON=(()=>{const SZ=160;let R=null,scene,cam,P,arc,props,ok=null;const cac
   if(fila.length)requestAnimationFrame(proximo);else rodando=false}
  return {item:(id,look,cb)=>pedir("i:"+id,look,l=>fazItem(id,l),cb),pose:(n,look,cb)=>pedir("p:"+n,look,l=>fazPose(n,l),cb),ok:()=>init()}})();
 
-return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,BOMB_DIA,ganhosBomber,bomberBest,bomberDec,CONTEUDO,progressoAulas,focoAlvo,focoAula,focoAviso,FOCO_REV,FOCO_REV_DIAS,FOCO_AULA,JOGOS_RAPIDOS,FOCO_CANSADO,FOCO_MIN,FOCO_VOLTA,precos,focoConta,concluidas,focoDe,energia,focoGasta,focoMostra,JOGOS,NOME_JOGO,EQ_MIN,EQ_LIM,EQ_DESC,EQ_CRED,VEZ_DIA,tempoKey,diaDe,tempo7,ganhosVez,mergeTempo,equilibrio,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
+return {BONUS,POR_AULA,POR_FASE,POR_ESTRELA,RUN_DIA,SNAKE_DIA,DEF_DIA,runKey,ganhosRunner,ganhosSnake,snakeBest,ganhosDefesa,defesaBest,defesaDec,BOMB_DIA,ganhosBomber,bomberBest,bomberDec,SPACE_DIA,ganhosSpace,spaceBest,SPACE_ROTA,SPACE_ZONAS,spaceKm,spaceFmt,spaceZona,CONTEUDO,progressoAulas,focoAlvo,focoAula,focoAviso,FOCO_REV,FOCO_REV_DIAS,FOCO_AULA,JOGOS_RAPIDOS,FOCO_CANSADO,FOCO_MIN,FOCO_VOLTA,precos,focoConta,concluidas,focoDe,energia,focoGasta,focoMostra,JOGOS,NOME_JOGO,EQ_MIN,EQ_LIM,EQ_DESC,EQ_CRED,VEZ_DIA,tempoKey,diaDe,tempo7,ganhosVez,mergeTempo,equilibrio,ganhos,loja,salvarLoja,gasto,saldo,KITS,KIT,kitPreco,lojaKey,COIN,fmt,RAR,CATS,ITEMS,BYID,DEFAULT,gratis,destaque,
  faceTex,eyePreview,buildBody,dress,tick,setMood,glowTex,face2d,patTex,ICON}})();
